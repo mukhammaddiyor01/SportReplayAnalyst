@@ -19,8 +19,24 @@ li { padding-bottom: 12px; }
 .notice { border-left: 3px solid var(--accent); padding-left: 12px; font-size: .9rem; }
 footer { margin-top: 22px; font-size: .9rem; }
 button, input { font: inherit; }
-button, .file-button { background: var(--ink); color: var(--white); border: 0; border-radius: 5px; padding: 10px 14px; cursor: pointer; }
+button { background: var(--ink); color: var(--white); border: 0; border-radius: 5px; padding: 10px 14px; cursor: pointer; }
 button:disabled { opacity: .5; cursor: default; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
 [hidden] { display: none !important; }
 @media (max-width: 850px) { .workspace { grid-template-columns: 1fr; } .app-header { flex-wrap: wrap; } main { padding-top: 24px; } }
+
+.frame { position: relative; line-height: 0; }
+video { width: 100%; height: auto; display: block; }
+canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+.playback { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; }
+.playback input { flex: 1; min-width: 120px; }
+.file-input { display: block; width: 100%; font-size: .8rem; margin: 12px 0; }
+#clip-summary { overflow-wrap: anywhere; font-weight: 600; margin-top: 16px; }
+.hint, #geometry { font-size: .85rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+.quiet { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+#status { font-weight: 600; }
+details { font-size: .9rem; }
+summary { cursor: pointer; }
+#coordinate-form { display: grid; gap: 8px; padding-top: 12px; }
+#coordinate-form input { width: 100%; padding: 6px; }

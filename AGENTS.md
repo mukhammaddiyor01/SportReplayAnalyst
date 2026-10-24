@@ -5,7 +5,9 @@
 Build a local application for analyzing prerecorded table tennis video: ball
 observations and image-space tracks, estimated table contacts, and rally timing.
 The minimal application setup and bounded local video reader are implemented.
-The current stage adds manual table calibration and verifies coordinate handling.
+Manual frame calibration is implemented and clears when playback or seeking changes
+the frame. No uploads or tracking exist yet. The next stage is isolated analysis
+jobs with progress, cancellation, and cleanup before accepting video uploads.
 Do not claim that tracking or event detection already works. Implement subsequent
 work in small, independently verified steps. Do not modify reference projects.
 Conversation is in Uzbek; code, interface, comments, and documentation are English.

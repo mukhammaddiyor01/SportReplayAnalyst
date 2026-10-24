@@ -5,7 +5,8 @@ FastAPI, Jinja2, and plain browser JavaScript.
 
 ## Current stage
 
-The application shell and bounded local video reader are implemented. Ball
+The application shell, bounded local video reader, and manual frame calibration
+are implemented. Ball
 tracking, table-contact estimation, rally timing, and uploads are not implemented. No analysis results are fabricated.
 
 ## Run locally
@@ -15,10 +16,10 @@ Use Python 3.12. Install dependencies in this project's own environment:
 ```bash
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements-dev.txt
-.venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+.venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8014
 ```
 
-Open http://127.0.0.1:8000. Do not expose this development server publicly.
+Open http://127.0.0.1:8014. Do not expose this development server publicly.
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
@@ -52,3 +53,22 @@ The final frame timestamp is not the container's total playback duration.
 
 The CLI runs locally outside HTTP. No video upload or analysis endpoint exists.
 See docs/video-inspection.md for the real-clip evidence and remaining limits.
+
+## Prepare and calibrate a clip
+
+1. Choose a local browser-playable video. Playback does not upload the video.
+2. Pause at a clear frame and select the four table corners clockwise from the
+   upper-left, using the video or numeric source-coordinate controls.
+3. Select **Check calibration**. Only corners and source dimensions go to the
+   local server. It validates a convex, sufficiently large quadrilateral and
+   computes a table-plane homography to a unit square.
+4. Playback, seeking, removing, or replacing the clip clears the frame calibration.
+   Undoing a corner also invalidates the previous geometry check.
+
+The browser checks size, duration, and resolution; it does not reliably expose
+source FPS. Run the separate local inspection command to validate all frames
+and FPS. Browser preparation is not admission to an analysis job.
+The calibration response has no persistent identifier and is not saved. It is
+valid only for the selected frame; camera drift has not been evaluated. A unit
+square describes the table plane, not physical distances or airborne positions.
+Background jobs, uploads, and ball analysis remain later stages.

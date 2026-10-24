@@ -5,16 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sports Replay Analyst</title>
   <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+  <script src="{{ url_for('static', path='/js/workspace.js') }}" defer></script>
 </head>
 <body>
   <header class="app-header"><a href="/" class="brand">Sports Replay Analyst</a><span>Local video workspace</span></header>
   <main>
-    <section class="intro"><h1>Start with the table.</h1><p>Prepare a single fixed-camera clip before tracing the ball.</p></section>
+    <section class="intro"><h1>Start with the table.</h1><p>Review your clip and mark the playing surface before tracing the ball.</p></section>
     <div class="workspace">
-      <section class="viewer" aria-label="Video workspace"><div class="empty-view"><h2>No video loaded</h2><p>Video preparation is the next step.</p></div></section>
-      <aside class="preparation"><h2>Prepare your clip</h2><p>Use a stationary camera with the entire playing surface visible.</p><ol><li>Review the video.</li><li>Mark the four table corners.</li><li>Check calibration before analysis.</li></ol><p class="notice">Tracking, table contacts, and rally analysis are not available yet.</p></aside>
+      <section class="viewer" aria-label="Video workspace">
+        <div id="empty" class="empty-view"><h2>No video loaded</h2><p>Choose a local clip to inspect the table.</p></div>
+        <div id="media" hidden><div class="frame"><video id="video" preload="metadata" playsinline aria-label="Table tennis replay"></video><canvas id="corners" aria-label="Select table corners; numeric controls are also available below"></canvas></div><div class="playback"><button id="toggle-play" type="button">Play</button><label for="seek">Video position</label><input id="seek" type="range" min="0" max="1" step="0.001" value="0"><output id="time">0.000 s</output></div></div>
+      </section>
+      <aside class="preparation">
+        <h2>Prepare your clip</h2>
+        <label for="clip">Choose local video</label>
+        <input id="clip" class="file-input" type="file" accept="video/mp4,video/webm,video/quicktime" data-max-bytes="{{ limits.max_bytes }}" data-max-duration="{{ limits.max_duration }}" data-max-width="{{ limits.max_width }}" data-max-height="{{ limits.max_height }}">
+        <p id="clip-summary">No video selected</p><p id="geometry"></p>
+        <p class="hint">Up to 100 MiB, 60 seconds, 1920 × 1080. FPS is checked separately by the local video reader.</p>
+        <h2>Mark the table</h2><p>Pause on a clear frame. Click four corners clockwise, starting at the upper-left.</p>
+        <ol id="corner-list" aria-label="Selected source coordinates"></ol>
+        <details><summary>Enter corners by keyboard</summary><form id="coordinate-form"><label for="corner-x">Source x (px)</label><input id="corner-x" type="number" min="0" step="any" required><label for="corner-y">Source y (px)</label><input id="corner-y" type="number" min="0" step="any" required><button type="submit">Add corner</button></form></details>
+        <div class="actions"><button id="undo" type="button" disabled>Undo corner</button><button id="confirm" type="button" disabled>Check calibration</button><button id="remove" class="quiet" type="button" disabled>Remove video</button></div>
+        <p id="status" role="status" aria-live="polite">Choose a local video to begin.</p>
+        <p class="notice">Calibration is for the selected frame only. Playback or seeking clears it. Tracking, contacts, and rally analysis are not available yet.</p>
+      </aside>
     </div>
-    <footer>Videos stay on this computer. No external AI services.</footer>
+    <footer>Playback stays in your browser. Only corner coordinates go to the local server when you check calibration. Nothing is saved.</footer>
   </main>
 </body>
 </html>

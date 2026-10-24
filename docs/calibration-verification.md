@@ -33,3 +33,19 @@ pointer click in the resized preview produced source coordinates (187.3, 84.6),
 consistent with the expected approximate (188, 84) click location. Removing the
 video cleared metadata and corners; selecting the same file again restored the
 preview without old corners. Seeking to the end also cleared selected corners.
+
+## Workspace redesign verification
+
+The replay desk layout was visually reviewed in the browser at desktop and
+narrow viewport settings, then the temporary viewport override was reset.
+The video surface and inspector sit side by side on desktop and stack on narrow
+screens. Narrow-layout DOM measurements showed no horizontal document overflow.
+
+The real local video was selected through the redesigned file control. Entering
+four source corners updated the visible count to 4 / 4; checking geometry returned
+the expected success message. Playback cleared the points, restored the empty
+corner hint and 0 / 4 count, and disabled calibration. Browser error/warning logs
+were empty during calibration. All 14 existing Python checks passed.
+
+No new tracking, contact, or rally behavior was introduced. Screenshots remain
+outside the repository because the loaded preview contains user-provided footage.

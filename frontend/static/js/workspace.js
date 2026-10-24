@@ -28,6 +28,8 @@ function resetCorners(message = "Pause on a clear frame and mark the table corne
 function renderCorners() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   cornerList.replaceChildren();
+  document.querySelector("#corner-count").textContent = `${points.length} / 4`;
+  document.querySelector("#corner-empty").hidden = points.length > 0;
   points.forEach(([x, y], index) => {
     const row = document.createElement("li");
     row.textContent = `Corner ${index + 1}: ${x.toFixed(1)}, ${y.toFixed(1)} px`;

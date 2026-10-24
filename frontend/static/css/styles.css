@@ -1,0 +1,26 @@
+/* Table blue anchors the workspace; orange marks user-selected geometry. */
+:root { color-scheme: light; --paper: #eef3f6; --ink: #183347; --table: #245e78; --line: #c4d1d9; --accent: #a74317; --white: #fff; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Avenir Next", "Segoe UI", sans-serif; line-height: 1.55; }
+a { color: inherit; }
+.app-header { padding: 20px 4vw; display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); }
+.brand { text-decoration: none; font-weight: 700; }
+main { max-width: 1500px; padding: 34px 4vw; margin: auto; }
+h1 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.1; letter-spacing: -.04em; margin: 0 0 12px; }
+h2 { font-size: 1.25rem; margin: 0 0 12px; }
+p { max-width: 65ch; margin: 0 0 18px; }
+.intro { margin-bottom: 28px; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 290px; align-items: start; background: var(--white); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.viewer { background: var(--table); color: var(--white); min-width: 0; }
+.empty-view { aspect-ratio: 16/9; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 24px; text-align: center; }
+.preparation { padding: 26px; }
+ol { padding-left: 20px; }
+li { padding-bottom: 12px; }
+.notice { border-left: 3px solid var(--accent); padding-left: 12px; font-size: .9rem; }
+footer { margin-top: 22px; font-size: .9rem; }
+button, input { font: inherit; }
+button, .file-button { background: var(--ink); color: var(--white); border: 0; border-radius: 5px; padding: 10px 14px; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+[hidden] { display: none !important; }
+@media (max-width: 850px) { .workspace { grid-template-columns: 1fr; } .app-header { flex-wrap: wrap; } main { padding-top: 24px; } }

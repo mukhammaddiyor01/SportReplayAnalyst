@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sports Replay Analyst</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+<body>
+  <header class="app-header"><a href="/" class="brand">Sports Replay Analyst</a><span>Local video workspace</span></header>
+  <main>
+    <section class="intro"><h1>Start with the table.</h1><p>Prepare a single fixed-camera clip before tracing the ball.</p></section>
+    <div class="workspace">
+      <section class="viewer" aria-label="Video workspace"><div class="empty-view"><h2>No video loaded</h2><p>Video preparation is the next step.</p></div></section>
+      <aside class="preparation"><h2>Prepare your clip</h2><p>Use a stationary camera with the entire playing surface visible.</p><ol><li>Review the video.</li><li>Mark the four table corners.</li><li>Check calibration before analysis.</li></ol><p class="notice">Tracking, table contacts, and rally analysis are not available yet.</p></aside>
+    </div>
+    <footer>Videos stay on this computer. No external AI services.</footer>
+  </main>
+</body>
+</html>

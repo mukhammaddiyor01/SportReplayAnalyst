@@ -7,7 +7,7 @@ FastAPI, Jinja2, and plain browser JavaScript.
 
 The application shell, bounded local video reader, and manual frame calibration
 are implemented. Ball
-tracking, table-contact estimation, rally timing, and uploads are not implemented. No analysis results are fabricated.
+tracking, table-contact estimation, and rally timing are not implemented. No analysis results are fabricated.
 
 ## Run locally
 
@@ -51,7 +51,8 @@ both checked. Premature EOF relative to declared frame count is rejected;
 OpenCV cannot distinguish every corrupt EOF when frame-count metadata is absent.
 The final frame timestamp is not the container's total playback duration.
 
-The CLI runs locally outside HTTP. No video upload or analysis endpoint exists.
+The CLI runs locally outside HTTP. Bounded local video inspection uploads are
+available through the inspection job API; this does not perform ball analysis.
 See docs/video-inspection.md for the real-clip evidence and remaining limits.
 
 ## Prepare and calibrate a clip
@@ -71,4 +72,14 @@ and FPS. Browser preparation is not admission to an analysis job.
 The calibration response has no persistent identifier and is not saved. It is
 valid only for the selected frame; camera drift has not been evaluated. A unit
 square describes the table plane, not physical distances or airborne positions.
-Background jobs, uploads, and ball analysis remain later stages.
+Background inspection jobs and bounded local uploads are available through the
+API; browser controls are the next increment. Ball analysis remains a later stage.
+
+## Background video inspection
+
+The app owns one spawned worker process at a time, with decoded-frame progress,
+cancellation, runtime limits, and private job storage. Completed copies/results
+expire after one hour; failed/cancelled copies are removed after the worker stops.
+Shutdown/restart ends the review session and removes orphaned job files. The
+original selected file is never deleted. Run a single Uvicorn worker.
+See docs/background-jobs.md for lifecycle, retention, and HTTP endpoints.

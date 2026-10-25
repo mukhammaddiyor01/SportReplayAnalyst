@@ -50,6 +50,7 @@ class Job:
     started: float | None = None
     cancel_requested: float | None = None
     terminated_at: float | None = None
+    upload_claimed: bool = False
     received_bytes: int = 0
     decoded_frames: int = 0
     timestamp_seconds: float | None = None
@@ -111,6 +112,13 @@ class JobManager:
         if job is None or not secrets.compare_digest(job.token.encode(), token.encode()):
             raise JobNotFound("Inspection not found or access expired.")
         return job
+
+    def claim_upload(self, identifier: str, token: str) -> None:
+        with self.lock:
+            job = self._get(identifier, token)
+            if job.status != "receiving" or job.upload_claimed:
+                raise JobBusy("This inspection already has a video transfer.")
+            job.upload_claimed = True
 
     def append(self, identifier: str, token: str, chunk: bytes) -> None:
         with self.lock:

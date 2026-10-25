@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from math import isfinite
 from pathlib import Path
-from typing import Iterator
+from typing import Callable, Iterator
 
 import cv2
 import numpy as np
@@ -78,7 +78,7 @@ def _validate_dimensions(width: float, height: float) -> None:
         raise VideoError("Video dimensions must be at most 1920 x 1080.")
 
 
-def inspect_video(path: Path) -> dict:
+def inspect_video(path: Path, *, on_frame: Callable[[int, float], None] | None = None) -> dict:
     count = 0
     fallback_count = 0
     first_time = None
@@ -94,6 +94,8 @@ def inspect_video(path: Path) -> dict:
         last_time = frame.timestamp_seconds
         fallback_count += frame.timestamp_source == "fps_fallback"
         count += 1
+        if on_frame is not None:
+            on_frame(count, frame.timestamp_seconds)
     return {"decoded_frames": count, "source_dimensions": dimensions,
             "first_timestamp_seconds": first_time, "last_timestamp_seconds": last_time,
             "largest_timestamp_gap_seconds": max_gap,

@@ -7,7 +7,9 @@ from typing import Callable, Iterator
 import cv2
 import numpy as np
 
-from backend.config import (MAX_DURATION_SECONDS, MAX_FPS, MAX_HEIGHT,
+from backend.adapters.camera_motion import CameraMotionEstimator
+from backend.services.camera_motion import summarize_motion
+from backend.config import (CAMERA_SAMPLE_INTERVAL_SECONDS, MAX_DURATION_SECONDS, MAX_FPS, MAX_HEIGHT,
                             MAX_VIDEO_BYTES, MAX_WIDTH)
 
 
@@ -85,10 +87,20 @@ def inspect_video(path: Path, *, on_frame: Callable[[int, float], None] | None =
     last_time = None
     max_gap = 0.0
     dimensions = None
+    motion_estimator = None
+    motion_samples = []
+    last_sample_time = None
+    last_sample_index = 0
     for frame in read_frames(path):
         if first_time is None:
             first_time = frame.timestamp_seconds
             dimensions = [frame.image.shape[1], frame.image.shape[0]]
+            motion_estimator = CameraMotionEstimator(frame.image)
+            last_sample_time = frame.timestamp_seconds
+        if frame.timestamp_seconds - last_sample_time >= CAMERA_SAMPLE_INTERVAL_SECONDS:
+            motion_samples.append(motion_estimator.measure(frame.image, frame.index, frame.timestamp_seconds))
+            last_sample_time = frame.timestamp_seconds
+            last_sample_index = frame.index
         if last_time is not None:
             max_gap = max(max_gap, frame.timestamp_seconds - last_time)
         last_time = frame.timestamp_seconds
@@ -96,8 +108,11 @@ def inspect_video(path: Path, *, on_frame: Callable[[int, float], None] | None =
         count += 1
         if on_frame is not None:
             on_frame(count, frame.timestamp_seconds)
+    if frame.index != last_sample_index:
+        motion_samples.append(motion_estimator.measure(frame.image, frame.index, frame.timestamp_seconds))
+    motion = summarize_motion(motion_samples, dimensions[0], dimensions[1], max_gap)
     return {"decoded_frames": count, "source_dimensions": dimensions,
             "first_timestamp_seconds": first_time, "last_timestamp_seconds": last_time,
             "largest_timestamp_gap_seconds": max_gap,
-            "fps_fallback_frames": fallback_count,
+            "fps_fallback_frames": fallback_count, "camera_motion": motion,
             "analysis_status": "Video inspected; tracking and events not evaluated."}

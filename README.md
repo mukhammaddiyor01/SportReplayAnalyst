@@ -95,3 +95,11 @@ recover old results. Stop/restart ends the review session and clears old artifac
 33 automated checks pass. Real browser checks on the supplied preview confirmed
 progress, 360 decoded frames, cancellation, explicit clearing, and replacing an
 active clip. See docs/background-jobs.md for evidence and limits.
+
+## Camera movement check
+
+Inspection now compares distributed scene features against the first frame.
+Movement or insufficient evidence blocks cross-frame calibration reuse; the UI
+continues to clear corners when the frame changes. A no-movement result still
+requires alignment review. No stabilization is implemented. See docs/camera-motion.md
+for parameters, real-clip estimates, tests, and limitations.

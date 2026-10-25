@@ -48,6 +48,12 @@
       ["Last frame time", `${result.last_timestamp_seconds.toFixed(3)} s`],
       ["FPS fallback frames", String(result.fps_fallback_frames)],
     ];
+    if (result.camera_motion) {
+      const camera = result.camera_motion;
+      const labels = {movement_detected: "Movement detected", no_movement_detected: "Review alignment", uncertain: "Inconclusive"};
+      fields.push(["Camera check", labels[camera.status] || "Inconclusive"]);
+      fields.push(["Calibration reuse", camera.calibration_reuse === "blocked" ? "Frame-local only" : "Review required"]);
+    }
     for (const [label, value] of fields) {
       const item = document.createElement("div");
       const term = document.createElement("dt");
@@ -66,7 +72,8 @@
     refreshButton.hidden = true;
     const cleanupNote = state.cleanup_pending ? " Temporary file cleanup is pending; the server will retry." : "";
     if (state.status === "completed") {
-      setMessage(`${state.decoded_frames} frames inspected. Ball tracking and events have not been evaluated.${cleanupNote}`);
+      const cameraNote = state.result.camera_motion ? ` ${state.result.camera_motion.message}` : "";
+      setMessage(`${state.decoded_frames} frames inspected.${cameraNote} Ball tracking and events have not been evaluated.${cleanupNote}`);
       showResult(state.result);
     } else if (state.status === "failed") {
       setMessage(`Inspection failed: ${state.error}${cleanupNote}`);

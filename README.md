@@ -92,7 +92,7 @@ request cleanup; exit requests are best effort, backed by server deadlines.
 Tokens stay in browser memory, never URLs or localStorage. A page reload cannot
 recover old results. Stop/restart ends the review session and clears old artifacts.
 
-33 automated checks pass. Real browser checks on the supplied preview confirmed
+The background-job milestone passed 33 automated checks. Its browser checks confirmed
 progress, 360 decoded frames, cancellation, explicit clearing, and replacing an
 active clip. See docs/background-jobs.md for evidence and limits.
 

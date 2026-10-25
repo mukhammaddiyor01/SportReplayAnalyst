@@ -8,7 +8,10 @@ The minimal application setup and bounded local video reader are implemented.
 Manual frame calibration is implemented and clears when playback or seeking changes
 the frame. Local video inspection now uses bounded uploads, an app-owned worker
 process, frame-count progress, cancellation, and private-file cleanup. The next
-stage establishes ball detection/tracking on real footage and an annotated subset.
+stage adds temporal ball association after the experimental offline candidate
+baseline. Sampled camera drift is now checked during inspection and blocks
+unattended calibration reuse. A small manually annotated candidate pilot exists.
+See docs/camera-motion.md and docs/ball-candidate-baseline.md before extending it.
 No automated ball tracking, table contacts, or rally analysis exist yet.
 Do not claim that tracking or event detection already works. Implement subsequent
 work in small, independently verified steps. Do not modify reference projects.

@@ -103,3 +103,19 @@ Movement or insufficient evidence blocks cross-frame calibration reuse; the UI
 continues to clear corners when the frame changes. A no-movement result still
 requires alignment review. No stabilization is implemented. See docs/camera-motion.md
 for parameters, real-clip estimates, tests, and limitations.
+
+## Experimental ball candidates (offline)
+
+An OpenCV baseline now extracts small bright moving candidates from consecutive
+source frames. It is not yet connected to browser analysis and does not track
+ball identity or draw a trajectory. It can also detect clothing fragments.
+
+```bash
+.venv/bin/python -m evaluation.evaluate_ball_candidates /path/to/clip.mp4 --split held_out
+```
+
+The supplied preview has a tiny manually annotated pilot. Held-out coverage found
+a candidate near all six visible-ball labels, with four extra candidates across
+three ambiguous frames. This is not an accuracy guarantee. See
+docs/ball-candidate-baseline.md for measured counts, limitations, and next steps.
+51 automated checks currently pass across the implemented components.

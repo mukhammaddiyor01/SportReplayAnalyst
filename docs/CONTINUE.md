@@ -1,6 +1,6 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-25 (Asia/Seoul).
+Checkpoint: camera drift and offline ball candidate pilot milestone.
 
 ## Working agreement
 
@@ -26,7 +26,11 @@ Verify current status and log before continuing; do not discard local changes.
 - Earlier handoff (7c75a4d).
 - App-owned spawned worker lifecycle, progress, cancellation, cleanup (2c6b5a4).
 - Bounded raw-upload API and authenticated status/cancel/delete (44b1438).
-- Browser inspection controls and this updated checkpoint are in the latest UI commit.
+- Browser inspection controls (fa3b030).
+- Generated original portfolio concepts (ec567c6); not screenshots/tracking proof.
+- Sampled camera drift and UI calibration-reuse result (1b91b7a).
+- Offline ball candidate baseline, manual pilot labels, and evaluation are in the
+  latest commit; this checkpoint accompanies them.
 
 Python 3.12 .venv and pinned requirements already exist. No new dependencies were
 needed for jobs. Controllers coordinate; OpenCV lives in adapters; table rules are
@@ -37,7 +41,8 @@ plain Python services. No database, cloud service, or frontend framework.
 Choose local video creates only a browser object URL. Pause and mark four table
 corners clockwise by pointer or numeric coordinates. POST /api/calibration sends
 only dimensions/corners and returns validated unit-plane geometry. Playback and
-seeking invalidate this frame-local calibration; camera stability is not measured.
+seeking invalidate this frame-local calibration. Sampled camera motion is now
+estimated against the first frame during inspection, without stabilization.
 
 Inspect video explicitly streams a temporary copy to the local server, then runs
 bounded OpenCV decoding in a spawned process. The UI displays decoded-frame count
@@ -63,7 +68,7 @@ Uvicorn worker; a POSIX root lock prevents two owners.
 
 ## Verification
 
-33 Python checks passed. They cover real generated videos in spawned processes,
+51 Python checks passed. They cover real generated videos in spawned processes,
 progress, cancellation, crashes, runtime timeout, interrupted/oversized transfers,
 access isolation, capacity, expiry, private paths, explicit deletion, startup,
 shutdown, cleanup retry, health responsiveness, geometry, reader, and HTTP policies.
@@ -76,22 +81,56 @@ Real Cancel, Clear, and removing a running clip were exercised. Private files we
 confirmed removed and the original remained present. Final browser error/warn
 logs were empty. Screenshots remain outside Git.
 
-The watermark, overhead view, blur, and apparent camera drift still limit the
-sample. No ball model has been selected, no detector/tracker implemented, and no
-manually annotated evaluation set exists. No contact/rally accuracy was measured.
+The watermark, overhead view, blur, and measured camera drift still limit the
+sample. Camera inspection found 24 supported comparisons and a maximum estimated
+frame-boundary displacement of 13.064px against a 4.406px threshold. The browser
+showed Movement detected / Frame-local only, with no error/warn logs in that flow.
+This is an image-transform estimate, not measured camera position or an accuracy
+claim. Read docs/camera-motion.md for conservative support rules and limits.
+
+An experimental white-moving-blob detector now exists in backend/adapters/
+ball_detector.py, with plain candidate dataclasses in backend/services/
+ball_observations.py. It is offline only, not wired into the worker or browser.
+No trained model has been selected. It returns candidates, not confirmed tracks.
+
+The annotated pilot in evaluation/ball-pilot.json stores the video hash and 18
+approximate manual labels. Each split has six visible-ball centers and three
+search-region negatives. Initial tuning found many tiny clothing/line fragments;
+the minimum component area was raised from 3 to 35 using tuning only. All other
+initial thresholds stayed fixed. At source width 768, the later scaling-related
+contrast-window adjustment leaves this pilot's 15px window unchanged.
+
+Frozen held-out evaluation found a candidate near 6/6 visible labels at 8px
+matching tolerance, but also 4 extra candidates across 3 ambiguous frames (183,
+186, 210). All three held-out negative frames were empty. Tuning had 6/6 nearby
+candidates and no extras on its nine frames. These are tiny adjacent same-video
+segments, not representative tracking accuracy. Do not tune further on this held-out
+split or hide the false candidates. No contact/rally accuracy was measured.
 Do not conflate video inspection with ball analysis. Table-plane homography
 cannot locate an airborne ball on the table; 2D direction changes alone do not
 confirm table contact. See docs/video-inspection.md and AGENTS.md.
 
 ## Next step
 
-Establish a small, video-appropriate ball detection/tracking baseline using the
-real clip. Inspect representative frames and define manually annotated tuning
-and held-out segments. Check whether the current footage can support the intended
-measurements; request a better fixed-camera clip if necessary. Evaluate camera
-motion before reusing calibration across frames. Keep uncertain detections and
-predictions distinct. Do not assume a general-purpose detector resolves the ball.
-Keep contacts and rally rules as later verified stages after reliable observations.
+Add a small plain Python temporal association service over candidate batches.
+Use actual source timestamps for motion gating; confirm initialization, handle
+ambiguity without blindly selecting the biggest blob, reject implausible jumps,
+recover short occlusions, and reset after longer losses. Keep predictions separate
+from actual observations. Cover those rules with meaningful tests and evaluate
+association on manually annotated sequences before showing a trustworthy 2D trail.
+
+The offline evaluation command is:
+
+```bash
+.venv/bin/python -m evaluation.evaluate_ball_candidates /path/to/clip.mp4 --split held_out
+```
+
+Retain the source-hash check. Read evaluation/README.md and
+docs/ball-candidate-baseline.md before changing the frozen baseline. Ask for a
+better fixed-camera video when needed. Camera drift blocks unattended table-plane
+calibration reuse, and no stabilization exists. Do not infer contacts/rallies or
+physical speeds from image-space points. Live browser inspection still does not
+run the ball detector; wire it in only after temporal behavior is verified.
 
 ## Resume
 

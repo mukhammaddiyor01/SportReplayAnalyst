@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "video_filename": "gettyimages-1747255434-640_adpp.mp4",
+  "sha256": "de1be132d44deb1be6e932585b2b029a8092a3fc4aa65c6774368ec5cad28fc1",
+  "source_dimensions": [
+    768,
+    432
+  ],
+  "frame_indexing": "zero_based_decoded",
+  "annotation_method": "Approximate manual centers from original source frames; visible blur midpoint, not a physical contact point. Not expert reviewed.",
+  "search_region": [
+    170,
+    70,
+    625,
+    330
+  ],
+  "matching_tolerance_px": 8,
+  "scope": "Small pilot only; bright visible ball over this table. Not a representative benchmark. The fixed image search window is not table-plane calibration.",
+  "samples": [
+    {
+      "frame_index": 150,
+      "split": "tuning",
+      "visibility": "visible",
+      "center": [
+        370,
+        182
+      ]
+    },
+    {
+      "frame_index": 155,
+      "split": "tuning",
+      "visibility": "visible",
+      "center": [
+        300,
+        168
+      ]
+    },
+    {
+      "frame_index": 160,
+      "split": "tuning",
+      "visibility": "visible",
+      "center": [
+        241,
+        158
+      ]
+    },
+    {
+      "frame_index": 165,
+      "split": "tuning",
+      "visibility": "visible",
+      "center": [
+        186,
+        148
+      ]
+    },
+    {
+      "frame_index": 170,
+      "split": "tuning",
+      "visibility": "visible",
+      "center": [
+        227,
+        160
+      ]
+    },
+    {
+      "frame_index": 175,
+      "split": "tuning",
+      "visibility": "visible",
+      "center": [
+        284,
+        174
+      ]
+    },
+    {
+      "frame_index": 180,
+      "split": "held_out",
+      "visibility": "visible",
+      "center": [
+        340,
+        189
+      ]
+    },
+    {
+      "frame_index": 183,
+      "split": "held_out",
+      "visibility": "visible",
+      "center": [
+        373,
+        197
+      ]
+    },
+    {
+      "frame_index": 186,
+      "split": "held_out",
+      "visibility": "visible",
+      "center": [
+        406,
+        205
+      ]
+    },
+    {
+      "frame_index": 210,
+      "split": "held_out",
+      "visibility": "visible",
+      "center": [
+        477,
+        228
+      ]
+    },
+    {
+      "frame_index": 220,
+      "split": "held_out",
+      "visibility": "visible",
+      "center": [
+        303,
+        207
+      ]
+    },
+    {
+      "frame_index": 225,
+      "split": "held_out",
+      "visibility": "visible",
+      "center": [
+        248,
+        205
+      ]
+    },
+    {
+      "frame_index": 90,
+      "split": "tuning",
+      "visibility": "not_visible_in_search_region",
+      "center": null
+    },
+    {
+      "frame_index": 93,
+      "split": "tuning",
+      "visibility": "not_visible_in_search_region",
+      "center": null
+    },
+    {
+      "frame_index": 96,
+      "split": "tuning",
+      "visibility": "not_visible_in_search_region",
+      "center": null
+    },
+    {
+      "frame_index": 99,
+      "split": "held_out",
+      "visibility": "not_visible_in_search_region",
+      "center": null
+    },
+    {
+      "frame_index": 102,
+      "split": "held_out",
+      "visibility": "not_visible_in_search_region",
+      "center": null
+    },
+    {
+      "frame_index": 105,
+      "split": "held_out",
+      "visibility": "not_visible_in_search_region",
+      "center": null
+    }
+  ]
+}

@@ -14,6 +14,7 @@ let points = [];
 let revision = 0;
 let referenceTime = null;
 let ready = false;
+let selectedClipFile = null;
 
 function setStatus(message) { status.textContent = message; }
 
@@ -56,6 +57,8 @@ function renderCorners() {
 
 function removeClip(message = "Choose a local video to begin.", clearInput = true) {
   ready = false;
+  selectedClipFile = null;
+  document.dispatchEvent(new CustomEvent("replay:clip-cleared"));
   video.pause();
   video.removeAttribute("src");
   video.load();
@@ -80,6 +83,7 @@ input.addEventListener("change", () => {
   if (!file.size || file.size > Number(limits.maxBytes)) {
     setStatus("Choose a nonempty video of at most 100 MiB."); return;
   }
+  selectedClipFile = file;
   objectUrl = URL.createObjectURL(file);
   summary.textContent = file.name;
   video.src = objectUrl;
@@ -97,6 +101,7 @@ video.addEventListener("loadedmetadata", () => {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   ready = true;
+  document.dispatchEvent(new CustomEvent("replay:clip-ready", {detail: {file: selectedClipFile}}));
   document.querySelector("#empty").hidden = true;
   document.querySelector("#media").hidden = false;
   document.querySelector("#geometry").textContent =

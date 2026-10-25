@@ -5,8 +5,8 @@ FastAPI, Jinja2, and plain browser JavaScript.
 
 ## Current stage
 
-The application shell, bounded local video reader, and manual frame calibration
-are implemented. Ball
+The replay workspace, bounded local video reader, manual frame calibration, and
+background video inspection are implemented. Ball
 tracking, table-contact estimation, and rally timing are not implemented. No analysis results are fabricated.
 
 ## Run locally
@@ -72,8 +72,9 @@ and FPS. Browser preparation is not admission to an analysis job.
 The calibration response has no persistent identifier and is not saved. It is
 valid only for the selected frame; camera drift has not been evaluated. A unit
 square describes the table plane, not physical distances or airborne positions.
-Background inspection jobs and bounded local uploads are available through the
-API; browser controls are the next increment. Ball analysis remains a later stage.
+Use **Inspect video** to send a temporary copy to the local server and inspect
+all frames in a worker process. **Cancel inspection** stops the worker and removes
+its copy. **Clear inspection** deletes the retained copy and result. Ball analysis remains a later stage.
 
 ## Background video inspection
 
@@ -83,3 +84,14 @@ expire after one hour; failed/cancelled copies are removed after the worker stop
 Shutdown/restart ends the review session and removes orphaned job files. The
 original selected file is never deleted. Run a single Uvicorn worker.
 See docs/background-jobs.md for lifecycle, retention, and HTTP endpoints.
+
+Inspection displays actual decoded-frame progress and timing, followed by a real
+summary. It does not measure ball detection, contacts, or rallies. The browser
+explains local retention before inspection begins. File replacement and page exit
+request cleanup; exit requests are best effort, backed by server deadlines.
+Tokens stay in browser memory, never URLs or localStorage. A page reload cannot
+recover old results. Stop/restart ends the review session and clears old artifacts.
+
+33 automated checks pass. Real browser checks on the supplied preview confirmed
+progress, 360 decoded frames, cancellation, explicit clearing, and replacing an
+active clip. See docs/background-jobs.md for evidence and limits.

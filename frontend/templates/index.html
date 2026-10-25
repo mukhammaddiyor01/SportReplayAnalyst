@@ -6,6 +6,7 @@
   <title>Sports Replay Analyst</title>
   <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
   <script src="{{ url_for('static', path='/js/workspace.js') }}" defer></script>
+  <script src="{{ url_for('static', path='/js/inspection.js') }}" defer></script>
 </head>
 <body>
   <header class="app-header">
@@ -67,6 +68,27 @@
           <span class="scope-dot" aria-hidden="true"></span>
           <p>Video preparation only. Ball tracking, contacts and rallies are not available yet.</p>
         </div>
+        <section class="inspection-panel" aria-label="Local video inspection">
+          <div class="inspection-heading">
+            <div>
+              <h2>Video inspection</h2>
+              <p>Check every frame before ball analysis.</p>
+            </div>
+            <button id="inspect-start" class="secondary-button" type="button" disabled>Inspect video</button>
+          </div>
+          <p class="inspection-privacy">Inspecting sends a temporary copy to this computer's local server.
+            Copies and results are removed after one hour, when cleared, or when the server stops.
+            Your original file stays untouched. Nothing goes to an external service.</p>
+          <div class="inspection-state">
+            <p id="inspection-status" role="status" aria-live="polite">Choose a video before inspecting.</p>
+            <div class="inspection-actions">
+              <button id="inspect-cancel" class="text-button" type="button" hidden>Cancel inspection</button>
+              <button id="inspect-delete" class="text-button" type="button" hidden>Clear inspection</button>
+              <button id="inspect-refresh" class="text-button" type="button" hidden>Retry status</button>
+            </div>
+          </div>
+          <dl id="inspection-result" class="inspection-result" hidden></dl>
+        </section>
       </section>
 
       <aside class="preparation" aria-label="Calibration controls">
@@ -138,7 +160,7 @@
 
     <footer>
       <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="9" width="10" height="8" rx="2"/><path d="M7 9V6a3 3 0 0 1 6 0v3"/></svg>
-      <p>Your video stays in this browser. Only corner coordinates go to the local server. Nothing is saved.</p>
+      <p>Playback stays in your browser. Inspection uses a temporary local copy. No cloud processing.</p>
     </footer>
   </main>
 </body>

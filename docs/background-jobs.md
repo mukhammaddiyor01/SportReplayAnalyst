@@ -5,7 +5,7 @@
 A JobManager belongs to one application instance. It spawns one Python process
 per inspection and monitors its bounded message queue from an app-owned thread.
 OpenCV decoding and disk cleanup do not run on the HTTP event loop. HTTP controllers now accept bounded video transfers and expose status/cancel/
-removal. The browser interface is connected in a separate increment.
+removal. The browser interface provides Inspect, Cancel, Clear, and status retry controls.
 The worker performs actual video inspection only; no ball detection is simulated.
 
 There is one admission slot and no pending-job queue (capacity zero). A receiving,
@@ -74,3 +74,29 @@ Errors: 404 for absent/incorrect access, 409 for busy or duplicate transfer, 413
 for oversized uploads, 415 for unsupported media type, 400 for invalid lifecycle
 operations. The job root and copied media are never served by HTTP. Multiple
 Uvicorn workers are unsupported; the exclusive root lock enforces one owner.
+
+## Browser verification on 2026-10-25
+
+33 automated checks passed (job lifecycle, API, geometry, reader, and HTTP policies).
+Using the actual supplied preview, the browser displayed progress at 288 decoded
+frames / source time 9.576 s, then completed with 360 frames, 768x432 dimensions,
+11.979 s last-frame time, and zero FPS fallback frames. Error/warning logs were
+empty in the final completion flow.
+
+Clear inspection removed the private input and result: job-directory/input counts
+went from one to zero; the original Downloads file remained present. A second
+real inspection was cancelled through the interface, reached the cancelled state,
+and left zero private input files. Removing the video during another active
+inspection also left zero private job directories and no stale result on screen.
+The final completion screenshot stays outside Git with other local UI evidence.
+
+Choosing a clip still only creates a browser object URL. Inspect explicitly sends
+a temporary local copy; the privacy text precedes that action. On replacing a
+clip, the frontend cancels the old job and briefly polls for its terminal state
+before deleting the job record. Navigation requests are best effort; the server
+still finalizes cancellation and enforces expiry even if the browser disappears.
+Status polling is serialized and stops on terminal states or errors. Network
+errors expose a retry/cancel path instead of pretending inspection succeeded.
+
+Ball detection, tracking, contacts, rallies, camera-motion validation, and a
+manually annotated evaluation set are not implemented or evaluated by this stage.

@@ -1,105 +1,107 @@
 # Continue Sports Replay Analyst
 
-Checkpoint saved on 2026-10-24 (Asia/Seoul). The user asked to preserve today's
-progress and continue tomorrow. Do not infer an automatic scheduled run.
+Checkpoint: 2026-10-25 (Asia/Seoul).
 
-## User preferences and scope
+## Working agreement
 
-Talk to the user in Uzbek. Keep code, interface, comments, and documentation in
-English. Read AGENTS.md before changes. Build readable, small, verified increments
-without drifting from local table tennis video analysis. The user requested a
-more intentional, human-designed interface; the replay desk redesign is complete.
-Do not change the reference projects or deploy this application.
-
-## Repository and Git
+Speak Uzbek to the user; code, UI, comments, and documentation are English.
+Read AGENTS.md before changing code. Keep increments readable and verified.
+Work in SportReplayAnalyst under the user's Desktop Projects, not the unrelated
+AI _ Python conversation workspace. Do not modify reference projects or deploy.
+The user asked for a human-designed workspace; preserve the current replay desk.
 
 Repository: https://github.com/mukhammaddiyor01/SportReplayAnalyst.git (private).
-Local project folder is named SportReplayAnalyst under the user's Desktop Projects.
-Use this repository, not the unrelated AI _ Python conversation workspace.
-Git CLI access succeeded even though the GitHub connector returned 404.
-Use only feat: and fix: prefixes. Review staged files and commit each verified
-logical step. User authorization covers pushes in the agreed branch workflow.
+Git CLI authentication works; the GitHub connector previously returned 404.
+Use feat: and fix: commits only. The user authorized small verified commits and
+pushes to develop. master must remain at 42a6008 (completed initial setup).
+Verify current status and log before continuing; do not discard local changes.
 
-- Active branch: develop, synchronized with origin at the checkpoint.
-- master: 42a6008, the completed initial setup. Do not advance it again.
-- 3d337ba: development rules, committed before application code.
-- 42a6008: minimal local FastAPI/Jinja2 application setup.
-- c8327ab: bounded OpenCV reader with source timestamps and inspection CLI.
-- f516509: browser-local playback and manual frame calibration.
-- 60490f4: replay workspace and calibration inspector redesign.
-- Working tree was clean before saving this handoff.
+## Completed stages
 
-## Implemented behavior
+- AGENTS.md committed before code (3d337ba).
+- Minimal FastAPI/Jinja2 setup shared by master/develop (42a6008).
+- Bounded video reader and inspection CLI (c8327ab).
+- Browser-local playback and manual table geometry (f516509).
+- Redesigned replay desk (60490f4).
+- Earlier handoff (7c75a4d).
+- App-owned spawned worker lifecycle, progress, cancellation, cleanup (2c6b5a4).
+- Bounded raw-upload API and authenticated status/cancel/delete (44b1438).
+- Browser inspection controls and this updated checkpoint are in the latest UI commit.
 
-Python 3.12 virtual environment in .venv; pinned direct dependencies in
-requirements.txt and development dependencies in requirements-dev.txt.
-FastAPI controllers, OpenCV adapters, plain Python geometry service, and plain
-HTML/CSS/JavaScript. No database, cloud inference, or frontend framework.
+Python 3.12 .venv and pinned requirements already exist. No new dependencies were
+needed for jobs. Controllers coordinate; OpenCV lives in adapters; table rules are
+plain Python services. No database, cloud service, or frontend framework.
 
-- GET / serves the replay workspace; GET /health returns status.
-- Only frontend/static is mounted publicly. Host checks, no-store responses,
-  and restrictive browser policies are configured.
-- CLI: python -m backend.inspect_video /path/to/clip.mp4.
-- Reader limits: 100 MiB, 60 seconds, 1920x1080, 120 FPS; checks actual decoded
-  frames and source dimensions, with explicit fallback for unusable timestamps.
-- Choose video uses a browser object URL. Video bytes are not uploaded or saved.
-- Playback controls and seeking work; selecting a file reads browser metadata.
-- Four corners can be clicked or entered numerically in source coordinates.
-- POST /api/calibration receives dimensions and corners only. Validates winding,
-  convexity, area, bounds, and finite coordinates; returns a unit-plane homography.
-- Playback, seeking, replacement, and removal clear the frame calibration.
-- The visible corner count and empty-state hint update with selection/reset.
-- The redesigned UI prioritizes the video and attached calibration inspector,
-  with local assets, keyboard controls, and responsive stacking.
+## Current behavior
 
-## Real footage and evidence
+Choose local video creates only a browser object URL. Pause and mark four table
+corners clockwise by pointer or numeric coordinates. POST /api/calibration sends
+only dimensions/corners and returns validated unit-plane geometry. Playback and
+seeking invalidate this frame-local calibration; camera stability is not measured.
 
-User-supplied file: gettyimages-1747255434-640_adpp.mp4, in the user's Downloads.
-Do not commit or transmit the video or derived frames to external services.
-All 360 frames decoded at 768x432. Approximately 29.970 FPS and 12.012-second
-container duration. Last frame timestamp: 11.978633333333335 seconds. No FPS
-fallback was required. See docs/video-inspection.md.
+Inspect video explicitly streams a temporary copy to the local server, then runs
+bounded OpenCV decoding in a spawned process. The UI displays decoded-frame count
+and source time, not a fabricated percentage. Cancel stops it; Clear deletes its
+retained copy/result. Browser preparation and inspection are separate from ball
+analysis. The original selected file is never deleted.
 
-The overhead view, watermark, motion blur, and apparent camera drift limit its
-suitability. Camera stability is not evaluated. Do not call it a validated
-stationary-camera clip. Image-space tracks are not 3D trajectories. Table-plane
-homography cannot recover true table coordinates of an airborne ball. A change
-in image direction alone is insufficient evidence for a table contact.
+The app owns JobManager via FastAPI lifespan. One active admission slot, no
+pending queue, eight retained records maximum, 32 messages per worker queue.
+Job-specific routes require a random bearer token (header only). Tokens remain in
+browser memory, never URLs/localStorage. Wrong tokens cannot read/cancel/delete
+another job. Public responses omit tokens and paths. Private job files are never
+mounted as static files. Host/origin restrictions and response policies remain.
 
-14 Python tests passed. Browser checks with the supplied real clip verified
-selection, metadata, numeric corners, pointer coordinate mapping, geometry
-submission, playback/reset, seeking/reset, removal/reselection, and the live
-corner counter. Desktop and narrow layouts were reviewed. Browser error/warn
-logs were empty during calibration. See docs/calibration-verification.md and
-docs/design-direction.md. Do not imply a manually annotated evaluation exists.
+See docs/background-jobs.md for endpoints, exact limits, states, and cleanup.
+100 MiB, 60 seconds, 1920x1080, 120 FPS; receiving timeout 120 seconds, worker
+runtime 180 seconds; cooperative cancellation plus terminate/kill fallback.
+Inputs/results live in ignored local-data/jobs with private permissions, expire
+one hour after completion, and can be explicitly removed earlier. Failed/cancelled
+artifacts are removed after the worker exits. Cleanup failures are visible and
+retried. Shutdown/restart ends review and removes old job artifacts. Run only one
+Uvicorn worker; a POSIX root lock prevents two owners.
 
-## Not implemented yet
+## Verification
 
-No video uploads, background analysis jobs, progress/cancellation, automated
-ball detection/tracking, trajectory overlays, table-contact events, rally timing,
-or event timeline. No detection, contact, or rally accuracy has been measured.
-No model has been chosen or downloaded. The only overlay is manual table geometry.
+33 Python checks passed. They cover real generated videos in spawned processes,
+progress, cancellation, crashes, runtime timeout, interrupted/oversized transfers,
+access isolation, capacity, expiry, private paths, explicit deletion, startup,
+shutdown, cleanup retry, health responsiveness, geometry, reader, and HTTP policies.
+
+User footage: gettyimages-1747255434-640_adpp.mp4 in Downloads. 360 frames,
+768x432, about 29.970 FPS, 12.012 seconds. Final frame time 11.978633333333335 s;
+no timestamp fallback. In the real browser flow, intermediate progress showed
+288 frames / 9.576 s and the final summary showed 360 frames / 11.979 s.
+Real Cancel, Clear, and removing a running clip were exercised. Private files were
+confirmed removed and the original remained present. Final browser error/warn
+logs were empty. Screenshots remain outside Git.
+
+The watermark, overhead view, blur, and apparent camera drift still limit the
+sample. No ball model has been selected, no detector/tracker implemented, and no
+manually annotated evaluation set exists. No contact/rally accuracy was measured.
+Do not conflate video inspection with ball analysis. Table-plane homography
+cannot locate an airborne ball on the table; 2D direction changes alone do not
+confirm table contact. See docs/video-inspection.md and AGENTS.md.
 
 ## Next step
 
-Implement a small app-owned worker-process job mechanism with isolated job state,
-progress, cooperative cancellation, a bounded queue, and cleanup before adding
-uploads. Follow the retention policy in AGENTS.md: private job directories,
-failed/cancelled input deletion, one-hour expiry for review artifacts, startup and
-periodic cleanup, and no deletion of active jobs. Never block the HTTP event loop.
-Test lifecycle and failure handling before wiring actual video analysis into it.
-Then establish a video-appropriate detection/tracking baseline and a small,
-manually annotated evaluation subset; keep uncertain contacts/rallies explicit.
+Establish a small, video-appropriate ball detection/tracking baseline using the
+real clip. Inspect representative frames and define manually annotated tuning
+and held-out segments. Check whether the current footage can support the intended
+measurements; request a better fixed-camera clip if necessary. Evaluate camera
+motion before reusing calibration across frames. Keep uncertain detections and
+predictions distinct. Do not assume a general-purpose detector resolves the ball.
+Keep contacts and rally rules as later verified stages after reliable observations.
 
-## Resume commands
+## Resume
 
-Check branch, working tree, and any existing server before starting a new one.
-The last development server was at http://127.0.0.1:8014; it may not survive until
-the next session. Port 8000 was occupied by Coach App; do not stop that server.
+The last server was started at http://127.0.0.1:8014. Check before starting another;
+port 8000 belongs to the unrelated Coach App. Never stop that other server.
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8014
 ```
 
-Continue on develop in small commits. Keep master unchanged.
+Keep videos, extracted frames, weights, local-data, credentials, and .venv out of
+Git. Update this checkpoint after the next verified milestone.

@@ -221,3 +221,19 @@ footer p { max-width: 80ch; }
   footer { justify-content: flex-start; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+
+.inspection-panel { border-top: 1px solid var(--border); padding: 20px; }
+.inspection-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.inspection-heading h2 { font-size: 14px; font-weight: 600; }
+.inspection-heading p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.inspection-heading button { margin-top: 0; flex-shrink: 0; }
+.secondary-button:disabled { opacity: .55; cursor: not-allowed; }
+.inspection-privacy { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 16px; max-width: 80ch; }
+.inspection-state { margin-top: 16px; font-size: 12px; }
+.inspection-actions { display: flex; gap: 14px; margin-top: 8px; }
+.inspection-result { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0 0; padding-top: 16px; border-top: 1px solid #edf1f4; }
+.inspection-result dt { color: var(--muted); font-size: 12px; }
+.inspection-result dd { margin: 3px 0 0; font-size: 14px; font-variant-numeric: tabular-nums; }
+@media (max-width: 420px) {
+  .inspection-heading { align-items: flex-start; flex-direction: column; }
+}

@@ -25,12 +25,31 @@
     <div class="page-heading">
       <div>
         <h1>Replay workspace</h1>
-        <p>Prepare the table. Then follow the ball.</p>
+        <p>Load a clip, mark the table, and review the ball’s path.</p>
       </div>
-      <span class="workspace-mode">Table calibration</span>
+      <span id="workspace-mode" class="workspace-mode">Choose a video</span>
     </div>
 
     <div class="workspace">
+      <section class="source-bar" aria-label="Video source">
+        <div class="file-picker">
+          <label for="clip">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3m-4 4 4-4 4 4M4 12v4a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-4"/></svg>
+            Choose video
+          </label>
+          <input id="clip" type="file" accept="video/mp4,video/webm,video/quicktime"
+            data-max-bytes="{{ limits.max_bytes }}" data-max-duration="{{ limits.max_duration }}"
+            data-max-width="{{ limits.max_width }}" data-max-height="{{ limits.max_height }}">
+        </div>
+        <div class="source-details">
+          <p id="clip-summary">Choose a table tennis clip to begin</p>
+          <p id="geometry"></p>
+        </div>
+        <div class="source-actions">
+          <span>Up to 60 seconds · 100 MiB</span>
+          <button id="remove" class="text-button" type="button" disabled>Remove video</button>
+        </div>
+      </section>
       <section class="replay" aria-label="Video workspace">
         <div class="viewer-heading">
           <h2>Video preview</h2>
@@ -68,87 +87,16 @@
         </div>
 
         <div class="viewer-note">
-          <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M7 4v12M3 8h14"/></svg>
-          <p>Mark the playing surface on a paused frame.<span>Playback or seeking clears the selected corners.</span></p>
+          <p>Pause to mark the table corners. Tracking stays in image coordinates.</p>
         </div>
-        <div class="scope-note">
-          <span class="scope-dot" aria-hidden="true"></span>
-          <p>Tracking is experimental and uses image pixels. Contacts and rallies are not available.</p>
-        </div>
-        <section class="inspection-panel" aria-label="Local video inspection">
-          <div class="inspection-heading">
-            <div>
-              <h2>Video inspection</h2>
-              <p>Inspect frames or try image-space tracking.</p>
-            </div>
-            <div class="analysis-start-actions">
-              <button id="inspect-start" class="secondary-button" type="button" disabled>Inspect video</button>
-              <button id="track-start" class="secondary-button" type="button" disabled>Track ball (experimental)</button>
-            </div>
-          </div>
-          <p class="tracking-instructions">Mark the four table corners and check calibration to set a coarse tracking search window.
-            Tracking does not use table-plane coordinates or correct camera movement.</p>
-          <p class="inspection-privacy">Inspection and tracking send a temporary copy to this computer's local server.
-            Copies and results are removed after one hour, when cleared, or when the server stops.
-            Your original file stays untouched. Nothing goes to an external service.</p>
-          <div class="inspection-state">
-            <p id="inspection-status" role="status" aria-live="polite">Choose a video before inspecting.</p>
-            <div class="inspection-actions">
-              <button id="inspect-cancel" class="text-button" type="button" hidden>Cancel analysis</button>
-              <button id="inspect-delete" class="text-button" type="button" hidden>Clear result</button>
-              <button id="inspect-refresh" class="text-button" type="button" hidden>Retry status</button>
-            </div>
-          </div>
-          <dl id="inspection-result" class="inspection-result" hidden></dl>
-          <section id="tracking-review" class="tracking-review" aria-labelledby="tracking-review-heading" hidden>
-            <div class="review-heading">
-              <h3 id="tracking-review-heading">Review tracking gaps</h3>
-              <output id="review-count"></output>
-            </div>
-            <p id="review-explanation">These frames have no associated observation. Review the video to check what happened.</p>
-            <p class="review-limit">A tracking gap does not confirm a contact, occlusion, or rally end.</p>
-            <ol id="review-gaps" class="review-gaps"></ol>
-            <output id="review-position" role="status" aria-live="polite"></output>
-          </section>
-        </section>
       </section>
-
-      <aside class="preparation" aria-label="Calibration controls">
-        <section class="inspector-section source-section">
-          <div class="section-heading">
-            <span class="step-number" aria-hidden="true">1</span>
-            <h2>Video source</h2>
-          </div>
-          <div class="file-picker">
-            <label for="clip">
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 13V3m-4 4 4-4 4 4M4 12v4a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-4"/></svg>
-              Choose local video
-            </label>
-            <input id="clip" type="file" accept="video/mp4,video/webm,video/quicktime"
-              data-max-bytes="{{ limits.max_bytes }}" data-max-duration="{{ limits.max_duration }}"
-              data-max-width="{{ limits.max_width }}" data-max-height="{{ limits.max_height }}">
-          </div>
-          <div class="source-details">
-            <p id="clip-summary">No video selected</p>
-            <p id="geometry"></p>
-          </div>
-          <div class="source-footer">
-            <span>100 MiB max · 60 seconds</span>
-            <button id="remove" class="text-button" type="button" disabled>Remove video</button>
-          </div>
-          <details class="clip-requirements">
-            <summary>Clip requirements</summary>
-            <p>Use a fixed camera with the whole table visible. Maximum resolution: 1920 × 1080. The local video reader checks FPS separately.</p>
-          </details>
-        </section>
-
+      <aside class="preparation" aria-label="Calibration and analysis controls">
         <section class="inspector-section corners-section">
           <div class="section-heading">
-            <span class="step-number" aria-hidden="true">2</span>
-            <h2>Table corners</h2>
+            <h2>Prepare the table</h2>
             <span id="corner-count" class="corner-count">0 / 4</span>
           </div>
-          <p class="section-description">Pause the clip. Mark each corner clockwise, starting at the upper-left.</p>
+          <p class="section-description">Pause on a clear frame. Select four corners clockwise from the upper-left.</p>
           <div class="corner-selection">
             <p id="corner-empty">Your selected corners will appear here.</p>
             <ol id="corner-list" aria-label="Selected source coordinates"></ol>
@@ -175,9 +123,50 @@
             <span class="status-dot" aria-hidden="true"></span>
             <p id="status" role="status" aria-live="polite">Choose a local video to begin.</p>
           </div>
-          <p class="calibration-note">Checks table geometry for this frame. Camera stability must be checked before analysis.</p>
+          <p class="calibration-note">Moving to another frame clears these corners.</p>
+        </section>
+        <section class="inspection-panel" aria-label="Local video inspection">
+          <div class="inspection-heading">
+            <div>
+              <h2>Analyze the clip</h2>
+              <p id="workflow-hint">Choose a video to get started.</p>
+            </div>
+          </div>
+          <button id="track-start" class="primary-button" type="button" disabled>Track ball</button>
+          <p class="analysis-note">Experimental 2D tracking. Contacts and rallies are not analyzed.</p>
+          <p class="inspection-privacy">Analysis uses a local copy, removed after one hour or when cleared. Your original stays untouched. Nothing is sent externally.</p>
+          <div class="inspection-state">
+            <p id="inspection-status" role="status" aria-live="polite">Choose a video before inspecting.</p>
+            <div class="inspection-actions">
+              <button id="inspect-cancel" class="text-button" type="button" hidden>Cancel analysis</button>
+              <button id="inspect-delete" class="text-button" type="button" hidden>Clear result</button>
+              <button id="inspect-refresh" class="text-button" type="button" hidden>Retry status</button>
+            </div>
+          </div>
+          <details class="analysis-details">
+            <summary>Inspection details</summary>
+            <p>Check video frames and camera movement without running ball tracking.</p>
+            <button id="inspect-start" class="secondary-button" type="button" disabled>Inspect video only</button>
+            <dl id="inspection-result" class="inspection-result" hidden></dl>
+          </details>
+          <details class="clip-requirements">
+            <summary>Video requirements &amp; privacy</summary>
+            <p>Use a fixed camera with the whole table visible. Limits: 60 seconds, 100 MiB, 1920 × 1080. The reader also checks FPS.</p>
+            <p>Temporary copies and results are removed after one hour, when cleared, or when the server stops. Your original file stays untouched.</p>
+          </details>
+
         </section>
       </aside>
+          <section id="tracking-review" class="tracking-review" aria-labelledby="tracking-review-heading" hidden>
+            <div class="review-heading">
+              <h2 id="tracking-review-heading">Review tracking gaps</h2>
+              <output id="review-count"></output>
+            </div>
+            <p id="review-explanation">These frames have no associated observation. Review the video to check what happened.</p>
+            <p class="review-limit">A tracking gap does not confirm a contact, occlusion, or rally end.</p>
+            <ol id="review-gaps" class="review-gaps"></ol>
+            <output id="review-position" role="status" aria-live="polite"></output>
+          </section>
     </div>
 
     <footer>

@@ -1,6 +1,6 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: full_shape_v1 with source-timed tracking gap review.
+Checkpoint: clean replay workflow with full_shape_v1 and gap review.
 
 ## Agreement and repository
 
@@ -195,6 +195,22 @@ hid the list. Final browser warn/error logs were empty, screenshot outside Git.
 An actual HTTP/ASGI spawned-worker check matched offline 360-frame output;
 explicit deletion left zero private job directories and preserved the original.
 The final browser result is retained normally for review.
+
+## Clean replay workflow
+
+Frontend workflow now puts Choose video in a toolbar above the player. The wide
+layout groups calibration/analysis in the side panel and review below the video;
+narrow order is source, video, controls, review. Track ball is the primary action.
+Inspection-only and numeric results are in Inspection details. Dynamic phase and
+next-action hints reflect actual clip/calibration/job state. Review now pauses,
+seeks and scrolls the video into view; one-frame messages use singular text.
+No backend/tracking rules changed. Retention/privacy remain visible and expandable.
+
+94 Python tests passed; JS syntax and HTML integrity checks passed. Actual browser
+flow verified upload, numeric corners/check, tracking, progress/completion, details
+disclosure, review navigation to missing frame 149 and seek to observed frame 180.
+The final 544px viewport had no horizontal overflow; browser warn/error logs were
+empty. Screenshot is outside Git. See docs/replay-usability.md for scope and limits.
 
 ## Next step
 

@@ -31,9 +31,11 @@
     video.pause();
     selectedGap = gap;
     video.currentTime = seconds;
+    video.scrollIntoView({block: 'nearest', behavior: 'auto'});
     list.querySelectorAll('[aria-current]').forEach(item => item.removeAttribute('aria-current'));
     button.setAttribute('aria-current', 'true');
-    position.textContent = `Reviewing frames ${gap.start_frame}–${gap.end_frame}.`;
+    position.textContent = gap.frame_count === 1 ? `Reviewing frame ${gap.start_frame}.` :
+      `Reviewing frames ${gap.start_frame}–${gap.end_frame}.`;
   }
 
   document.addEventListener('replay:tracking-ready', event => {

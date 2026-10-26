@@ -7,6 +7,8 @@
   const refreshButton = document.querySelector("#inspect-refresh");
   const statusText = document.querySelector("#inspection-status");
   const resultList = document.querySelector("#inspection-result");
+  const workflowHint = document.querySelector("#workflow-hint");
+  const workflowMode = document.querySelector("#workspace-mode");
   const terminalStates = new Set(["completed", "failed", "cancelled"]);
   let file = null;
   let job = null;
@@ -25,6 +27,27 @@
     cancelButton.hidden = !job || terminal;
     cancelButton.disabled = job?.status === "cancelling";
     deleteButton.hidden = !terminal;
+    let mode = "Choose a video";
+    let hint = "Choose a video to get started.";
+    if (file) {
+      mode = "Prepare the table";
+      hint = "Mark four corners and check calibration to enable tracking.";
+    }
+    if (trackingRegion) {
+      mode = "Ready to track";
+      hint = "The search window is ready. Start ball tracking below.";
+    }
+    if (reserving || (job && !terminal)) {
+      mode = "Analyzing locally";
+      hint = "You can keep reviewing the video while analysis runs.";
+    } else if (terminal) {
+      mode = job.status === "completed" ? "Ready to review" : "Analysis stopped";
+      hint = job.status === "completed" ? (job.trackingPublished ?
+        "Review tracking gaps below the video." : "Open Inspection details to see the results.") :
+        "Clear the current result before running another analysis.";
+    }
+    workflowMode.textContent = mode;
+    workflowHint.textContent = hint;
   }
 
   async function jobRequest(handle, suffix = "", method = "GET", keepalive = false) {

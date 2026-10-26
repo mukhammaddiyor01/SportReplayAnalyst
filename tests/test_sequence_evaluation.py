@@ -57,3 +57,24 @@ class SequenceEvaluationTests(unittest.TestCase):
                              ([dict(frame_index=0, visibility='visible', center=None)], {0: record(0)})]:
             with self.subTest(labels=labels), self.assertRaises(ValueError):
                 score_sequence(labels, rows, 8)
+
+    def test_detection_failure_is_separate_from_association_failure(self):
+        rows = {0: record(0), 1: record(1)}
+        rows[0]['candidates'] = [[10, 10], [70, 70]]
+        rows[1]['candidates'] = [[70, 70]]
+        result = score_sequence([label(0), label(1)], rows, 8)
+        self.assertEqual(result['detection']['near_reference'], 1)
+        self.assertEqual(result['detection']['missing_near_reference'], 1)
+        self.assertEqual(result['detection']['near_reference_without_correct_association'], 1)
+        self.assertIs(result['frames'][0]['candidate_near_reference'], True)
+        self.assertIs(result['frames'][1]['candidate_near_reference'], False)
+
+    def test_negative_candidates_do_not_imply_confirmed_false_track(self):
+        rows = {0: record(0), 1: record(1)}
+        for row in rows.values():
+            row.update(candidates=[[50, 50]], candidates_truncated=True)
+        result = score_sequence([label(0, 'not_visible_in_search_region'),
+                                 label(1, 'uncertain')], rows, 8)
+        self.assertEqual(result['detection']['negative_frames_with_candidates'], 1)
+        self.assertEqual(result['detection']['truncated_frames'], 1)
+        self.assertEqual(result['counts']['observations_on_negatives'], 0)

@@ -14,7 +14,7 @@
   ],
   "matching_tolerance_px": 8,
   "annotation_method": "Approximate manual visible-blur midpoints read from unmarked source crops at native resolution; no interpolation and no detector-assisted centers. Single reviewer, not expert reviewed.",
-  "protocol": "Frozen baseline review. Tuning 140-169 overlaps the earlier tuning pilot. Review 230-259 is a new contiguous same-video diagnostic, not independent held-out generalization. Unknown frames are excluded, not negative labels. No detector/tracker parameters changed.",
+  "protocol": "Frozen baseline review. Tuning 140-169 overlaps the earlier tuning pilot. Review 230-259 is a new contiguous same-video diagnostic, not independent held-out generalization. Unknown frames are excluded, not negative labels. No detector/tracker parameters changed. Added frozen diagnostics 195-224 around the previously known frame-210 failure and 80-109 with no ball visually identifiable in the search region. Negative labels do not establish physical absence behind a player or outside the region. These intervals overlap old sparse held-out labels and are not a new holdout.",
   "sequences": [
     {
       "name": "tuning",
@@ -488,6 +488,400 @@
             455,
             131
           ]
+        }
+      ]
+    },
+    {
+      "name": "difficult_review",
+      "samples": [
+        {
+          "frame_index": 195,
+          "visibility": "visible",
+          "center": [
+            471,
+            220
+          ]
+        },
+        {
+          "frame_index": 196,
+          "visibility": "visible",
+          "center": [
+            475,
+            221
+          ]
+        },
+        {
+          "frame_index": 197,
+          "visibility": "visible",
+          "center": [
+            479,
+            222
+          ]
+        },
+        {
+          "frame_index": 198,
+          "visibility": "visible",
+          "center": [
+            483,
+            223
+          ]
+        },
+        {
+          "frame_index": 199,
+          "visibility": "visible",
+          "center": [
+            487,
+            224
+          ]
+        },
+        {
+          "frame_index": 200,
+          "visibility": "visible",
+          "center": [
+            490,
+            225
+          ]
+        },
+        {
+          "frame_index": 201,
+          "visibility": "visible",
+          "center": [
+            495,
+            226
+          ]
+        },
+        {
+          "frame_index": 202,
+          "visibility": "visible",
+          "center": [
+            499,
+            227
+          ]
+        },
+        {
+          "frame_index": 203,
+          "visibility": "visible",
+          "center": [
+            503,
+            228
+          ]
+        },
+        {
+          "frame_index": 204,
+          "visibility": "visible",
+          "center": [
+            506,
+            229
+          ]
+        },
+        {
+          "frame_index": 205,
+          "visibility": "visible",
+          "center": [
+            509,
+            230
+          ]
+        },
+        {
+          "frame_index": 206,
+          "visibility": "visible",
+          "center": [
+            513,
+            231
+          ]
+        },
+        {
+          "frame_index": 207,
+          "visibility": "visible",
+          "center": [
+            517,
+            232
+          ]
+        },
+        {
+          "frame_index": 208,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 209,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 210,
+          "visibility": "visible",
+          "center": [
+            477,
+            228
+          ]
+        },
+        {
+          "frame_index": 211,
+          "visibility": "visible",
+          "center": [
+            457,
+            227
+          ]
+        },
+        {
+          "frame_index": 212,
+          "visibility": "visible",
+          "center": [
+            438,
+            225
+          ]
+        },
+        {
+          "frame_index": 213,
+          "visibility": "visible",
+          "center": [
+            420,
+            224
+          ]
+        },
+        {
+          "frame_index": 214,
+          "visibility": "visible",
+          "center": [
+            401,
+            223
+          ]
+        },
+        {
+          "frame_index": 215,
+          "visibility": "visible",
+          "center": [
+            382,
+            216
+          ]
+        },
+        {
+          "frame_index": 216,
+          "visibility": "visible",
+          "center": [
+            364,
+            214
+          ]
+        },
+        {
+          "frame_index": 217,
+          "visibility": "visible",
+          "center": [
+            347,
+            212
+          ]
+        },
+        {
+          "frame_index": 218,
+          "visibility": "visible",
+          "center": [
+            331,
+            210
+          ]
+        },
+        {
+          "frame_index": 219,
+          "visibility": "visible",
+          "center": [
+            315,
+            215
+          ]
+        },
+        {
+          "frame_index": 220,
+          "visibility": "visible",
+          "center": [
+            303,
+            207
+          ]
+        },
+        {
+          "frame_index": 221,
+          "visibility": "visible",
+          "center": [
+            292,
+            206
+          ]
+        },
+        {
+          "frame_index": 222,
+          "visibility": "visible",
+          "center": [
+            281,
+            208
+          ]
+        },
+        {
+          "frame_index": 223,
+          "visibility": "visible",
+          "center": [
+            269,
+            207
+          ]
+        },
+        {
+          "frame_index": 224,
+          "visibility": "visible",
+          "center": [
+            259,
+            206
+          ]
+        }
+      ]
+    },
+    {
+      "name": "negative_review",
+      "samples": [
+        {
+          "frame_index": 80,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 81,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 82,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 83,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 84,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 85,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 86,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 87,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 88,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 89,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 90,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 91,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 92,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 93,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 94,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 95,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 96,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 97,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 98,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 99,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 100,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 101,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 102,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 103,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 104,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 105,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 106,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 107,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 108,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 109,
+          "visibility": "not_visible_in_search_region",
+          "center": null
         }
       ]
     }

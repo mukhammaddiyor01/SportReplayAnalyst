@@ -15,6 +15,10 @@ def score_sequence(samples: list[dict], records: dict, tolerance: float) -> dict
     counts = dict(visible=0, correct=0, wrong=0, missed=0, uncertain=0,
                   negative=0, observations_on_negatives=0, correct_runs=0,
                   id_changes_between_correct_observations=0)
+    detection = dict(evaluated_visible=0, near_reference=0, missing_near_reference=0,
+                     near_reference_without_correct_association=0,
+                     negative_frames_with_candidates=0, truncated_frames=0)
+    details = []
     losses = []
     loss = None
     previous_correct_id = None
@@ -44,6 +48,23 @@ def score_sequence(samples: list[dict], records: dict, tolerance: float) -> dict
             counts['observations_on_negatives'] += int(observed is not None)
         else:
             raise ValueError('Unsupported visibility label.')
+        candidate_near = None
+        if 'candidates' in row and visibility != 'uncertain':
+            candidates = row['candidates']
+            detection['truncated_frames'] += int(row.get('candidates_truncated', False))
+            if visibility == 'visible':
+                candidate_near = any(hypot(x - label['center'][0], y - label['center'][1]) <= tolerance
+                                     for x, y in candidates)
+                detection['evaluated_visible'] += 1
+                detection['near_reference' if candidate_near else 'missing_near_reference'] += 1
+                detection['near_reference_without_correct_association'] += int(candidate_near and not correct)
+            else:
+                detection['negative_frames_with_candidates'] += int(bool(candidates))
+        details.append(dict(frame_index=index, timestamp_seconds=row['timestamp_seconds'],
+                            visibility=visibility, manual_center=label['center'],
+                            observation=observed, track_id=row['track_id'],
+                            status=row.get('status'), candidate_near_reference=candidate_near,
+                            candidate_count=len(row['candidates']) if 'candidates' in row else None))
         if visibility == 'visible' and not correct:
             if loss is None:
                 loss = dict(start_frame=index, end_frame=index, frame_count=0,
@@ -67,14 +88,14 @@ def score_sequence(samples: list[dict], records: dict, tolerance: float) -> dict
         previous_was_correct = correct
     if loss is not None:
         losses.append(loss)
-    return {'counts': counts, 'visible_loss_runs': losses,
+    return {'counts': counts, 'detection': detection, 'frames': details, 'visible_loss_runs': losses,
             'longest_visible_loss_frames': max((r['frame_count'] for r in losses), default=0)}
 
 
 def evaluate(video: Path, annotations: dict) -> dict:
     sequences = annotations['sequences']
     records = collect_records(video, annotations, max(
-        row['frame_index'] for seq in sequences for row in seq['samples']))
+        row['frame_index'] for seq in sequences for row in seq['samples']), include_candidates=True)
     return {'protocol': annotations['protocol'], 'sequences': {
         seq['name']: score_sequence(seq['samples'], records, annotations['matching_tolerance_px'])
         for seq in sequences},

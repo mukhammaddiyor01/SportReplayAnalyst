@@ -168,3 +168,55 @@ Next evaluate a dense difficult interval around the known ambiguity at 210 and
 ball-absent intervals to measure false initializations. Keep those diagnostic
 labels separate from any future tuning protocol. Contact/rally work still waits
 for independent evidence and explicit event rules.
+
+## Difficult and negative sequence review (2026-10-26)
+
+The frozen diagnostic set now also covers 195–224 and 80–109. Manual source
+review labeled 28 visible centers and two uncertain racket-adjacent frames in
+195–224. The latter are excluded, not invented occlusion/contact truth. No ball
+was visually identifiable in the search region in 80–109. These negative labels
+say nothing about physical absence outside the region or behind a player.
+Both intervals overlap previously inspected sparse labels; neither is a new
+holdout. No detector or tracker parameter was changed.
+
+The offline evaluator now distinguishes a missing nearby candidate from a
+nearby candidate without a correct association. It reports per-frame source
+time, status, manual center, observation, candidate count, and nearby-candidate
+presence so failures can be located in the original video. TrackingRun returns
+its candidate batch to an offline caller; production worker records and API
+payloads still omit candidate lists. Missing diagnostics are not counted as
+negative detection evidence. Uncertain labels are excluded from detection scores.
+
+| Diagnostic | Visible | Nearby candidate | Correct association | Wrong association | Missed association | Uncertain |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Difficult 195–224 | 28 | 15 | 8 | 0 | 20 | 2 |
+
+The 30 negative frames had zero candidate batches containing a candidate and
+zero associated observations. This tests one quiet interval, not the entire clip
+or all clothing false positives. The two easier intervals retain their previous
+26/26 and 29/29 matches. The difficult interval contains two visible-loss runs:
+195–207 (13 frames, source endpoints 6.5065–6.9069s) and 210–216 (seven frames,
+7.0070–7.2072s). Correct tracking resumes at 217. Unknown frames 208–209 interrupt
+label evidence, so the evaluator does not merge losses across them or infer
+physical occlusion length. Zero identity changes in the scored interval does not
+prove identity preservation: no earlier correct association exists in this window.
+
+A separate inspection of the pre-area-filter connected components near manual
+centers found areas of 25–34 pixels on frames 195–207, below the frozen minimum
+of 35. This identifies an area-filter failure on those frames. Frames 210–214
+contain nearby candidates but multiple candidates prevent unique initialization;
+215–216 are tentative before confirmation at 217. Predictions remain unscored.
+These are two distinct bottlenecks, not evidence of a contact or rally boundary.
+
+All 78 automated Python checks passed. New scoring checks separate detector and
+association losses and distinguish negative candidates from confirmed false
+tracks. The adapter check verifies candidate batches can be inspected without
+adding them to production result records. User footage and generated diagnostic
+results remain outside Git; only numeric manual annotations are committed.
+
+Before changing thresholds, define a new development/holdout protocol: these
+already-inspected intervals can support development, but cannot remain an
+untouched test. A lower area threshold may improve small-ball coverage while
+reintroducing clothing fragments; compare both detection and tracking against
+the frozen baseline on newly annotated, uninspected footage/segments. A separate
+fixed-camera clip is still needed to assess generalization and contact evidence.

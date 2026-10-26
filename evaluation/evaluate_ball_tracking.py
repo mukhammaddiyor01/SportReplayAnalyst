@@ -9,7 +9,7 @@ from backend.adapters.video_reader import VideoError, read_frames
 from evaluation.evaluate_ball_candidates import verify_source
 
 
-def collect_records(video: Path, annotations: dict, last_index: int) -> dict:
+def collect_records(video: Path, annotations: dict, last_index: int, *, include_candidates: bool = False) -> dict:
     """Run all preceding frames as inference context, without consulting labels."""
     verify_source(video, annotations)
     run = TrackingRun(tuple(annotations["search_region"]))
@@ -18,7 +18,11 @@ def collect_records(video: Path, annotations: dict, last_index: int) -> dict:
         for frame in reader:
             if [frame.image.shape[1], frame.image.shape[0]] != annotations["source_dimensions"]:
                 raise ValueError("Annotation dimensions do not match the source video.")
-            run.consume(frame)
+            batch = run.consume(frame)
+            if include_candidates:
+                # Offline diagnostics only; do not add candidates to worker/API results.
+                run.frames[-1]['candidates'] = [(c.x, c.y) for c in batch.candidates]
+                run.frames[-1]['candidates_truncated'] = batch.truncated
             if frame.index >= last_index:
                 break
     finally:

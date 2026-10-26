@@ -117,17 +117,30 @@ negative labels and cannot measure ball-absent false tracks. No detector/tracker
 parameters changed. The sparse held-out result remains 5/6 with frame 210 withheld.
 76 Python tests passed, including six scoring checks. See temporal-tracking.md.
 
+## Difficult/negative follow-up
+
+The same frozen diagnostic now includes 195–224 (28 visible, two uncertain) and
+80–109 (30 frames with no ball visually identifiable in the search region).
+Difficult frames: 15/28 nearby candidates, 8/28 correct associations, zero wrong
+associations, 20 misses. Visible-loss runs are 195–207 and 210–216; association
+resumes at 217. All 30 negatives have no candidates/observations. Earlier easy
+sequence scores remain unchanged. This is still inspected same-video evidence.
+
+Candidate-area inspection found 25–34px components near the manual ball centers
+on 195–207, below the frozen 35px minimum. Multi-candidate initialization blocks
+210–214; 215–216 are tentative. No production thresholds or tracker rules changed.
+Offline reports now include candidate coverage and per-frame diagnostic details;
+candidate lists are not added to worker/API results. 78 Python tests pass.
+
 ## Next step
 
-Review a dense difficult interval around frame 210 and ball-absent frames to
-measure false initializations before changing the detector/tracker. New diagnostic
-labels are not an untouched tuning-independent benchmark.
-
-Expand sequence-level manual evaluation before contact/rally inference. Review
-false initializations, missed small balls, nearby player/clothing ambiguity,
-real occlusions, and identity changes. Obtain a better fixed-camera clip if needed.
-Do not retune the frozen baseline against the existing held-out labels without a
-new evaluation protocol. Keep measured/associated points separate from predictions.
+Define a new development/holdout protocol before changing the area threshold or
+initialization rules. Previously inspected sparse and dense labels may support
+development but cannot serve as an untouched test. Compare candidate coverage,
+false candidates and actual associations against the frozen baseline on newly
+annotated, previously uninspected segments or a new fixed-camera video. Lowering
+minimum area alone can bring back clothing fragments. Contact/rally inference
+still waits for reliable evidence, not merely a direction change.
 
 Contacts, racket interactions, rally timing, event timeline, scoring, physical
 speed, and 3D reconstruction are not implemented. Direction changes alone cannot

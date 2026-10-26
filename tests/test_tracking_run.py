@@ -14,7 +14,9 @@ class TrackingRunTests(unittest.TestCase):
             image = np.full((432, 768, 3), (80, 60, 30), np.uint8)
             if x is not None:
                 cv2.circle(image, (x, 150), 5, (245, 245, 245), -1)
-            run.consume(VideoFrame(index, index / 30, "presentation", image))
+            batch = run.consume(VideoFrame(index, index / 30, "presentation", image))
+            self.assertEqual(bool(batch.candidates), x is not None)
+            self.assertNotIn('candidates', run.frames[-1])
         result = run.result()
         self.assertEqual(len(result["frames"]), 6)
         self.assertEqual(result["track_count"], 1)

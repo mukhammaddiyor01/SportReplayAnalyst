@@ -16,7 +16,7 @@ class TrackingRun:
         self.frames = []
         self.counts = Counter()
 
-    def consume(self, frame: VideoFrame) -> None:
+    def consume(self, frame: VideoFrame) -> CandidateBatch:
         height, width = frame.image.shape[:2]
         if self.tracker is None:
             left, top, right, bottom = self.region
@@ -32,6 +32,7 @@ class TrackingRun:
         self.frames.append(record)
         self.counts[update.status] += 1
         self.previous = frame.image
+        return batch
 
     def result(self) -> dict:
         return {"mode": "experimental_image_space", "search_region": list(self.region),

@@ -1,0 +1,120 @@
+import unittest
+
+from backend.services.ball_observations import BallCandidate, CandidateBatch
+from backend.services.ball_tracker import BallTracker
+
+
+def batch(*points, truncated=False):
+    return CandidateBatch([BallCandidate(x, y, 50, (int(x) - 3, int(y) - 3, 6, 6))
+                           for x, y in points], truncated)
+
+
+class BallTrackerTests(unittest.TestCase):
+    def setUp(self):
+        self.tracker = BallTracker(768, 432)
+
+    def initialize(self):
+        self.tracker.update(batch((100, 150)), 0, 0)
+        self.tracker.update(batch((110, 150)), 1, .033)
+        return self.tracker.update(batch((120, 150)), 2, .066)
+
+    def test_requires_three_coherent_moving_observations(self):
+        one = self.tracker.update(batch((100, 150)), 0, 0)
+        two = self.tracker.update(batch((110, 150)), 1, .033)
+        three = self.tracker.update(batch((120, 150)), 2, .066)
+        self.assertEqual([one.status, two.status, three.status], ["tentative", "tentative", "observed"])
+        self.assertIsNone(two.observation)
+        self.assertEqual(three.observation, (120, 150))
+        self.assertTrue(three.break_before)
+
+    def test_stationary_false_object_does_not_initialize(self):
+        for index in range(10):
+            result = self.tracker.update(batch((100, 150)), index, index / 30)
+            self.assertEqual(result.status, "tentative")
+            self.assertIsNone(result.observation)
+
+    def test_large_distractor_is_not_preferred_over_motion_match(self):
+        initial = self.initialize()
+        result = self.tracker.update(batch((600, 250), (130, 150)), 3, .099)
+        self.assertEqual(result.observation, (130, 150))
+        self.assertEqual(result.track_id, initial.track_id)
+        self.assertFalse(result.break_before)
+
+    def test_close_competing_candidates_are_ambiguous(self):
+        self.initialize()
+        result = self.tracker.update(batch((130, 150), (133, 151)), 3, .099)
+        self.assertEqual(result.status, "ambiguous")
+        self.assertIsNone(result.observation)
+        self.assertIsNotNone(result.prediction)
+
+    def test_saturated_batch_is_never_treated_as_unique(self):
+        self.initialize()
+        result = self.tracker.update(batch((130, 150), truncated=True), 3, .099)
+        self.assertEqual(result.status, "ambiguous")
+        other = BallTracker(768, 432)
+        self.assertEqual(other.update(batch((100, 150), truncated=True), 0, 0).status, "ambiguous")
+
+    def test_short_loss_recovers_id_without_solid_gap_bridge(self):
+        initial = self.initialize()
+        missing = self.tracker.update(batch(), 3, .099)
+        self.tracker.update(batch(), 4, .132)
+        recovered = self.tracker.update(batch((150, 150)), 5, .165)
+        self.assertEqual(missing.status, "predicted")
+        self.assertIsNone(missing.observation)
+        self.assertEqual(recovered.track_id, initial.track_id)
+        self.assertEqual(recovered.observation, (150, 150))
+        self.assertTrue(recovered.break_before)
+
+    def test_long_loss_requires_new_confirmation_and_identity(self):
+        first = self.initialize()
+        self.tracker.update(batch(), 3, .099)
+        result = self.tracker.update(batch((300, 150)), 10, .4)
+        self.assertEqual(result.status, "tentative")
+        self.tracker.update(batch((310, 150)), 11, .433)
+        second = self.tracker.update(batch((320, 150)), 12, .466)
+        self.assertNotEqual(second.track_id, first.track_id)
+        self.assertTrue(second.break_before)
+
+    def test_skipped_frame_indices_break_trail_even_when_time_gate_accepts(self):
+        self.initialize()
+        result = self.tracker.update(batch((140, 150)), 4, .132)
+        self.assertEqual(result.status, "observed")
+        self.assertTrue(result.break_before)
+
+    def test_impossible_jump_does_not_replace_last_observation(self):
+        self.initialize()
+        rejected = self.tracker.update(batch((650, 380)), 3, .099)
+        self.assertIsNone(rejected.observation)
+        recovered = self.tracker.update(batch((140, 150)), 4, .132)
+        self.assertEqual(recovered.observation, (140, 150))
+
+    def test_actual_timestamp_interval_controls_prediction(self):
+        self.tracker.update(batch((100, 150)), 0, 0)
+        self.tracker.update(batch((110, 150)), 1, .02)
+        self.tracker.update(batch((120, 150)), 2, .04)
+        result = self.tracker.update(batch(), 3, .14)
+        self.assertAlmostEqual(result.prediction[0], 170)
+        self.assertIsNone(result.observation)
+
+    def test_input_validation_does_not_mutate_state(self):
+        self.initialize()
+        for points, index, timestamp in [(batch((130, 150)), 2, .1),
+                                         (batch((130, 150)), 3, .066),
+                                         (batch((130, 150)), 3, float("nan")),
+                                         (batch((9999, 150)), 3, .099)]:
+            with self.assertRaises(ValueError):
+                self.tracker.update(points, index, timestamp)
+        self.assertEqual(self.tracker.update(batch((130, 150)), 3, .099).observation, (130, 150))
+
+    def test_sessions_and_reset_do_not_share_state(self):
+        self.initialize()
+        other = BallTracker(768, 432)
+        self.assertEqual(other.update(batch((130, 150)), 0, 0).status, "tentative")
+        self.tracker.reset()
+        self.assertEqual(self.tracker.update(batch((300, 150)), 0, 0).status, "tentative")
+
+    def test_missing_initial_evidence_breaks_confirmation(self):
+        self.tracker.update(batch((100, 150)), 0, 0)
+        self.tracker.update(batch(), 1, .033)
+        self.assertEqual(self.tracker.update(batch((120, 150)), 2, .066).status, "tentative")
+        self.assertEqual(self.tracker.update(batch((130, 150)), 3, .099).status, "tentative")

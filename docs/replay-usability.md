@@ -35,3 +35,34 @@ page width was also 544px, with no horizontal overflow. Browser warning/error lo
 were empty. Screenshot proof stays outside Git; the final local review result
 remains under ordinary retention. Wider breakpoints are defined in CSS and were
 not visually exercised in this increment.
+
+## Source-frame stepping
+
+Playback now includes Previous frame / Next frame buttons (−1/+1). They remain
+disabled until a matching tracking result with usable source presentation times
+is available. The controls reuse the overlay's actual ordered frame records and
+timestamp lookup, pause playback, and seek inside the neighboring source frame's
+recorded time interval. The midpoint avoids browser decoder rounding at exact
+frame boundaries; the following timestamp (or clip duration at the last frame)
+bounds the interval. They do not estimate a step from nominal FPS, interpolate positions,
+or turn a missing/predicted record into an observation. Clip/result clearing
+disables them; source timing fallback or dimension mismatch keeps them disabled.
+
+Left/Right arrows work when focus is in the playback control group, except the
+native position slider. Modifier shortcuts and coordinate inputs retain their
+normal behavior. Frame stepping clears frame-local corners through existing seek
+handling. Hiding the trail still leaves the current source frame identifiable.
+The narrow layout puts the timeline below the playback buttons to avoid crowding.
+
+Actual browser verification on the supplied video confirmed frame transitions
+149 → 148 → 149 → 150, including the missing observation at 149. The initial
+exact-boundary seek displayed 147 when 148 was requested; seeking inside the
+recorded frame interval fixed that observed browser rounding issue. Both arrow
+keys were exercised in playback controls. At source frames 0 and 359 the outward
+step button was disabled; stepping 359 → 358 → 359 stayed bounded. With the trail
+hidden, source frame status and stepping still worked. A Right arrow in the native
+slider moved 6.006s to 6.007s while remaining on frame 180, confirming the shortcut
+did not hijack its controls. The final next-frame action showed associated frame
+181. Browser warning/error logs were empty; screenshot proof remains outside Git.
+All 94 Python tests and the changed script's syntax check passed. This increment
+does not improve detector accuracy or infer a contact/rally.

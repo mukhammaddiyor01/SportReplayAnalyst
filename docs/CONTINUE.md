@@ -1,6 +1,6 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: clean replay workflow with full_shape_v1 and gap review.
+Checkpoint: clean replay workflow, source-frame stepping, full_shape_v1 and gap review.
 
 ## Agreement and repository
 
@@ -211,6 +211,22 @@ flow verified upload, numeric corners/check, tracking, progress/completion, deta
 disclosure, review navigation to missing frame 149 and seek to observed frame 180.
 The final 544px viewport had no horizontal overflow; browser warn/error logs were
 empty. Screenshot is outside Git. See docs/replay-usability.md for scope and limits.
+
+## Source-frame stepping
+
+Previous/Next frame (−1/+1) buttons now use actual tracking frame timestamp
+intervals, with no nominal-FPS step. Seeking to the interval midpoint avoids an
+observed browser boundary-rounding error. Buttons stay disabled without matching
+usable tracking results; clear/result reset disables them again. First/last
+records bound stepping. Left/Right arrows work only in playback controls, leaving
+native slider/coordinate editing and modifier shortcuts alone. Trail-hidden mode
+still identifies the current frame. Narrow playback puts the slider on a new row.
+
+Browser verified 149 → 148 → 149 → 150, 0/359 bounds, 359 → 358 → 359, hidden
+trail stepping, both arrow shortcuts, and native slider Right moving only .001s.
+Final frame 181 showed an associated marker. Browser warn/error logs empty;
+proof outside Git. 94 Python tests and JS syntax passed. No detector/event rule
+changed. See docs/replay-usability.md.
 
 ## Next step
 

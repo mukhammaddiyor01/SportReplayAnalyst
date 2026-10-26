@@ -73,8 +73,11 @@
               <canvas id="corners" aria-label="Select table corners; numeric controls are also available below"></canvas>
               <canvas id="tracking-overlay" aria-hidden="true"></canvas>
             </div>
-            <div class="playback">
+            <div class="playback" role="group" aria-label="Video playback" aria-describedby="frame-step-help" tabindex="0">
               <button id="toggle-play" class="play-button" type="button">Play</button>
+              <button id="step-back" class="play-button frame-step" type="button" aria-label="Previous frame" title="Previous frame (Left arrow). Available after tracking." disabled>−1</button>
+              <button id="step-forward" class="play-button frame-step" type="button" aria-label="Next frame" title="Next frame (Right arrow). Available after tracking." disabled>+1</button>
+              <span id="frame-step-help" class="visually-hidden">After tracking, use the frame buttons or Left and Right arrows in playback controls to review source frames. The position slider keeps its usual arrow controls.</span>
               <label for="seek" class="visually-hidden">Video position</label>
               <input id="seek" type="range" min="0" max="1" step="0.001" value="0">
               <output id="time">0.000 s</output>

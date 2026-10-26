@@ -17,7 +17,8 @@ and plain HTML/CSS/JavaScript. Video processing stays on this computer.
 Tracking results also include source-timed [gap review](docs/tracking-review.md):
 select an unobserved interval to pause and inspect its first frame.
 The upload toolbar, calibration/analysis panel and collapsible inspection details
-keep the [review workflow](docs/replay-usability.md) focused.
+keep the [review workflow](docs/replay-usability.md) focused. After tracking,
+−1/+1 and playback arrow keys step through recorded source-frame intervals.
 
 Table contacts, rally boundaries, shot classification, scoring, and physical
 measurements are not implemented. Image-space tracks are not 3D trajectories.

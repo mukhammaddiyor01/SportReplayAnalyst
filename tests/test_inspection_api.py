@@ -153,6 +153,7 @@ class InspectionApiTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(state["status"], "completed", state)
         result = state["result"]["tracking"]
         self.assertEqual(result["mode"], "experimental_image_space")
+        self.assertEqual(result["detector"], "full_shape_v1")
         self.assertEqual(len(result["frames"]), 20)
         self.assertEqual(result["frames"][-1]["frame_index"], 19)
         self.assertEqual(result["track_count"], 0)

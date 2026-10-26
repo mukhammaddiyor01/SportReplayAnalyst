@@ -10,7 +10,9 @@ and plain HTML/CSS/JavaScript. Video processing stays on this computer.
 - Bounded background frame inspection, camera-movement estimates, progress,
   cancellation, explicit clearing, and private temporary-file cleanup.
 - Experimental temporal ball association and a synchronized image-space 2D trail.
-  This is an early bright-moving-blob baseline, not a generally reliable tracker.
+  Full-shape brightness, motion, and surrounding-appearance filters remain
+  experimental; moving false objects and missed balls are still possible.
+  See [detector evaluation](docs/appearance-detector.md).
 
 Table contacts, rally boundaries, shot classification, scoring, and physical
 measurements are not implemented. Image-space tracks are not 3D trajectories.

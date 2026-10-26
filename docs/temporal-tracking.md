@@ -220,3 +220,23 @@ untouched test. A lower area threshold may improve small-ball coverage while
 reintroducing clothing fragments; compare both detection and tracking against
 the frozen baseline on newly annotated, uninspected footage/segments. A separate
 fixed-camera clip is still needed to assess generalization and contact evidence.
+
+
+## Current detector: full_shape_v1
+
+Normal worker tracking now uses full bright/contrast components with separate
+motion evidence, shape-fill and surrounding-brightness checks. The association
+service, confirmation, ambiguity, gap, and browser observation-only rules stay
+unchanged. Results identify the detector version. See appearance-detector.md for
+prospective protocol, exact thresholds, gains/losses and reproducible commands.
+Historical tables above describe their frozen increments, not current defaults.
+Current evaluators accept --legacy-detector to reproduce the original detector.
+The rejected --small-candidate-continuation remains a legacy offline experiment.
+
+On previously reserved 300–339, correct associations rose 19/23 to 20/23, with
+zero wrong observations and zero observations on 16 negative labels in either
+method; one boundary frame is uncertain. Development rose 97/120 to 115/120,
+including four lost easy observations. Both are same-video manual diagnostics.
+88 tests passed; actual-video API upload/spawned tracking/delete matched offline
+360-frame records and left zero private job directories. Browser rendering was
+not re-tested this increment. Contacts/rallies remain unimplemented.

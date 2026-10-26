@@ -1,5 +1,8 @@
 # Small-candidate continuation protocol
 
+Historical experiment. Normal tracking has since moved to full_shape_v1; see
+appearance-detector.md. This rejected legacy continuation remains offline-only.
+
 Protocol established before labeling/scoring the reserved 260–299 source interval.
 Baseline: commit 142d5be, fixed 35px minimum connected-component area at 768px
 reference width. All previously inspected sparse/dense labels are now development

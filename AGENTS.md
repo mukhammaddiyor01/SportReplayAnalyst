@@ -14,10 +14,13 @@ system: predictions and missing/ambiguous frames are not drawn as observations.
 See docs/temporal-tracking.md, docs/camera-motion.md, and the annotated pilot.
 Dense easy, difficult, and ball-not-visible intervals are evaluated. Known losses
 include small components rejected by the area filter and ambiguous initialization.
-A small-candidate continuation experiment failed reserved same-video validation
-and stays offline-only; normal tracking keeps its original thresholds. Previously
-inspected sparse/dense and 260–299 labels are now development evidence. Reserve
-new evaluation data before the next tuning change. See docs/tracking-refinement.md.
+Normal tracking now uses full-shape bright components with separate motion,
+fill, and surrounding-brightness checks (full_shape_v1). It improved same-video
+sequence results but still loses some easy observations and is not semantic ball
+classification. Original motion-clipped tracking is available offline for baseline
+comparisons; its rejected small-candidate continuation remains offline-only.
+Labels through 339 have now been inspected; reserve new data before further tuning.
+See docs/appearance-detector.md and docs/tracking-refinement.md.
 Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent
 work in small, independently verified steps. Do not modify reference projects.

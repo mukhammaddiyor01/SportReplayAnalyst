@@ -2,7 +2,7 @@
 from collections import Counter
 from dataclasses import asdict
 
-from backend.adapters.ball_detector import find_ball_candidates
+from backend.adapters.ball_detector import find_appearance_candidates, find_ball_candidates
 from backend.adapters.video_reader import VideoError, VideoFrame
 from backend.config import BALL_CONTINUATION_MIN_AREA, BALL_MIN_AREA, TRACK_MAX_GAP_SECONDS
 from backend.services.ball_observations import CandidateBatch
@@ -10,7 +10,9 @@ from backend.services.ball_tracker import BallTracker
 
 
 class TrackingRun:
-    def __init__(self, region: tuple[int, int, int, int], *, small_candidate_continuation: bool = False):
+    def __init__(self, region: tuple[int, int, int, int], *, small_candidate_continuation: bool = False,
+                 appearance_filter: bool = True):
+        self.appearance_filter = appearance_filter and not small_candidate_continuation
         self.small_candidate_continuation = small_candidate_continuation
         self.region = region
         self.previous = None
@@ -29,8 +31,12 @@ class TrackingRun:
         continuing = (self.small_candidate_continuation and last is not None and
                       0 < frame.timestamp_seconds - last.timestamp <= TRACK_MAX_GAP_SECONDS)
         minimum_area = BALL_CONTINUATION_MIN_AREA if continuing else BALL_MIN_AREA
-        batch = CandidateBatch([]) if self.previous is None else find_ball_candidates(
-            self.previous, frame.image, self.region, minimum_area=minimum_area)
+        if self.previous is None:
+            batch = CandidateBatch([])
+        elif self.appearance_filter:
+            batch = find_appearance_candidates(self.previous, frame.image, self.region)
+        else:
+            batch = find_ball_candidates(self.previous, frame.image, self.region, minimum_area=minimum_area)
         update = self.tracker.update(batch, frame.index, frame.timestamp_seconds)
         record = asdict(update)
         record["timestamp_source"] = frame.timestamp_source
@@ -41,7 +47,9 @@ class TrackingRun:
         return batch
 
     def result(self) -> dict:
-        return {"mode": "experimental_image_space", "search_region": list(self.region),
+        return {"mode": "experimental_image_space",
+                "detector": "full_shape_v1" if self.appearance_filter else "motion_clipped_v1",
+                "search_region": list(self.region),
                 "status_counts": dict(self.counts), "frames": self.frames,
                 "track_count": self.tracker.next_track_id - 1 if self.tracker else 0,
                 "warning": "Experimental associations in image pixels. Predictions are not observations; contacts and rallies are not inferred."}

@@ -1,6 +1,6 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-26, dense sequence evaluation after the browser 2D trail milestone.
+Checkpoint: full_shape_v1 promoted after same-video reserved validation.
 
 ## Agreement and repository
 
@@ -36,7 +36,7 @@ for experimental tracking; it does not make an airborne point a table coordinate
 Playback/seek clears manual geometry, while tracking results remain source-timed.
 
 Inspect video runs bounded frame inspection and sampled camera drift checks.
-Track ball (experimental) additionally runs bright-blob extraction and pure Python
+Track ball (experimental) now runs full_shape_v1 bright-component extraction and pure Python
 temporal association. The worker returns one record per decoded frame, with source
 index/time, status, local track ID, observation/prediction separately, and gap marker.
 
@@ -154,14 +154,37 @@ in normal workers/API. Only offline --small-candidate-continuation enables it.
 claimed. See evaluation/ball-validation.json and docs/tracking-refinement.md.
 The newly inspected validation interval is no longer untouched for future tuning.
 
+## Current full-shape detector
+
+Normal worker/API tracking uses full_shape_v1. Connect the full bright/contrast
+component, require motion on max(10 scaled pixels, 15% of area), area 25–180,
+extent <=24, aspect <=6, fill >=0.45, and median surrounding V<=145 in a 4px
+ring, with geometry scaled from 768px. No hue/table-coordinate classifier.
+Temporal rules and observation-only rendering are unchanged. Result metadata
+identifies the detector. --legacy-detector reproduces the old motion-clipped
+baseline; --small-candidate-continuation forces the rejected legacy experiment.
+
+Prospective protocol in docs/appearance-detector.md was frozen before manual
+labels/scoring on 300–339. Baseline from exported 0e2fb4c: 19/23 correct, zero
+wrong, four missed. Full-shape: 20/23 correct, zero wrong, three missed. Both had
+zero observations on 16 negatives; one boundary frame is uncertain. Extra visible
+candidates fell 27 to 14, but negative frames with candidates rose three to four.
+Development (all older inspected labels) rose 97/120 to 115/120 with four easy
+matches lost, zero wrong observations and zero/30 negative associations. Historical
+sparse held_out is now development: 6/6 vs 5/6. No independent-video claim.
+
+88 tests passed. Actual source upload through HTTP ASGI routes completed in a
+spawned worker: 360 records equal offline output, explicit delete left zero
+private job directories, original preserved. Final default and legacy reserved
+records/scores equal frozen evaluations. No browser retest this increment.
+
 ## Next step
 
-Investigate temporal/appearance evidence distinguishing ball candidates from
-player/racket fragments before relaxing area filtering. More candidate coverage
-alone harmed association and is insufficient. Define another untouched interval
-or obtain a separate fixed-camera clip for the next candidate. Do not keep tuning
-against 260–299. Keep uncertainty explicit; contact/rally inference still waits
-for independent evidence and documented rules.
+Review the four lost easy observations and full-video false-track intervals.
+Do not retune against reserved 300–339, now inspected. Obtain a distinct fixed-
+camera clip for independent evaluation and eventual contact evidence. Moving
+compact false objects, light backgrounds, watermark overlap, merged ball/racket
+shapes and motionless balls remain limitations. Keep uncertainty explicit.
 
 Contacts, racket interactions, rally timing, event timeline, scoring, physical
 speed, and 3D reconstruction are not implemented. Direction changes alone cannot

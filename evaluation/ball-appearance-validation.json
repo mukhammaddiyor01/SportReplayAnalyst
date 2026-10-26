@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "sha256": "de1be132d44deb1be6e932585b2b029a8092a3fc4aa65c6774368ec5cad28fc1",
+  "source_dimensions": [
+    768,
+    432
+  ],
+  "frame_indexing": "zero_based_decoded",
+  "search_region": [
+    170,
+    70,
+    625,
+    330
+  ],
+  "matching_tolerance_px": 8,
+  "annotation_method": "Approximate manual visible-blur midpoints read from unmarked source crops at native resolution; no interpolation and no detector-assisted centers. Single reviewer, not expert reviewed.",
+  "protocol": "Reserved appearance-detector validation 300-339. Frozen before source-only manual annotation and scoring, see docs/appearance-detector.md. Baseline 0e2fb4c versus full-shape motion-supported appearance detector. Single-reviewer same-video evidence only; 323 uncertain at search boundary, 324-339 no ball visually identifiable inside search window. Physical absence outside window is not asserted.",
+  "sequences": [
+    {
+      "name": "appearance_reserved_300_339",
+      "samples": [
+        {
+          "frame_index": 300,
+          "visibility": "visible",
+          "center": [
+            299,
+            239
+          ]
+        },
+        {
+          "frame_index": 301,
+          "visibility": "visible",
+          "center": [
+            311,
+            243
+          ]
+        },
+        {
+          "frame_index": 302,
+          "visibility": "visible",
+          "center": [
+            322,
+            248
+          ]
+        },
+        {
+          "frame_index": 303,
+          "visibility": "visible",
+          "center": [
+            333,
+            253
+          ]
+        },
+        {
+          "frame_index": 304,
+          "visibility": "visible",
+          "center": [
+            344,
+            258
+          ]
+        },
+        {
+          "frame_index": 305,
+          "visibility": "visible",
+          "center": [
+            355,
+            261
+          ]
+        },
+        {
+          "frame_index": 306,
+          "visibility": "visible",
+          "center": [
+            365,
+            265
+          ]
+        },
+        {
+          "frame_index": 307,
+          "visibility": "visible",
+          "center": [
+            376,
+            269
+          ]
+        },
+        {
+          "frame_index": 308,
+          "visibility": "visible",
+          "center": [
+            384,
+            274
+          ]
+        },
+        {
+          "frame_index": 309,
+          "visibility": "visible",
+          "center": [
+            375,
+            276
+          ]
+        },
+        {
+          "frame_index": 310,
+          "visibility": "visible",
+          "center": [
+            366,
+            280
+          ]
+        },
+        {
+          "frame_index": 311,
+          "visibility": "visible",
+          "center": [
+            359,
+            285
+          ]
+        },
+        {
+          "frame_index": 312,
+          "visibility": "visible",
+          "center": [
+            352,
+            288
+          ]
+        },
+        {
+          "frame_index": 313,
+          "visibility": "visible",
+          "center": [
+            345,
+            292
+          ]
+        },
+        {
+          "frame_index": 314,
+          "visibility": "visible",
+          "center": [
+            336,
+            296
+          ]
+        },
+        {
+          "frame_index": 315,
+          "visibility": "visible",
+          "center": [
+            329,
+            300
+          ]
+        },
+        {
+          "frame_index": 316,
+          "visibility": "visible",
+          "center": [
+            323,
+            304
+          ]
+        },
+        {
+          "frame_index": 317,
+          "visibility": "visible",
+          "center": [
+            316,
+            307
+          ]
+        },
+        {
+          "frame_index": 318,
+          "visibility": "visible",
+          "center": [
+            310,
+            310
+          ]
+        },
+        {
+          "frame_index": 319,
+          "visibility": "visible",
+          "center": [
+            304,
+            314
+          ]
+        },
+        {
+          "frame_index": 320,
+          "visibility": "visible",
+          "center": [
+            298,
+            317
+          ]
+        },
+        {
+          "frame_index": 321,
+          "visibility": "visible",
+          "center": [
+            292,
+            320
+          ]
+        },
+        {
+          "frame_index": 322,
+          "visibility": "visible",
+          "center": [
+            286,
+            324
+          ]
+        },
+        {
+          "frame_index": 323,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 324,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 325,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 326,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 327,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 328,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 329,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 330,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 331,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 332,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 333,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 334,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 335,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 336,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 337,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 338,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        },
+        {
+          "frame_index": 339,
+          "visibility": "not_visible_in_search_region",
+          "center": null
+        }
+      ]
+    }
+  ]
+}

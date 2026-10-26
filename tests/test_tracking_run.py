@@ -75,8 +75,8 @@ class TrackingRunTests(unittest.TestCase):
         self.assertEqual(run.frames[-1]['status'], 'ambiguous')
         self.assertIsNone(run.frames[-1]['observation'])
 
-    def test_normal_worker_path_keeps_strict_area_during_continuation(self):
-        run = TrackingRun((100, 50, 500, 300))
+    def test_legacy_path_keeps_strict_area_during_continuation(self):
+        run = TrackingRun((100, 50, 500, 300), appearance_filter=False)
         for i, x in enumerate([None, 200, 210, 220, 230]):
             image = np.full((432, 768, 3), (80, 60, 30), np.uint8)
             if x is not None:

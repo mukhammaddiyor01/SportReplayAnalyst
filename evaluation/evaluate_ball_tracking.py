@@ -10,11 +10,11 @@ from evaluation.evaluate_ball_candidates import verify_source
 
 
 def collect_records(video: Path, annotations: dict, last_index: int, *, include_candidates: bool = False,
-                    small_candidate_continuation: bool = False) -> dict:
+                    small_candidate_continuation: bool = False, appearance_filter: bool = True) -> dict:
     """Run all preceding frames as inference context, without consulting labels."""
     verify_source(video, annotations)
     run = TrackingRun(tuple(annotations["search_region"]),
-                      small_candidate_continuation=small_candidate_continuation)
+                      small_candidate_continuation=small_candidate_continuation, appearance_filter=appearance_filter)
     reader = read_frames(video)
     try:
         for frame in reader:
@@ -32,11 +32,11 @@ def collect_records(video: Path, annotations: dict, last_index: int, *, include_
     return {row["frame_index"]: row for row in run.frames}
 
 
-def evaluate(video: Path, annotations: dict, split: str) -> dict:
+def evaluate(video: Path, annotations: dict, split: str, *, legacy_detector: bool = False) -> dict:
     samples = {row["frame_index"]: row for row in annotations["samples"] if row["split"] == split}
     if not samples:
         raise ValueError("This split contains no labeled frames.")
-    records = collect_records(video, annotations, max(samples))
+    records = collect_records(video, annotations, max(samples), appearance_filter=not legacy_detector)
     summary = {"split": split, "visible_labels": 0, "observed_near_reference": 0,
                "observed_away_from_reference": 0, "not_observed_on_visible": 0,
                "negative_labels": 0, "observations_on_negatives": 0}
@@ -65,13 +65,14 @@ def evaluate(video: Path, annotations: dict, split: str) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate frozen temporal association on the existing pilot.")
+    parser = argparse.ArgumentParser(description="Evaluate temporal association on the existing pilot.")
     parser.add_argument("video", type=Path)
     parser.add_argument("--annotations", type=Path, default=Path(__file__).with_name("ball-pilot.json"))
     parser.add_argument("--split", choices=["tuning", "held_out"], default="held_out")
+    parser.add_argument('--legacy-detector', action='store_true', help='Reproduce the original motion-clipped detector.')
     args = parser.parse_args()
     try:
-        result = evaluate(args.video, json.loads(args.annotations.read_text()), args.split)
+        result = evaluate(args.video, json.loads(args.annotations.read_text()), args.split, legacy_detector=args.legacy_detector)
     except (ValueError, OSError, VideoError) as error:
         parser.exit(1, f"Tracking evaluation failed: {error}\n")
     print(json.dumps(result, indent=2))

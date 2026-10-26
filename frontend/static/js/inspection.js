@@ -1,5 +1,6 @@
 // Inspection owns its worker handle; table calibration remains frame-local.
 (() => {
+  const trackButton = document.querySelector("#track-start");
   const startButton = document.querySelector("#inspect-start");
   const cancelButton = document.querySelector("#inspect-cancel");
   const deleteButton = document.querySelector("#inspect-delete");
@@ -11,6 +12,7 @@
   let job = null;
   let generation = 0;
   let reserving = false;
+  let trackingRegion = null;
 
   function setMessage(message) {
     statusText.textContent = message;
@@ -19,6 +21,7 @@
   function updateControls() {
     const terminal = job && terminalStates.has(job.status);
     startButton.disabled = !file || reserving || job !== null;
+    trackButton.disabled = startButton.disabled || !trackingRegion;
     cancelButton.hidden = !job || terminal;
     cancelButton.disabled = job?.status === "cancelling";
     deleteButton.hidden = !terminal;
@@ -54,6 +57,10 @@
       fields.push(["Camera check", labels[camera.status] || "Inconclusive"]);
       fields.push(["Calibration reuse", camera.calibration_reuse === "blocked" ? "Frame-local only" : "Review required"]);
     }
+    if (result.tracking) {
+      fields.push(["Associated observations", String(result.tracking.status_counts.observed || 0)]);
+      fields.push(["Unobserved predictions", String(result.tracking.status_counts.predicted || 0)]);
+    }
     for (const [label, value] of fields) {
       const item = document.createElement("div");
       const term = document.createElement("dt");
@@ -73,8 +80,13 @@
     const cleanupNote = state.cleanup_pending ? " Temporary file cleanup is pending; the server will retry." : "";
     if (state.status === "completed") {
       const cameraNote = state.result.camera_motion ? ` ${state.result.camera_motion.message}` : "";
-      setMessage(`${state.decoded_frames} frames inspected.${cameraNote} Ball tracking and events have not been evaluated.${cleanupNote}`);
+      const trackingNote = state.result.tracking ? " Experimental 2D associations are ready. Contacts and rallies were not evaluated." : " Ball tracking was not run.";
+      setMessage(`${state.decoded_frames} frames inspected.${cameraNote}${trackingNote}${cleanupNote}`);
       showResult(state.result);
+      if (state.result.tracking && !handle.trackingPublished) {
+        handle.trackingPublished = true;
+        document.dispatchEvent(new CustomEvent("replay:tracking-ready", {detail: {result: state.result}}));
+      }
     } else if (state.status === "failed") {
       setMessage(`Inspection failed: ${state.error}${cleanupNote}`);
     } else if (state.status === "cancelled") {
@@ -106,6 +118,7 @@
       if (job !== handle) return;
       if (error.status === 404) {
         job = null;
+        document.dispatchEvent(new CustomEvent("replay:tracking-cleared"));
         resultList.hidden = true;
         setMessage("This inspection expired or the server restarted. You can inspect the clip again.");
         updateControls();
@@ -137,6 +150,15 @@
     }
   }
 
+  document.addEventListener("replay:table-checked", event => {
+    trackingRegion = [...event.detail.region];
+    updateControls();
+  });
+  document.addEventListener("replay:table-cleared", () => {
+    trackingRegion = null;
+    updateControls();
+  });
+
   document.addEventListener("replay:clip-ready", event => {
     file = event.detail.file;
     setMessage("Ready to inspect this clip.");
@@ -146,6 +168,7 @@
   document.addEventListener("replay:clip-cleared", () => {
     generation += 1;
     file = null;
+    trackingRegion = null;
     reserving = false;
     const previous = job;
     job = null;
@@ -157,16 +180,19 @@
     updateControls();
   });
 
-  startButton.addEventListener("click", async () => {
-    if (!file || job || reserving) return;
+  async function startAnalysis(mode) {
+    if (!file || job || reserving || (mode === "track" && !trackingRegion)) return;
     const currentGeneration = generation;
     const selectedFile = file;
+    const options = mode === "track" ? {mode, search_region: [...trackingRegion]} : {mode};
     let handle = null;
     reserving = true;
     updateControls();
     setMessage("Preparing local inspection…");
     try {
-      const reservation = await fetch("/api/inspections", {method: "POST"});
+      const reservation = await fetch("/api/inspections", {
+        method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(options),
+      });
       const body = await reservation.json();
       if (!reservation.ok) throw new Error(body.detail || "Could not start local inspection.");
       handle = {...body, upload: new AbortController(), timer: null};
@@ -206,7 +232,10 @@
         updateControls();
       }
     }
-  });
+  }
+
+  startButton.addEventListener("click", () => startAnalysis("inspect"));
+  trackButton.addEventListener("click", () => startAnalysis("track"));
 
   cancelButton.addEventListener("click", async () => {
     const current = job;
@@ -237,6 +266,7 @@
       if (job !== current) return;
       clearTimeout(current.timer);
       job = null;
+      document.dispatchEvent(new CustomEvent("replay:tracking-cleared"));
       resultList.replaceChildren();
       resultList.hidden = true;
       setMessage("The local video copy and inspection result were removed.");

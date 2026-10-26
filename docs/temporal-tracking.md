@@ -84,4 +84,41 @@ there is no learned model. This reuses the small same-video pilot and does not
 measure dense temporal identity, identity switches, real occlusion recovery,
 full-flight correctness, or generalization. Additional sequence annotations are
 required. The underlying detector's small-ball and clothing-fragment failures
-still apply. UI integration remains a separate increment.
+still apply. The browser integration described below was verified in the following increment.
+
+## Browser 2D overlay
+
+After four corners are checked, the browser derives a padded rectangle (2% of
+source width/height on each side, clipped to the image). This is only a coarse
+search window. Track ball explicitly requests tracking; Inspect video still
+runs without it. Neither applies the table-plane homography to airborne points.
+The browser-derived window differs slightly from the fixed pilot window; browser
+record totals are not substituted for the offline pilot scores.
+
+The tracking canvas matches source video dimensions. Playback uses presented
+video media timestamps when available; seeking uses timestamp lookup. A 0.6s tail
+contains only observed records with the same track ID. Missing/ambiguous frames,
+source-index gaps, and break_before markers interrupt the line. The current marker
+appears only on observed records. Tentative/predicted locations are not plotted.
+Estimated timestamps or playback/source size mismatches disable the overlay.
+
+Actual browser checks on the supplied clip verified:
+
+- Frame 180 at 6.006s showed a candidate marker and image-space trail aligned
+  with the visible ball. Playback advanced the displayed source frame.
+- Frame 210 at 7.007s showed no observation (ambiguous), without a false marker.
+- The overlay checkbox hid/restored the trail.
+- Clear result removed the overlay/records and left zero private job directories.
+- Cancelling an actual tracking job stopped its worker and left zero private
+  job directories; the original source file remained present.
+- Final tracking completion returned 360 source records, including 208 associated
+  observations and 20 prediction-only frames for this browser search window.
+  These are processing counts, not verified ball accuracy or rally statistics.
+
+The final flow's browser error/warning logs were empty. JavaScript syntax checks
+passed. Screenshots remain outside Git because they contain user-provided footage.
+70 Python checks passed, including the worker-mode/region validation and cleanup.
+
+Next, expand manually labeled sequences and review false tracks/losses before
+contact or rally inference. Synthetic short-gap tests are not proof of reliable
+recovery through real occlusions. No stabilization or 3D inference was added.

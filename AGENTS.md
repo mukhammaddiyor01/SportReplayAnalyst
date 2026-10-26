@@ -5,15 +5,16 @@
 Build a local application for analyzing prerecorded table tennis video: ball
 observations and image-space tracks, estimated table contacts, and rally timing.
 The minimal application setup and bounded local video reader are implemented.
-Manual frame calibration is implemented and clears when playback or seeking changes
-the frame. Local video inspection now uses bounded uploads, an app-owned worker
-process, frame-count progress, cancellation, and private-file cleanup. The next
-stage adds temporal ball association after the experimental offline candidate
-baseline. Sampled camera drift is now checked during inspection and blocks
-unattended calibration reuse. A small manually annotated candidate pilot exists.
-See docs/camera-motion.md and docs/ball-candidate-baseline.md before extending it.
-No automated ball tracking, table contacts, or rally analysis exist yet.
-Do not claim that tracking or event detection already works. Implement subsequent
+Manual frame calibration clears when playback or seeking changes the frame.
+Bounded local video jobs provide progress, cancellation, and private-file cleanup.
+Sampled camera drift blocks unattended table-plane calibration reuse.
+Experimental image-space tracking now runs in a separate requested worker mode
+and renders a short 2D trail in the browser. It is not a robust ball identity
+system: predictions and missing/ambiguous frames are not drawn as observations.
+See docs/temporal-tracking.md, docs/camera-motion.md, and the annotated pilot.
+The next stage expands sequence-level evaluation and detector reliability before
+contact/rally inference. No table-contact or rally analysis is implemented.
+Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent
 work in small, independently verified steps. Do not modify reference projects.
 Conversation is in Uzbek; code, interface, comments, and documentation are English.
 

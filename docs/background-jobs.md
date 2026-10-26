@@ -100,3 +100,16 @@ errors expose a retry/cancel path instead of pretending inspection succeeded.
 
 Ball detection, tracking, contacts, rallies, camera-motion validation, and a
 manually annotated evaluation set are not implemented or evaluated by this stage.
+
+## Optional experimental tracking mode
+
+Reservation accepts mode=track and search_region=[left,top,right,bottom]. The
+schema validates a nonempty supported image rectangle before admission; the
+worker checks it against actual source dimensions. Default mode remains inspect.
+Tracking uses the same worker slot, progress, token scope, limits, and cleanup.
+
+The result may include tracking frames with indices, source timestamps, status,
+track IDs, separate associated/predicted positions, and gap markers. The bounded
+video reader limits the record count to at most 7200 source frames. No image bytes
+are returned in these records. An invalid source window fails and removes the
+private copy. Cancel analysis and Clear result also apply to tracking jobs.

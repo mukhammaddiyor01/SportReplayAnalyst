@@ -1,17 +1,25 @@
 # Sports Replay Analyst
 
-Local table tennis replay analysis, built incrementally with Python, OpenCV,
-FastAPI, Jinja2, and plain browser JavaScript.
+A local table tennis replay workspace built with Python, OpenCV, FastAPI, Jinja2,
+and plain HTML/CSS/JavaScript. Video processing stays on this computer.
 
-## Current stage
+## Current behavior
 
-The replay workspace, bounded local video reader, manual frame calibration, and
-background video inspection are implemented. Ball
-tracking, table-contact estimation, and rally timing are not implemented. No analysis results are fabricated.
+- Local playback, seeking, manual source-coordinate table corners, and validated
+  unit-table-plane geometry.
+- Bounded background frame inspection, camera-movement estimates, progress,
+  cancellation, explicit clearing, and private temporary-file cleanup.
+- Experimental temporal ball association and a synchronized image-space 2D trail.
+  This is an early bright-moving-blob baseline, not a generally reliable tracker.
+
+Table contacts, rally boundaries, shot classification, scoring, and physical
+measurements are not implemented. Image-space tracks are not 3D trajectories.
+An airborne ball cannot be mapped to its true table coordinates with a table-plane
+homography. A direction change alone does not establish table contact.
 
 ## Run locally
 
-Use Python 3.12. Install dependencies in this project's own environment:
+Use Python 3.12 and this project's own environment:
 
 ```bash
 python3.12 -m venv .venv
@@ -19,103 +27,84 @@ python3.12 -m venv .venv
 .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8014
 ```
 
-Open http://127.0.0.1:8014. Do not expose this development server publicly.
+Open http://127.0.0.1:8014. Use one Uvicorn worker and keep the server local.
+The job directory is exclusively locked by one app instance. Only intended
+frontend assets are publicly mounted; videos/results use token-scoped job APIs.
+
+## Review a video and try tracking
+
+1. Choose a browser-playable local clip. Selection alone does not upload it.
+2. Pause on a clear frame. Select four table corners clockwise from upper-left,
+   using the image or numeric source-coordinate controls.
+3. Check calibration. It validates this frame's geometry and derives a coarse
+   padded image search window for tracking. That window is not a table homography.
+4. Select **Track ball (experimental)** to stream a temporary copy to the local
+   server and decode/associate it in a spawned worker process. **Inspect video**
+   remains available for inspection without tracking.
+5. Play or seek to inspect the cyan trail. Only associated observations are
+   rendered; gaps and reinitializations break the line. The current label names
+   missing/ambiguous states. Predictions and tentative seeds are never rendered
+   as measured points. The checkbox hides the overlay.
+6. **Cancel analysis** stops active work. **Clear result** deletes the local copy,
+   records, and displayed trail. Your original file is never deleted.
+
+Playback/seek clears manual frame calibration. It retains valid source-coordinate
+tracking records for the same video. Replacing/removing the video clears them.
+Camera drift blocks unattended table-plane reuse; raw-image tracking does not
+stabilize the scene. If source timestamps are estimated or decoded dimensions
+mismatch browser playback, the overlay is disabled to avoid false synchronization.
+
+## Limits and privacy
+
+Maximum 100 MiB, 60 seconds, 1920x1080, and 120 FPS. The server counts streamed
+bytes and validates actual decoding, not just browser/container metadata.
+One receiving/running job is admitted at a time; there is no pending queue.
+Inputs and results live outside public assets in ignored private job directories.
+Completed artifacts expire after one hour; failed/cancelled copies are removed
+once their worker exits. Shutdown/restart ends the review session and removes
+orphaned artifacts. Cleanup failures are exposed and retried.
+
+The UI explains retention before sending a local copy. Tokens remain in browser
+memory, never URLs or localStorage. Page-exit cleanup is best effort, backed by
+server deadlines. No cloud inference, remote fonts, analytics, or model download
+is used. Do not commit videos, frames, credentials, weights, or local environments.
+
+## Verification and real-video limitations
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Only frontend static files are public. Videos, extracted frames, weights, and
-local environments must remain untracked. The first version targets one fixed
-camera and a visible table surface, with manually selected table corners.
-Image-space motion is not a 3D trajectory. An airborne ball cannot be mapped to
-its true table coordinates using a table-plane homography.
+70 automated checks pass across HTTP policies, geometry, decoding, camera evidence,
+candidates, association, source timing, isolation, worker lifecycle, and cleanup.
+The real supplied 360-frame clip was also exercised through the browser, including
+tracking, playback/seek synchronization, ambiguity, overlay toggling, cancellation,
+and clearing. These checks do not measure general tracking accuracy.
 
-The supplied preview clip has a watermark, overhead perspective, blur, and
-apparent camera drift. It has not been validated for contact or rally accuracy.
-See AGENTS.md for stage boundaries and the master/develop workflow.
+A small same-video pilot uses approximate manual source centers. The frozen
+candidate baseline found nearby candidates for all six held-out visible labels
+but produced four extra candidates. Temporal association produced five nearby
+observations, no wrong labeled observations, and one withheld ambiguous result.
+Three held-out search-region negatives had no associated observations. This sparse
+reused pilot is not dense temporal identity or generalization ground truth.
 
-## Inspect a local video
+The preview's overhead view, watermark, blur, and estimated camera drift still
+limit reliability. The detector can follow clothing or miss small/occluded balls.
+No physical contact locations, rallies, or accuracy percentages are inferred.
+
+## Offline diagnostics
 
 ```bash
 .venv/bin/python -m backend.inspect_video /path/to/clip.mp4
-```
-
-The reader checks at most 100 MiB, 60 seconds, 1920x1080, and 120 FPS.
-It decodes sequentially without keeping a video in memory, retains original
-frame indices and dimensions, and reports timestamp fallback usage. Invalid or
-non-increasing presentation times use an explicitly marked FPS-based estimate.
-That estimate does not recover missing source timestamps or establish variable
-frame rate accuracy. Metadata and actual decoded dimensions/frame budget are
-both checked. Premature EOF relative to declared frame count is rejected;
-OpenCV cannot distinguish every corrupt EOF when frame-count metadata is absent.
-The final frame timestamp is not the container's total playback duration.
-
-The CLI runs locally outside HTTP. Bounded local video inspection uploads are
-available through the inspection job API; this does not perform ball analysis.
-See docs/video-inspection.md for the real-clip evidence and remaining limits.
-
-## Prepare and calibrate a clip
-
-1. Choose a local browser-playable video. Playback does not upload the video.
-2. Pause at a clear frame and select the four table corners clockwise from the
-   upper-left, using the video or numeric source-coordinate controls.
-3. Select **Check calibration**. Only corners and source dimensions go to the
-   local server. It validates a convex, sufficiently large quadrilateral and
-   computes a table-plane homography to a unit square.
-4. Playback, seeking, removing, or replacing the clip clears the frame calibration.
-   Undoing a corner also invalidates the previous geometry check.
-
-The browser checks size, duration, and resolution; it does not reliably expose
-source FPS. Run the separate local inspection command to validate all frames
-and FPS. Browser preparation is not admission to an analysis job.
-The calibration response has no persistent identifier and is not saved. It is
-valid only for the selected frame; camera drift has not been evaluated. A unit
-square describes the table plane, not physical distances or airborne positions.
-Use **Inspect video** to send a temporary copy to the local server and inspect
-all frames in a worker process. **Cancel inspection** stops the worker and removes
-its copy. **Clear inspection** deletes the retained copy and result. Ball analysis remains a later stage.
-
-## Background video inspection
-
-The app owns one spawned worker process at a time, with decoded-frame progress,
-cancellation, runtime limits, and private job storage. Completed copies/results
-expire after one hour; failed/cancelled copies are removed after the worker stops.
-Shutdown/restart ends the review session and removes orphaned job files. The
-original selected file is never deleted. Run a single Uvicorn worker.
-See docs/background-jobs.md for lifecycle, retention, and HTTP endpoints.
-
-Inspection displays actual decoded-frame progress and timing, followed by a real
-summary. It does not measure ball detection, contacts, or rallies. The browser
-explains local retention before inspection begins. File replacement and page exit
-request cleanup; exit requests are best effort, backed by server deadlines.
-Tokens stay in browser memory, never URLs or localStorage. A page reload cannot
-recover old results. Stop/restart ends the review session and clears old artifacts.
-
-The background-job milestone passed 33 automated checks. Its browser checks confirmed
-progress, 360 decoded frames, cancellation, explicit clearing, and replacing an
-active clip. See docs/background-jobs.md for evidence and limits.
-
-## Camera movement check
-
-Inspection now compares distributed scene features against the first frame.
-Movement or insufficient evidence blocks cross-frame calibration reuse; the UI
-continues to clear corners when the frame changes. A no-movement result still
-requires alignment review. No stabilization is implemented. See docs/camera-motion.md
-for parameters, real-clip estimates, tests, and limitations.
-
-## Experimental ball candidates (offline)
-
-An OpenCV baseline now extracts small bright moving candidates from consecutive
-source frames. It is not yet connected to browser analysis and does not track
-ball identity or draw a trajectory. It can also detect clothing fragments.
-
-```bash
 .venv/bin/python -m evaluation.evaluate_ball_candidates /path/to/clip.mp4 --split held_out
+.venv/bin/python -m evaluation.evaluate_ball_tracking /path/to/clip.mp4 --split held_out
 ```
 
-The supplied preview has a tiny manually annotated pilot. Held-out coverage found
-a candidate near all six visible-ball labels, with four extra candidates across
-three ambiguous frames. This is not an accuracy guarantee. See
-docs/ball-candidate-baseline.md for measured counts, limitations, and next steps.
-51 automated checks currently pass across the implemented components.
+Evaluation verifies the source hash before applying tracked pilot labels. Frame
+indices and timestamps stay in source coordinates; FPS fallback is explicit.
+The final frame timestamp is not the full container playback duration.
+
+See docs/temporal-tracking.md, docs/ball-candidate-baseline.md,
+docs/camera-motion.md, and docs/background-jobs.md for evidence and limitations.
+Read AGENTS.md for development rules. Initial setup remains on master; subsequent
+verified work belongs only on develop. docs/CONTINUE.md records the resume state.

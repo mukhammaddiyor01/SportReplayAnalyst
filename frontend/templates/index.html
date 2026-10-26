@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
   <script src="{{ url_for('static', path='/js/workspace.js') }}" defer></script>
   <script src="{{ url_for('static', path='/js/inspection.js') }}" defer></script>
+  <script src="{{ url_for('static', path='/js/tracking-overlay.js') }}" defer></script>
 </head>
 <body>
   <header class="app-header">
@@ -50,12 +51,17 @@
             <div class="frame">
               <video id="video" preload="metadata" playsinline aria-label="Table tennis replay"></video>
               <canvas id="corners" aria-label="Select table corners; numeric controls are also available below"></canvas>
+              <canvas id="tracking-overlay" aria-hidden="true"></canvas>
             </div>
             <div class="playback">
               <button id="toggle-play" class="play-button" type="button">Play</button>
               <label for="seek" class="visually-hidden">Video position</label>
               <input id="seek" type="range" min="0" max="1" step="0.001" value="0">
               <output id="time">0.000 s</output>
+            </div>
+            <div id="tracking-controls" class="tracking-controls" hidden>
+              <label><input id="show-tracking" type="checkbox" checked> Experimental 2D trail</label>
+              <output id="tracking-status">No tracking result.</output>
             </div>
           </div>
         </div>
@@ -66,24 +72,29 @@
         </div>
         <div class="scope-note">
           <span class="scope-dot" aria-hidden="true"></span>
-          <p>Video preparation only. Ball tracking, contacts and rallies are not available yet.</p>
+          <p>Tracking is experimental and uses image pixels. Contacts and rallies are not available.</p>
         </div>
         <section class="inspection-panel" aria-label="Local video inspection">
           <div class="inspection-heading">
             <div>
               <h2>Video inspection</h2>
-              <p>Check every frame before ball analysis.</p>
+              <p>Inspect frames or try image-space tracking.</p>
             </div>
-            <button id="inspect-start" class="secondary-button" type="button" disabled>Inspect video</button>
+            <div class="analysis-start-actions">
+              <button id="inspect-start" class="secondary-button" type="button" disabled>Inspect video</button>
+              <button id="track-start" class="secondary-button" type="button" disabled>Track ball (experimental)</button>
+            </div>
           </div>
-          <p class="inspection-privacy">Inspecting sends a temporary copy to this computer's local server.
+          <p class="tracking-instructions">Mark the four table corners and check calibration to set a coarse tracking search window.
+            Tracking does not use table-plane coordinates or correct camera movement.</p>
+          <p class="inspection-privacy">Inspection and tracking send a temporary copy to this computer's local server.
             Copies and results are removed after one hour, when cleared, or when the server stops.
             Your original file stays untouched. Nothing goes to an external service.</p>
           <div class="inspection-state">
             <p id="inspection-status" role="status" aria-live="polite">Choose a video before inspecting.</p>
             <div class="inspection-actions">
-              <button id="inspect-cancel" class="text-button" type="button" hidden>Cancel inspection</button>
-              <button id="inspect-delete" class="text-button" type="button" hidden>Clear inspection</button>
+              <button id="inspect-cancel" class="text-button" type="button" hidden>Cancel analysis</button>
+              <button id="inspect-delete" class="text-button" type="button" hidden>Clear result</button>
               <button id="inspect-refresh" class="text-button" type="button" hidden>Retry status</button>
             </div>
           </div>

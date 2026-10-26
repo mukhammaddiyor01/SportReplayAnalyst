@@ -12,8 +12,9 @@ No learned model, external service, or model download is used.
 A bright moving candidate is not a confirmed ball. Multiple candidates remain
 ambiguous; candidate overflow is explicitly marked. The output cap is 12 per
 frame. There is no temporal identity, track, prediction, trajectory, bounce
-classification, or rally calculation. This adapter is an offline pilot and is
-not yet connected to the browser or an analysis job.
+classification, or rally calculation. The same frozen adapter is now composed with the separate temporal
+service in experimental worker/browser tracking. It does not assign identity
+or create trajectories on its own; see docs/temporal-tracking.md.
 
 Named experimental parameters live in backend/config.py. The reference source
 width is 768; area, extent, and contrast-neighborhood size scale with source

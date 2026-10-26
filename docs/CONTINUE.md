@@ -1,146 +1,133 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: camera drift and offline ball candidate pilot milestone.
+Checkpoint: 2026-10-26, experimental tracking and browser 2D trail milestone.
 
-## Working agreement
+## Agreement and repository
 
-Speak Uzbek to the user; code, UI, comments, and documentation are English.
-Read AGENTS.md before changing code. Keep increments readable and verified.
+Speak Uzbek; code, interface, comments, and documentation are English.
+Read AGENTS.md before changes. Keep code small/readable and work in verified
+increments. Do not modify reference projects or deploy. Preserve the replay desk.
+
 Work in SportReplayAnalyst under the user's Desktop Projects, not the unrelated
-AI _ Python conversation workspace. Do not modify reference projects or deploy.
-The user asked for a human-designed workspace; preserve the current replay desk.
+AI _ Python conversation workspace. Repository:
+https://github.com/mukhammaddiyor01/SportReplayAnalyst.git (private).
+Git CLI access works; the GitHub connector previously returned 404.
 
-Repository: https://github.com/mukhammaddiyor01/SportReplayAnalyst.git (private).
-Git CLI authentication works; the GitHub connector previously returned 404.
-Use feat: and fix: commits only. The user authorized small verified commits and
-pushes to develop. master must remain at 42a6008 (completed initial setup).
-Verify current status and log before continuing; do not discard local changes.
+Active branch is develop. Use feat: and fix: commits only. The user authorized
+small verified commits and pushes to develop. master stays at 42a6008; never
+advance it without a separate explicit instruction. Check git status/log before
+resuming; never discard user changes. Important recent commits:
 
-## Completed stages
+- 1b91b7a: sampled camera drift and calibration reuse result.
+- b7b58e2: frozen bright-ball candidate pilot and approximate manual labels.
+- a00ebcd: documentation count clarification.
+- 1b9a086: pure Python temporal association service.
+- c3fe27b: tracking pipeline, real evaluation, worker mode and API validation.
+- Latest UI commit: experimental browser tracking/2D overlay and this checkpoint.
 
-- AGENTS.md committed before code (3d337ba).
-- Minimal FastAPI/Jinja2 setup shared by master/develop (42a6008).
-- Bounded video reader and inspection CLI (c8327ab).
-- Browser-local playback and manual table geometry (f516509).
-- Redesigned replay desk (60490f4).
-- Earlier handoff (7c75a4d).
-- App-owned spawned worker lifecycle, progress, cancellation, cleanup (2c6b5a4).
-- Bounded raw-upload API and authenticated status/cancel/delete (44b1438).
-- Browser inspection controls (fa3b030).
-- Generated original portfolio concepts (ec567c6); not screenshots/tracking proof.
-- Sampled camera drift and UI calibration-reuse result (1b91b7a).
-- Offline ball candidate baseline, manual pilot labels, and evaluation are in the
-  latest commit; this checkpoint accompanies them.
+Python 3.12 .venv and pinned requirements exist. No new dependencies were added.
+FastAPI/Jinja2/OpenCV plus plain JS; no database, cloud inference, or model weights.
 
-Python 3.12 .venv and pinned requirements already exist. No new dependencies were
-needed for jobs. Controllers coordinate; OpenCV lives in adapters; table rules are
-plain Python services. No database, cloud service, or frontend framework.
+## Current implementation
 
-## Current behavior
+Choose video opens a browser object URL only. Mark four corners clockwise and
+Check calibration validates frame geometry. It derives a padded image rectangle
+for experimental tracking; it does not make an airborne point a table coordinate.
+Playback/seek clears manual geometry, while tracking results remain source-timed.
 
-Choose local video creates only a browser object URL. Pause and mark four table
-corners clockwise by pointer or numeric coordinates. POST /api/calibration sends
-only dimensions/corners and returns validated unit-plane geometry. Playback and
-seeking invalidate this frame-local calibration. Sampled camera motion is now
-estimated against the first frame during inspection, without stabilization.
+Inspect video runs bounded frame inspection and sampled camera drift checks.
+Track ball (experimental) additionally runs bright-blob extraction and pure Python
+temporal association. The worker returns one record per decoded frame, with source
+index/time, status, local track ID, observation/prediction separately, and gap marker.
 
-Inspect video explicitly streams a temporary copy to the local server, then runs
-bounded OpenCV decoding in a spawned process. The UI displays decoded-frame count
-and source time, not a fabricated percentage. Cancel stops it; Clear deletes its
-retained copy/result. Browser preparation and inspection are separate from ball
-analysis. The original selected file is never deleted.
+The browser canvas renders a 0.6s cyan image-space tail of observed associations
+only. Predictions, tentative seeds, and ambiguous/missing frames are not plotted;
+gaps and new IDs break the line. Presented-video timestamps synchronize playback.
+Overlay is disabled if source timing was estimated or source/playback sizes differ.
+There is a hide/show checkbox. The system does not stabilize the camera.
 
-The app owns JobManager via FastAPI lifespan. One active admission slot, no
-pending queue, eight retained records maximum, 32 messages per worker queue.
-Job-specific routes require a random bearer token (header only). Tokens remain in
-browser memory, never URLs/localStorage. Wrong tokens cannot read/cancel/delete
-another job. Public responses omit tokens and paths. Private job files are never
-mounted as static files. Host/origin restrictions and response policies remain.
+BallTracker confirms three consecutive unique moving candidates, gates by source
+time/diagonal, avoids size-based selection, withholds close ambiguity/overflow,
+retains identity for gaps up to 0.18s, and confirms a new ID after longer losses.
+It rejects nonmonotonic inputs before mutating state. No shared global tracker.
+These are experimental rules, not proof of ball identity; clothing can still track.
 
-See docs/background-jobs.md for endpoints, exact limits, states, and cleanup.
-100 MiB, 60 seconds, 1920x1080, 120 FPS; receiving timeout 120 seconds, worker
-runtime 180 seconds; cooperative cancellation plus terminate/kill fallback.
-Inputs/results live in ignored local-data/jobs with private permissions, expire
-one hour after completion, and can be explicitly removed earlier. Failed/cancelled
-artifacts are removed after the worker exits. Cleanup failures are visible and
-retried. Shutdown/restart ends review and removes old job artifacts. Run only one
-Uvicorn worker; a POSIX root lock prevents two owners.
+## Jobs and privacy
 
-## Verification
+One app-owned spawned worker at a time, no pending queue, up to eight retained
+records, bounded progress queue. Token-scoped status/cancel/delete. Raw-upload
+limits: 100 MiB, 60s, 1920x1080, 120 FPS. Receiving timeout 120s; runtime 180s;
+cooperative cancellation plus terminate/kill fallback. Keep Uvicorn to one worker.
 
-51 Python checks passed. They cover real generated videos in spawned processes,
-progress, cancellation, crashes, runtime timeout, interrupted/oversized transfers,
-access isolation, capacity, expiry, private paths, explicit deletion, startup,
-shutdown, cleanup retry, health responsiveness, geometry, reader, and HTTP policies.
+Copies/results live in ignored private local-data/jobs. Cancel analysis waits for
+the worker before cleanup; Clear result removes artifacts and the displayed trail.
+Original files are never removed. Completed copies expire after one hour. Shutdown
+and restart end review and remove orphaned artifacts under an exclusive root lock.
+Cleanup failures are visible/retried. Tokens stay in browser memory, not URLs or
+localStorage; leaving the page requests best-effort cleanup backed by deadlines.
+Only intended static frontend assets are mounted. No external video/AI transfer.
 
-User footage: gettyimages-1747255434-640_adpp.mp4 in Downloads. 360 frames,
-768x432, about 29.970 FPS, 12.012 seconds. Final frame time 11.978633333333335 s;
-no timestamp fallback. In the real browser flow, intermediate progress showed
-288 frames / 9.576 s and the final summary showed 360 frames / 11.979 s.
-Real Cancel, Clear, and removing a running clip were exercised. Private files were
-confirmed removed and the original remained present. Final browser error/warn
-logs were empty. Screenshots remain outside Git.
+The job reservation accepts optional mode=track plus search_region; default is
+inspect. Schema admission and actual source-size validation are separate. See
+docs/background-jobs.md and docs/temporal-tracking.md for exact behavior.
 
-The watermark, overhead view, blur, and measured camera drift still limit the
-sample. Camera inspection found 24 supported comparisons and a maximum estimated
-frame-boundary displacement of 13.064px against a 4.406px threshold. The browser
-showed Movement detected / Frame-local only, with no error/warn logs in that flow.
-This is an image-transform estimate, not measured camera position or an accuracy
-claim. Read docs/camera-motion.md for conservative support rules and limits.
+## Verification and real video
 
-An experimental white-moving-blob detector now exists in backend/adapters/
-ball_detector.py, with plain candidate dataclasses in backend/services/
-ball_observations.py. It is offline only, not wired into the worker or browser.
-No trained model has been selected. It returns candidates, not confirmed tracks.
+70 Python tests passed, including 13 pure temporal tests and new pipeline/worker
+mode tests. JavaScript syntax checks passed. Unit rules cover false candidates,
+ambiguity, short/long gaps, skipped indices, irregular time, reset/isolation, and
+source scaling. Jobs/HTTP/geometry/camera/candidate checks still pass.
 
-The annotated pilot in evaluation/ball-pilot.json stores the video hash and 18
-approximate manual labels. Each split has six visible-ball centers and three
-search-region negatives. Initial tuning found many tiny clothing/line fragments;
-the minimum component area was raised from 3 to 35 using tuning only. All other
-initial thresholds stayed fixed. At source width 768, the later scaling-related
-contrast-window adjustment leaves this pilot's 15px window unchanged.
+User footage: gettyimages-1747255434-640_adpp.mp4 in Downloads. Source hash is in
+evaluation/ball-pilot.json. It has 360 frames, 768x432, about 29.970 FPS, 12.012s;
+last frame time 11.978633333333335s. The camera estimate found 13.064px maximum
+frame-boundary displacement vs 4.406px threshold over 24 supported comparisons.
+This is an image-transform estimate, not measured 3D camera movement. Calibration
+reuse is blocked; tracking remains raw image-space with an explicit warning.
 
-Frozen held-out evaluation found a candidate near 6/6 visible labels at 8px
-matching tolerance, but also 4 extra candidates across 3 ambiguous frames (183,
-186, 210). All three held-out negative frames were empty. Tuning had 6/6 nearby
-candidates and no extras on its nine frames. These are tiny adjacent same-video
-segments, not representative tracking accuracy. Do not tune further on this held-out
-split or hide the false candidates. No contact/rally accuracy was measured.
-Do not conflate video inspection with ball analysis. Table-plane homography
-cannot locate an airborne ball on the table; 2D direction changes alone do not
-confirm table contact. See docs/video-inspection.md and AGENTS.md.
+The 18 approximate manual labels form a tiny adjacent same-video pilot. The frozen
+candidate baseline had 6/6 nearby held-out candidates plus 4 extras in 3 ambiguous
+frames. Initial frozen temporal rules had 5/6 nearby held-out associated
+observations, zero wrong labeled observations, and one withheld ambiguous frame
+(210). Three held-out negatives had no associations. Tuning had 6/6 and zero
+negative associations. No parameters were adjusted against held-out failure.
+
+The evaluator processes all preceding frames as unlabeled inference context.
+This reuses sparse labels; no dense temporal identity, independent generalization,
+real occlusion-recovery, or contact/rally accuracy has been measured.
+
+Actual browser flow used a slightly different corner-derived search rectangle:
+360 source records, 208 associations, 20 prediction-only frames. Those are runtime
+counts, not accuracy. Frame 180 at 6.006s aligned with the visible ball and tail;
+frame 210 at 7.007s displayed no observation (ambiguous). Playback, seeking,
+overlay toggle, cancellation, and Clear result worked. Cleanup left zero private
+job directories and preserved the original file. Final browser error/warn logs
+were empty. The latest screenshot stays outside Git with other local UI evidence.
 
 ## Next step
 
-Add a small plain Python temporal association service over candidate batches.
-Use actual source timestamps for motion gating; confirm initialization, handle
-ambiguity without blindly selecting the biggest blob, reject implausible jumps,
-recover short occlusions, and reset after longer losses. Keep predictions separate
-from actual observations. Cover those rules with meaningful tests and evaluate
-association on manually annotated sequences before showing a trustworthy 2D trail.
+Expand sequence-level manual evaluation before contact/rally inference. Review
+false initializations, missed small balls, nearby player/clothing ambiguity,
+real occlusions, and identity changes. Obtain a better fixed-camera clip if needed.
+Do not retune the frozen baseline against the existing held-out labels without a
+new evaluation protocol. Keep measured/associated points separate from predictions.
 
-The offline evaluation command is:
+Contacts, racket interactions, rally timing, event timeline, scoring, physical
+speed, and 3D reconstruction are not implemented. Direction changes alone cannot
+confirm table contact. Define independent contact evidence and explicit rally
+rules before coding those stages. Update this checkpoint after verified work.
 
-```bash
-.venv/bin/python -m evaluation.evaluate_ball_candidates /path/to/clip.mp4 --split held_out
-```
+## Resume commands
 
-Retain the source-hash check. Read evaluation/README.md and
-docs/ball-candidate-baseline.md before changing the frozen baseline. Ask for a
-better fixed-camera video when needed. Camera drift blocks unattended table-plane
-calibration reuse, and no stabilization exists. Do not infer contacts/rallies or
-physical speeds from image-space points. Live browser inspection still does not
-run the ball detector; wire it in only after temporal behavior is verified.
-
-## Resume
-
-The last server was started at http://127.0.0.1:8014. Check before starting another;
-port 8000 belongs to the unrelated Coach App. Never stop that other server.
+The last local server was 127.0.0.1:8014. Check before starting another. Port 8000
+belongs to Coach App; do not stop unrelated servers.
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8014
+.venv/bin/python -m evaluation.evaluate_ball_tracking /path/to/clip.mp4 --split held_out
 ```
 
-Keep videos, extracted frames, weights, local-data, credentials, and .venv out of
-Git. Update this checkpoint after the next verified milestone.
+Keep user footage, frames, results, credentials, weights, and local environments
+out of Git. portfolio-assets contains original generated concepts, not screenshots
+or proof of tracking quality. No deploy is authorized.

@@ -237,3 +237,12 @@ footer p { max-width: 80ch; }
 @media (max-width: 420px) {
   .inspection-heading { align-items: flex-start; flex-direction: column; }
 }
+
+#tracking-overlay { pointer-events: none; cursor: default; }
+.analysis-start-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.tracking-instructions { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 14px; }
+.tracking-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 20px; background: #173345; font-size: 12px; }
+.tracking-controls label { display: flex; align-items: center; gap: 6px; }
+.tracking-controls input { accent-color: #46c7cf; }
+.tracking-controls output { color: #c5dce5; }
+@media (max-width: 640px) { .analysis-start-actions { justify-content: flex-start; } }

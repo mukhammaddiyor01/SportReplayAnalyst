@@ -27,6 +27,7 @@ function resetCorners(message = "Pause on a clear frame and mark the table corne
 }
 
 function renderCorners() {
+  document.dispatchEvent(new CustomEvent("replay:table-cleared"));
   context.clearRect(0, 0, canvas.width, canvas.height);
   cornerList.replaceChildren();
   document.querySelector("#corner-count").textContent = `${points.length} / 4`;
@@ -170,7 +171,16 @@ confirmButton.addEventListener("click", async () => {
     const result = await response.json();
     if (submittedRevision !== revision) return;
     if (!response.ok) throw new Error(typeof result.detail === "string" ? result.detail : "Check the four corner coordinates.");
-    setStatus("Table geometry checked for this frame. Camera stability and ball tracking have not been evaluated.");
+    const paddingX = Math.ceil(canvas.width * .02);
+    const paddingY = Math.ceil(canvas.height * .02);
+    const xs = points.map(point => point[0]);
+    const ys = points.map(point => point[1]);
+    const region = [Math.max(0, Math.floor(Math.min(...xs)) - paddingX),
+                    Math.max(0, Math.floor(Math.min(...ys)) - paddingY),
+                    Math.min(canvas.width, Math.ceil(Math.max(...xs)) + paddingX),
+                    Math.min(canvas.height, Math.ceil(Math.max(...ys)) + paddingY)];
+    document.dispatchEvent(new CustomEvent("replay:table-checked", {detail: {region}}));
+    setStatus("Frame geometry checked. A coarse image search window is ready for experimental tracking.");
   } catch (error) {
     if (submittedRevision === revision) setStatus(error.message || "Calibration could not be checked. Try again.");
   } finally {

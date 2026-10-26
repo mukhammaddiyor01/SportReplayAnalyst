@@ -30,3 +30,19 @@ Returned bright moving blobs may be clothing, hands, lines, or the ball. Saturat
 candidate lists and multiple candidates remain ambiguous. Neither detections nor
 single candidates establish physical contacts or rallies. Do not commit footage,
 frames, or generated analysis output. Record only honest aggregate evidence in docs.
+
+## Sequential temporal association
+
+The separate temporal evaluator processes every decoded source frame, not just
+labeled snapshots, and scores only associated observations (never predictions):
+
+```bash
+.venv/bin/python -m evaluation.evaluate_ball_tracking /path/to/clip.mp4 --split held_out
+```
+
+With the initial frozen association rules, tuning had 6/6 nearby observations;
+held out had 5/6 with one ambiguous withheld result at frame 210. Neither split
+had observations on its three negative labels. This reuses existing sparse labels
+and preceding unlabeled frames as inference context. It does not establish dense
+identity accuracy or real occlusion recovery. Do not retune against these held-out
+failures without defining and reporting a new evaluation protocol.

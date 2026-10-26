@@ -122,3 +122,49 @@ passed. Screenshots remain outside Git because they contain user-provided footag
 Next, expand manually labeled sequences and review false tracks/losses before
 contact or rally inference. Synthetic short-gap tests are not proof of reliable
 recovery through real occlusions. No stabilization or 3D inference was added.
+
+## Dense sequence diagnostic (2026-10-26)
+
+Numeric manual annotations in evaluation/ball-sequences.json now cover every
+frame of 140–169 and 230–259. Centers are approximate visible blur midpoints,
+read from native source crops with a coordinate grid before running the sequence
+scores. No points were interpolated or copied from detector output. Five frames
+near racket/player interactions could not be confidently labeled and remain
+uncertain; they are not counted as negatives or assumed occlusions. Labels have
+one reviewer and no expert review. The matching radius stays 8 source pixels.
+
+The baseline parameters and search window stayed frozen. Frames 140–169 overlap
+the previous tuning segment. Frames 230–259 are an additional same-video review,
+not an independent held-out benchmark. All preceding frames are processed as
+unlabeled inference context. This annotation set does not test false tracks when
+the ball is absent, or establish whole-video accuracy.
+
+| Sequence | Visible | Near manual center | Wrong | Missed | Uncertain | Correct runs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Tuning 140–169 | 26 | 26 | 0 | 0 | 4 | 2 |
+| Review 230–259 | 29 | 29 | 0 | 0 | 1 | 2 |
+
+Correct runs break at uncertain/missing/wrong observations, explicit trail breaks,
+or changed IDs. Changes between correct IDs are counted only within continuously
+visible labeled intervals, including intervening visible losses. Both sequences
+had zero such changes and zero labeled visible-loss frames. These diagnostic
+counts are not standard MOT identity metrics, confirmed occlusion recovery, or
+rally boundaries. Each loss report includes first/last source time and frame count;
+its endpoint span is not an inferred physical occlusion duration.
+
+```bash
+.venv/bin/python -m evaluation.evaluate_ball_sequences /path/to/clip.mp4
+```
+
+The evaluator rejects incomplete/nonconsecutive sequences and scores observations
+only. Predictions cannot earn a match. Six new automated checks cover visible
+losses, wrong points, identity changes across losses, uncertain/negative handling,
+trail boundaries, and invalid labels. All 76 Python tests passed. The original
+sparse held-out evaluation still returns 5/6 matches, one withheld ambiguous
+frame (210), and zero observations on its three negatives. No detector/tracker
+threshold was changed to improve these scores.
+
+Next evaluate a dense difficult interval around the known ambiguity at 210 and
+ball-absent intervals to measure false initializations. Keep those diagnostic
+labels separate from any future tuning protocol. Contact/rally work still waits
+for independent evidence and explicit event rules.

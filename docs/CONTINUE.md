@@ -1,6 +1,6 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-26, experimental tracking and browser 2D trail milestone.
+Checkpoint: 2026-10-26, dense sequence evaluation after the browser 2D trail milestone.
 
 ## Agreement and repository
 
@@ -104,7 +104,24 @@ overlay toggle, cancellation, and Clear result worked. Cleanup left zero private
 job directories and preserved the original file. Final browser error/warn logs
 were empty. The latest screenshot stays outside Git with other local UI evidence.
 
+## Dense sequence diagnostic
+
+Added evaluation/ball-sequences.json and evaluate_ball_sequences.py, sharing the
+source-record collector with the original sparse evaluator. Two contiguous
+30-frame intervals were manually reviewed from source crops; five ambiguous
+racket/player frames remain uncertain. The frozen baseline matched 26/26 visible
+labels in 140–169 and 29/29 in 230–259 within 8px. Each interval had two correct
+runs, zero visible losses, and zero ID changes across continuously visible labels.
+This is a single-reviewer same-video diagnostic, not general accuracy; it has no
+negative labels and cannot measure ball-absent false tracks. No detector/tracker
+parameters changed. The sparse held-out result remains 5/6 with frame 210 withheld.
+76 Python tests passed, including six scoring checks. See temporal-tracking.md.
+
 ## Next step
+
+Review a dense difficult interval around frame 210 and ball-absent frames to
+measure false initializations before changing the detector/tracker. New diagnostic
+labels are not an untouched tuning-independent benchmark.
 
 Expand sequence-level manual evaluation before contact/rally inference. Review
 false initializations, missed small balls, nearby player/clothing ambiguity,

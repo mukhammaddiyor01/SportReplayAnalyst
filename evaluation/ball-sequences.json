@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "sha256": "de1be132d44deb1be6e932585b2b029a8092a3fc4aa65c6774368ec5cad28fc1",
+  "source_dimensions": [
+    768,
+    432
+  ],
+  "frame_indexing": "zero_based_decoded",
+  "search_region": [
+    170,
+    70,
+    625,
+    330
+  ],
+  "matching_tolerance_px": 8,
+  "annotation_method": "Approximate manual visible-blur midpoints read from unmarked source crops at native resolution; no interpolation and no detector-assisted centers. Single reviewer, not expert reviewed.",
+  "protocol": "Frozen baseline review. Tuning 140-169 overlaps the earlier tuning pilot. Review 230-259 is a new contiguous same-video diagnostic, not independent held-out generalization. Unknown frames are excluded, not negative labels. No detector/tracker parameters changed.",
+  "sequences": [
+    {
+      "name": "tuning",
+      "samples": [
+        {
+          "frame_index": 140,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 141,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 142,
+          "visibility": "visible",
+          "center": [
+            505,
+            211
+          ]
+        },
+        {
+          "frame_index": 143,
+          "visibility": "visible",
+          "center": [
+            485,
+            209
+          ]
+        },
+        {
+          "frame_index": 144,
+          "visibility": "visible",
+          "center": [
+            469,
+            203
+          ]
+        },
+        {
+          "frame_index": 145,
+          "visibility": "visible",
+          "center": [
+            452,
+            200
+          ]
+        },
+        {
+          "frame_index": 146,
+          "visibility": "visible",
+          "center": [
+            435,
+            197
+          ]
+        },
+        {
+          "frame_index": 147,
+          "visibility": "visible",
+          "center": [
+            417,
+            193
+          ]
+        },
+        {
+          "frame_index": 148,
+          "visibility": "visible",
+          "center": [
+            402,
+            189
+          ]
+        },
+        {
+          "frame_index": 149,
+          "visibility": "visible",
+          "center": [
+            386,
+            185
+          ]
+        },
+        {
+          "frame_index": 150,
+          "visibility": "visible",
+          "center": [
+            370,
+            182
+          ]
+        },
+        {
+          "frame_index": 151,
+          "visibility": "visible",
+          "center": [
+            355,
+            180
+          ]
+        },
+        {
+          "frame_index": 152,
+          "visibility": "visible",
+          "center": [
+            341,
+            177
+          ]
+        },
+        {
+          "frame_index": 153,
+          "visibility": "visible",
+          "center": [
+            326,
+            174
+          ]
+        },
+        {
+          "frame_index": 154,
+          "visibility": "visible",
+          "center": [
+            313,
+            171
+          ]
+        },
+        {
+          "frame_index": 155,
+          "visibility": "visible",
+          "center": [
+            300,
+            168
+          ]
+        },
+        {
+          "frame_index": 156,
+          "visibility": "visible",
+          "center": [
+            287,
+            166
+          ]
+        },
+        {
+          "frame_index": 157,
+          "visibility": "visible",
+          "center": [
+            275,
+            164
+          ]
+        },
+        {
+          "frame_index": 158,
+          "visibility": "visible",
+          "center": [
+            263,
+            162
+          ]
+        },
+        {
+          "frame_index": 159,
+          "visibility": "visible",
+          "center": [
+            251,
+            160
+          ]
+        },
+        {
+          "frame_index": 160,
+          "visibility": "visible",
+          "center": [
+            240,
+            158
+          ]
+        },
+        {
+          "frame_index": 161,
+          "visibility": "visible",
+          "center": [
+            228,
+            156
+          ]
+        },
+        {
+          "frame_index": 162,
+          "visibility": "visible",
+          "center": [
+            217,
+            154
+          ]
+        },
+        {
+          "frame_index": 163,
+          "visibility": "visible",
+          "center": [
+            207,
+            153
+          ]
+        },
+        {
+          "frame_index": 164,
+          "visibility": "visible",
+          "center": [
+            197,
+            151
+          ]
+        },
+        {
+          "frame_index": 165,
+          "visibility": "visible",
+          "center": [
+            186,
+            149
+          ]
+        },
+        {
+          "frame_index": 166,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 167,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 168,
+          "visibility": "visible",
+          "center": [
+            204,
+            155
+          ]
+        },
+        {
+          "frame_index": 169,
+          "visibility": "visible",
+          "center": [
+            215,
+            157
+          ]
+        }
+      ]
+    },
+    {
+      "name": "review",
+      "samples": [
+        {
+          "frame_index": 230,
+          "visibility": "visible",
+          "center": [
+            200,
+            204
+          ]
+        },
+        {
+          "frame_index": 231,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 232,
+          "visibility": "visible",
+          "center": [
+            201,
+            201
+          ]
+        },
+        {
+          "frame_index": 233,
+          "visibility": "visible",
+          "center": [
+            212,
+            199
+          ]
+        },
+        {
+          "frame_index": 234,
+          "visibility": "visible",
+          "center": [
+            223,
+            199
+          ]
+        },
+        {
+          "frame_index": 235,
+          "visibility": "visible",
+          "center": [
+            235,
+            195
+          ]
+        },
+        {
+          "frame_index": 236,
+          "visibility": "visible",
+          "center": [
+            246,
+            193
+          ]
+        },
+        {
+          "frame_index": 237,
+          "visibility": "visible",
+          "center": [
+            258,
+            191
+          ]
+        },
+        {
+          "frame_index": 238,
+          "visibility": "visible",
+          "center": [
+            269,
+            187
+          ]
+        },
+        {
+          "frame_index": 239,
+          "visibility": "visible",
+          "center": [
+            280,
+            185
+          ]
+        },
+        {
+          "frame_index": 240,
+          "visibility": "visible",
+          "center": [
+            292,
+            183
+          ]
+        },
+        {
+          "frame_index": 241,
+          "visibility": "visible",
+          "center": [
+            303,
+            180
+          ]
+        },
+        {
+          "frame_index": 242,
+          "visibility": "visible",
+          "center": [
+            314,
+            178
+          ]
+        },
+        {
+          "frame_index": 243,
+          "visibility": "visible",
+          "center": [
+            325,
+            175
+          ]
+        },
+        {
+          "frame_index": 244,
+          "visibility": "visible",
+          "center": [
+            336,
+            172
+          ]
+        },
+        {
+          "frame_index": 245,
+          "visibility": "visible",
+          "center": [
+            348,
+            169
+          ]
+        },
+        {
+          "frame_index": 246,
+          "visibility": "visible",
+          "center": [
+            359,
+            167
+          ]
+        },
+        {
+          "frame_index": 247,
+          "visibility": "visible",
+          "center": [
+            371,
+            164
+          ]
+        },
+        {
+          "frame_index": 248,
+          "visibility": "visible",
+          "center": [
+            381,
+            162
+          ]
+        },
+        {
+          "frame_index": 249,
+          "visibility": "visible",
+          "center": [
+            392,
+            159
+          ]
+        },
+        {
+          "frame_index": 250,
+          "visibility": "visible",
+          "center": [
+            403,
+            156
+          ]
+        },
+        {
+          "frame_index": 251,
+          "visibility": "visible",
+          "center": [
+            413,
+            153
+          ]
+        },
+        {
+          "frame_index": 252,
+          "visibility": "visible",
+          "center": [
+            423,
+            151
+          ]
+        },
+        {
+          "frame_index": 253,
+          "visibility": "visible",
+          "center": [
+            428,
+            148
+          ]
+        },
+        {
+          "frame_index": 254,
+          "visibility": "visible",
+          "center": [
+            433,
+            145
+          ]
+        },
+        {
+          "frame_index": 255,
+          "visibility": "visible",
+          "center": [
+            437,
+            142
+          ]
+        },
+        {
+          "frame_index": 256,
+          "visibility": "visible",
+          "center": [
+            442,
+            139
+          ]
+        },
+        {
+          "frame_index": 257,
+          "visibility": "visible",
+          "center": [
+            446,
+            136
+          ]
+        },
+        {
+          "frame_index": 258,
+          "visibility": "visible",
+          "center": [
+            451,
+            134
+          ]
+        },
+        {
+          "frame_index": 259,
+          "visibility": "visible",
+          "center": [
+            455,
+            131
+          ]
+        }
+      ]
+    }
+  ]
+}

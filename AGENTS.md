@@ -12,7 +12,8 @@ Experimental image-space tracking now runs in a separate requested worker mode
 and renders a short 2D trail in the browser. It is not a robust ball identity
 system: predictions and missing/ambiguous frames are not drawn as observations.
 See docs/temporal-tracking.md, docs/camera-motion.md, and the annotated pilot.
-The next stage expands sequence-level evaluation and detector reliability before
+Two short dense sequences are now evaluated; the next stage covers difficult and
+ball-absent intervals and improves detector reliability before
 contact/rally inference. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent
 work in small, independently verified steps. Do not modify reference projects.

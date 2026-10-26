@@ -9,11 +9,9 @@ from backend.adapters.video_reader import VideoError, read_frames
 from evaluation.evaluate_ball_candidates import verify_source
 
 
-def evaluate(video: Path, annotations: dict, split: str) -> dict:
+def collect_records(video: Path, annotations: dict, last_index: int) -> dict:
+    """Run all preceding frames as inference context, without consulting labels."""
     verify_source(video, annotations)
-    samples = {row["frame_index"]: row for row in annotations["samples"] if row["split"] == split}
-    if not samples:
-        raise ValueError("This split contains no labeled frames.")
     run = TrackingRun(tuple(annotations["search_region"]))
     reader = read_frames(video)
     try:
@@ -21,11 +19,18 @@ def evaluate(video: Path, annotations: dict, split: str) -> dict:
             if [frame.image.shape[1], frame.image.shape[0]] != annotations["source_dimensions"]:
                 raise ValueError("Annotation dimensions do not match the source video.")
             run.consume(frame)
-            if frame.index >= max(samples):
+            if frame.index >= last_index:
                 break
     finally:
         reader.close()
-    records = {row["frame_index"]: row for row in run.frames}
+    return {row["frame_index"]: row for row in run.frames}
+
+
+def evaluate(video: Path, annotations: dict, split: str) -> dict:
+    samples = {row["frame_index"]: row for row in annotations["samples"] if row["split"] == split}
+    if not samples:
+        raise ValueError("This split contains no labeled frames.")
+    records = collect_records(video, annotations, max(samples))
     summary = {"split": split, "visible_labels": 0, "observed_near_reference": 0,
                "observed_away_from_reference": 0, "not_observed_on_visible": 0,
                "negative_labels": 0, "observations_on_negatives": 0}

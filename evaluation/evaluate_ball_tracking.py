@@ -1,0 +1,70 @@
+"""Score actual associated observations; predictions never count as detections."""
+import argparse
+import json
+from math import hypot
+from pathlib import Path
+
+from backend.adapters.ball_tracking import TrackingRun
+from backend.adapters.video_reader import VideoError, read_frames
+from evaluation.evaluate_ball_candidates import verify_source
+
+
+def evaluate(video: Path, annotations: dict, split: str) -> dict:
+    verify_source(video, annotations)
+    samples = {row["frame_index"]: row for row in annotations["samples"] if row["split"] == split}
+    if not samples:
+        raise ValueError("This split contains no labeled frames.")
+    run = TrackingRun(tuple(annotations["search_region"]))
+    reader = read_frames(video)
+    try:
+        for frame in reader:
+            if [frame.image.shape[1], frame.image.shape[0]] != annotations["source_dimensions"]:
+                raise ValueError("Annotation dimensions do not match the source video.")
+            run.consume(frame)
+            if frame.index >= max(samples):
+                break
+    finally:
+        reader.close()
+    records = {row["frame_index"]: row for row in run.frames}
+    summary = {"split": split, "visible_labels": 0, "observed_near_reference": 0,
+               "observed_away_from_reference": 0, "not_observed_on_visible": 0,
+               "negative_labels": 0, "observations_on_negatives": 0}
+    details = []
+    for index, label in sorted(samples.items()):
+        if index not in records:
+            raise ValueError("The source ended before all labels were processed.")
+        record = records[index]
+        observed = record["observation"]
+        if label["visibility"] == "visible":
+            summary["visible_labels"] += 1
+            if observed is None:
+                summary["not_observed_on_visible"] += 1
+            elif hypot(observed[0] - label["center"][0], observed[1] - label["center"][1]) <= annotations["matching_tolerance_px"]:
+                summary["observed_near_reference"] += 1
+            else:
+                summary["observed_away_from_reference"] += 1
+        else:
+            summary["negative_labels"] += 1
+            summary["observations_on_negatives"] += int(observed is not None)
+        details.append({"frame_index": index, "manual_center": label["center"],
+                        "status": record["status"], "observation": observed,
+                        "track_id": record["track_id"]})
+    return {"summary": summary, "frames": details,
+            "limitation": "Sparse reused pilot, not a dense temporal-identity or generalization benchmark."}
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Evaluate frozen temporal association on the existing pilot.")
+    parser.add_argument("video", type=Path)
+    parser.add_argument("--annotations", type=Path, default=Path(__file__).with_name("ball-pilot.json"))
+    parser.add_argument("--split", choices=["tuning", "held_out"], default="held_out")
+    args = parser.parse_args()
+    try:
+        result = evaluate(args.video, json.loads(args.annotations.read_text()), args.split)
+    except (ValueError, OSError, VideoError) as error:
+        parser.exit(1, f"Tracking evaluation failed: {error}\n")
+    print(json.dumps(result, indent=2))
+
+
+if __name__ == "__main__":
+    main()

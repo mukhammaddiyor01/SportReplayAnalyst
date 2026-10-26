@@ -41,3 +41,47 @@ separate next increment. They do not establish tracking accuracy on real footage
 
 Contacts, racket strikes, rallies, 3D geometry, and physical speed are not inferred.
 Camera drift is not compensated; any future trail is in raw image coordinates.
+
+## Sequential real-video evaluation and worker integration
+
+TrackingRun now feeds every decoded source frame through candidate extraction and
+association. Records preserve original frame index, timestamp/source, candidate
+count, separate observation/prediction fields, local track ID, and trail breaks.
+The existing worker can optionally return these bounded records. Raw image pixels
+are not included in the HTTP result. Uploaded copies and records use the existing
+private storage, cancellation, runtime, expiry, and cleanup mechanisms.
+
+POST /api/inspections accepts optional mode=track plus an explicit search_region
+image rectangle. Missing/invalid options are rejected before reserving a slot.
+The worker rechecks the window against actual decoded dimensions. Inspection
+without tracking remains the default. No table-plane transform is applied.
+
+70 automated checks passed at this increment, including pure tracking rules,
+real CV-to-service composition, source record separation, independent runs,
+worker serialization, request validation, and invalid-window cleanup.
+
+The initial association parameters were evaluated without adjusting against
+held-out failures. Existing sparse pilot results were:
+
+| Split | Visible reference labels | Associated observation near reference | Associated observation elsewhere | No observation | Negative labels with an observation |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Tuning | 6 | 6 | 0 | 0 | 0 of 3 |
+| Held out | 6 | 5 | 0 | 1 | 0 of 3 |
+
+Frame 210 remained ambiguous during reinitialization near the player. Its
+prediction was not counted as an observation or silently substituted. Frames
+183/186 associated the ball-like candidate instead of the distant clothing
+candidate. Later labels used a new local track ID after loss/reinitialization.
+Those IDs are not rally counts or proof of persistent ball identity.
+
+```bash
+.venv/bin/python -m evaluation.evaluate_ball_tracking /path/to/clip.mp4 --split held_out
+```
+
+The evaluator processes unlabeled earlier frames as inference context, including
+past frames in the candidate-tuning segment. Labels are used only for scoring;
+there is no learned model. This reuses the small same-video pilot and does not
+measure dense temporal identity, identity switches, real occlusion recovery,
+full-flight correctness, or generalization. Additional sequence annotations are
+required. The underlying detector's small-ball and clothing-fragment failures
+still apply. UI integration remains a separate increment.

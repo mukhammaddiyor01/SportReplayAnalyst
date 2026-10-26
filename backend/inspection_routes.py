@@ -6,6 +6,7 @@ from starlette.requests import ClientDisconnect
 from backend.config import MAX_VIDEO_BYTES
 from backend.jobs import JobNotFound
 from backend.security import check_local_origin
+from backend.schemas import InspectionOptions
 
 router = APIRouter(prefix="/api/inspections", dependencies=[Depends(check_local_origin)])
 SUPPORTED_MEDIA_TYPES = {"video/mp4", "video/webm", "video/quicktime", "application/octet-stream"}
@@ -29,8 +30,10 @@ def abort_receiving(manager, identifier: str, token: str) -> None:
 
 
 @router.post("", status_code=201)
-async def reserve_inspection(request: Request):
-    return await run_in_threadpool(request.app.state.jobs.begin)
+async def reserve_inspection(request: Request, payload: InspectionOptions | None = None):
+    options = payload or InspectionOptions()
+    worker_options = options.model_dump(mode="json") if options.mode == "track" else None
+    return await run_in_threadpool(request.app.state.jobs.begin, worker_options)
 
 
 @router.put("/{identifier}/video", status_code=202)

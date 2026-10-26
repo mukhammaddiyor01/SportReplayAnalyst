@@ -1,16 +1,17 @@
-"""Spawned worker entry point. It only inspects video, never invents tracking."""
+"""Spawned local inspection and optional experimental tracking entry point."""
 import logging
 from pathlib import Path
 from queue import Full
 
 from backend.adapters.video_reader import VideoError, inspect_video
+from backend.adapters.ball_tracking import TrackingRun
 
 
 class InspectionCancelled(Exception):
     pass
 
 
-def inspect_worker(video_path: str, cancel_event, messages) -> None:
+def inspect_worker(video_path: str, cancel_event, messages, options: dict | None = None) -> None:
     def report_frame(count: int, timestamp: float) -> None:
         if cancel_event.is_set():
             raise InspectionCancelled()
@@ -25,7 +26,11 @@ def inspect_worker(video_path: str, cancel_event, messages) -> None:
     try:
         if cancel_event.is_set():
             raise InspectionCancelled()
-        result = inspect_video(Path(video_path), on_frame=report_frame)
+        tracking = TrackingRun(tuple(options["search_region"])) if options and options["mode"] == "track" else None
+        result = inspect_video(Path(video_path), on_frame=report_frame,
+                               frame_processor=tracking.consume if tracking else None)
+        if tracking is not None:
+            result["tracking"] = tracking.result()
         messages.put({"kind": "completed", "result": result}, timeout=2)
     except InspectionCancelled:
         messages.put({"kind": "cancelled"}, timeout=2)

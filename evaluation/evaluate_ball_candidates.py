@@ -19,7 +19,7 @@ def score_candidates(batch, center, tolerance):
             "ambiguous": len(candidates) > 1 or batch.truncated, "truncated": batch.truncated}
 
 
-def evaluate(video: Path, annotations: dict, split: str) -> dict:
+def verify_source(video: Path, annotations: dict) -> None:
     if not video.is_file() or not 0 < video.stat().st_size <= MAX_VIDEO_BYTES:
         raise ValueError("Choose a bounded existing video file.")
     digest = hashlib.sha256()
@@ -28,6 +28,10 @@ def evaluate(video: Path, annotations: dict, split: str) -> dict:
             digest.update(chunk)
     if digest.hexdigest() != annotations["sha256"]:
         raise ValueError("The video does not match this annotation set.")
+
+
+def evaluate(video: Path, annotations: dict, split: str) -> dict:
+    verify_source(video, annotations)
     samples = {row["frame_index"]: row for row in annotations["samples"] if row["split"] == split}
     if not samples:
         raise ValueError("This split contains no labeled frames.")

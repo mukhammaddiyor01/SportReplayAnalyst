@@ -80,7 +80,8 @@ def _validate_dimensions(width: float, height: float) -> None:
         raise VideoError("Video dimensions must be at most 1920 x 1080.")
 
 
-def inspect_video(path: Path, *, on_frame: Callable[[int, float], None] | None = None) -> dict:
+def inspect_video(path: Path, *, on_frame: Callable[[int, float], None] | None = None,
+                  frame_processor: Callable[[VideoFrame], None] | None = None) -> dict:
     count = 0
     fallback_count = 0
     first_time = None
@@ -106,6 +107,8 @@ def inspect_video(path: Path, *, on_frame: Callable[[int, float], None] | None =
         last_time = frame.timestamp_seconds
         fallback_count += frame.timestamp_source == "fps_fallback"
         count += 1
+        if frame_processor is not None:
+            frame_processor(frame)
         if on_frame is not None:
             on_frame(count, frame.timestamp_seconds)
     if frame.index != last_sample_index:

@@ -140,3 +140,40 @@ class InspectionApiTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.json()["status"], "cancelling")
         self.assertEqual((await self.wait_for_terminal(path, headers))["status"], "cancelled")
         self.assertFalse((self.root / handle["id"]).exists())
+
+    async def test_tracking_mode_uses_private_worker_and_serializable_source_records(self):
+        response = await self.client.post("/api/inspections", json={"mode": "track", "search_region": [0, 0, 64, 48]})
+        self.assertEqual(response.status_code, 201)
+        handle = response.json()
+        path = "/api/inspections/" + handle["id"]
+        headers = {"Authorization": "Bearer " + handle["token"], "Content-Type": "video/mp4"}
+        response = await self.client.put(path + "/video", content=self.sample_video(), headers=headers)
+        self.assertEqual(response.status_code, 202)
+        state = await self.wait_for_terminal(path, headers)
+        self.assertEqual(state["status"], "completed", state)
+        result = state["result"]["tracking"]
+        self.assertEqual(result["mode"], "experimental_image_space")
+        self.assertEqual(len(result["frames"]), 20)
+        self.assertEqual(result["frames"][-1]["frame_index"], 19)
+        self.assertEqual(result["track_count"], 0)
+
+    async def test_tracking_options_are_validated_before_admission(self):
+        for body in [{"mode": "track"}, {"mode": "unknown"},
+                     {"mode": "track", "search_region": [-1, 0, 20, 20]},
+                     {"mode": "track", "search_region": [0, 0, 9999, 20]},
+                     {"mode": "inspect", "search_region": [0, 0, 20, 20]},
+                     {"mode": "track", "search_region": [0, 0, 20, 20], "video_path": "forbidden"}]:
+            response = await self.client.post("/api/inspections", json=body)
+            self.assertEqual(response.status_code, 422, response.text)
+        self.assertEqual(len(self.app.state.jobs.jobs), 0)
+
+    async def test_tracking_window_beyond_actual_source_fails_and_cleans_copy(self):
+        response = await self.client.post("/api/inspections", json={"mode": "track", "search_region": [0, 0, 768, 432]})
+        handle = response.json()
+        path = "/api/inspections/" + handle["id"]
+        headers = {"Authorization": "Bearer " + handle["token"], "Content-Type": "video/mp4"}
+        await self.client.put(path + "/video", content=self.sample_video(), headers=headers)
+        state = await self.wait_for_terminal(path, headers)
+        self.assertEqual(state["status"], "failed")
+        self.assertIn("search window", state["error"])
+        self.assertFalse((self.root / handle["id"]).exists())

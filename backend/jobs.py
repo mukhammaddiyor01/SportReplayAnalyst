@@ -44,6 +44,7 @@ class Job:
     identifier: str
     token: str
     directory: Path
+    options: dict | None = None
     status: str = "receiving"
     created: float = field(default_factory=time.monotonic)
     finished: float | None = None
@@ -92,7 +93,7 @@ class JobManager:
         self.monitor = threading.Thread(target=self._monitor, name="video-jobs", daemon=True)
         self.monitor.start()
 
-    def begin(self) -> dict:
+    def begin(self, options: dict | None = None) -> dict:
         with self.lock:
             if self.closed:
                 raise JobBusy("The application is shutting down.")
@@ -103,7 +104,7 @@ class JobManager:
             identifier = secrets.token_hex(16)
             directory = self.root / identifier
             directory.mkdir(mode=0o700)
-            job = Job(identifier, secrets.token_urlsafe(32), directory)
+            job = Job(identifier, secrets.token_urlsafe(32), directory, options=options)
             self.jobs[identifier] = job
             return {"id": identifier, "token": job.token, "status": job.status}
 
@@ -147,9 +148,12 @@ class JobManager:
                 raise JobError(job.error)
             job.cancel_event = self.context.Event()
             job.messages = self.context.Queue(maxsize=32)
+            arguments = (str(job.directory / "input.video"), job.cancel_event, job.messages)
+            if job.options is not None:
+                arguments += (job.options,)
             job.process = self.context.Process(
                 target=self.worker_target,
-                args=(str(job.directory / "input.video"), job.cancel_event, job.messages),
+                args=arguments,
                 name="video-inspection",
             )
             try:

@@ -9,10 +9,12 @@ from backend.adapters.video_reader import VideoError, read_frames
 from evaluation.evaluate_ball_candidates import verify_source
 
 
-def collect_records(video: Path, annotations: dict, last_index: int, *, include_candidates: bool = False) -> dict:
+def collect_records(video: Path, annotations: dict, last_index: int, *, include_candidates: bool = False,
+                    small_candidate_continuation: bool = False) -> dict:
     """Run all preceding frames as inference context, without consulting labels."""
     verify_source(video, annotations)
-    run = TrackingRun(tuple(annotations["search_region"]))
+    run = TrackingRun(tuple(annotations["search_region"]),
+                      small_candidate_continuation=small_candidate_continuation)
     reader = read_frames(video)
     try:
         for frame in reader:

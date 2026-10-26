@@ -39,3 +39,48 @@ class TrackingRunTests(unittest.TestCase):
         self.assertEqual(second.result()["frames"], [])
         self.assertEqual(first.result()["track_count"], 0)
         self.assertEqual(first.result()["frames"][0]["timestamp_source"], "fps_fallback")
+
+    def test_small_ball_continues_but_cannot_initialize_or_restart_a_track(self):
+        def frame(index, x, radius):
+            image = np.full((432, 768, 3), (80, 60, 30), np.uint8)
+            if x is not None:
+                cv2.circle(image, (x, 150), radius, (245, 245, 245), -1)
+            return VideoFrame(index, index / 30, "presentation", image)
+
+        run = TrackingRun((100, 50, 500, 300), small_candidate_continuation=True)
+        for i, x in enumerate([None, 200, 210, 220]):
+            run.consume(frame(i, x, 5))
+        self.assertEqual(run.frames[-1]['status'], 'observed')
+        run.consume(frame(4, 230, 3))
+        self.assertEqual(run.frames[-1]['status'], 'observed')
+        self.assertAlmostEqual(run.frames[-1]['observation'][0], 230, delta=1)
+        run.consume(frame(11, 300, 3))
+        self.assertEqual(run.frames[-1]['status'], 'searching')
+        self.assertIsNone(run.frames[-1]['observation'])
+
+        fresh = TrackingRun((100, 50, 500, 300), small_candidate_continuation=True)
+        for i, x in enumerate([None, 200, 210, 220]):
+            fresh.consume(frame(i, x, 3))
+        self.assertEqual(fresh.result()['track_count'], 0)
+
+    def test_small_distractors_still_withhold_ambiguous_continuation(self):
+        run = TrackingRun((100, 50, 500, 300), small_candidate_continuation=True)
+        for i, x in enumerate([None, 200, 210, 220, 230]):
+            image = np.full((432, 768, 3), (80, 60, 30), np.uint8)
+            if x is not None:
+                cv2.circle(image, (x, 150), 5, (245, 245, 245), -1)
+            if i == 4:
+                cv2.circle(image, (230, 160), 3, (245, 245, 245), -1)
+            run.consume(VideoFrame(i, i / 30, "presentation", image))
+        self.assertEqual(run.frames[-1]['status'], 'ambiguous')
+        self.assertIsNone(run.frames[-1]['observation'])
+
+    def test_normal_worker_path_keeps_strict_area_during_continuation(self):
+        run = TrackingRun((100, 50, 500, 300))
+        for i, x in enumerate([None, 200, 210, 220, 230]):
+            image = np.full((432, 768, 3), (80, 60, 30), np.uint8)
+            if x is not None:
+                cv2.circle(image, (x, 150), 3 if i == 4 else 5, (245, 245, 245), -1)
+            run.consume(VideoFrame(i, i / 30, "presentation", image))
+        self.assertEqual(run.frames[-1]['status'], 'predicted')
+        self.assertIsNone(run.frames[-1]['observation'])

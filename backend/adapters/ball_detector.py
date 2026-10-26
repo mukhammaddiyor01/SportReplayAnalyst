@@ -10,9 +10,12 @@ from backend.services.ball_observations import BallCandidate, CandidateBatch
 
 
 def find_ball_candidates(previous: np.ndarray, current: np.ndarray,
-                         region: tuple[int, int, int, int]) -> CandidateBatch:
+                         region: tuple[int, int, int, int], *,
+                         minimum_area: int = BALL_MIN_AREA) -> CandidateBatch:
     if previous.shape != current.shape or current.ndim != 3 or current.shape[2] != 3:
         raise ValueError("Candidate frames must have matching BGR source dimensions.")
+    if not isinstance(minimum_area, int) or not 1 <= minimum_area <= BALL_MAX_AREA:
+        raise ValueError("The candidate area must be a positive bounded reference-pixel count.")
     height, width = current.shape[:2]
     left, top, right, bottom = region
     if not (0 <= left < right <= width and 0 <= top < bottom <= height):
@@ -33,7 +36,7 @@ def find_ball_candidates(previous: np.ndarray, current: np.ndarray,
     candidates = []
     for label in range(1, count):
         x, y, blob_width, blob_height, area = map(int, statistics[label])
-        if not BALL_MIN_AREA * scale ** 2 <= area <= BALL_MAX_AREA * scale ** 2:
+        if not minimum_area * scale ** 2 <= area <= BALL_MAX_AREA * scale ** 2:
             continue
         if max(blob_width, blob_height) > BALL_MAX_EXTENT * scale:
             continue

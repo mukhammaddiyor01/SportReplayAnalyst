@@ -4,12 +4,14 @@ from dataclasses import asdict
 
 from backend.adapters.ball_detector import find_ball_candidates
 from backend.adapters.video_reader import VideoError, VideoFrame
+from backend.config import BALL_CONTINUATION_MIN_AREA, BALL_MIN_AREA, TRACK_MAX_GAP_SECONDS
 from backend.services.ball_observations import CandidateBatch
 from backend.services.ball_tracker import BallTracker
 
 
 class TrackingRun:
-    def __init__(self, region: tuple[int, int, int, int]):
+    def __init__(self, region: tuple[int, int, int, int], *, small_candidate_continuation: bool = False):
+        self.small_candidate_continuation = small_candidate_continuation
         self.region = region
         self.previous = None
         self.tracker = None
@@ -23,8 +25,12 @@ class TrackingRun:
             if not (0 <= left < right <= width and 0 <= top < bottom <= height):
                 raise VideoError("The tracking search window is outside the source video.")
             self.tracker = BallTracker(width, height)
+        last = self.tracker.last_observation
+        continuing = (self.small_candidate_continuation and last is not None and
+                      0 < frame.timestamp_seconds - last.timestamp <= TRACK_MAX_GAP_SECONDS)
+        minimum_area = BALL_CONTINUATION_MIN_AREA if continuing else BALL_MIN_AREA
         batch = CandidateBatch([]) if self.previous is None else find_ball_candidates(
-            self.previous, frame.image, self.region)
+            self.previous, frame.image, self.region, minimum_area=minimum_area)
         update = self.tracker.update(batch, frame.index, frame.timestamp_seconds)
         record = asdict(update)
         record["timestamp_source"] = frame.timestamp_source

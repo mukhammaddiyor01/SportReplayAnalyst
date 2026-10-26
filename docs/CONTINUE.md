@@ -132,15 +132,36 @@ on 195–207, below the frozen 35px minimum. Multi-candidate initialization bloc
 Offline reports now include candidate coverage and per-frame diagnostic details;
 candidate lists are not added to worker/API results. 78 Python tests pass.
 
+## Small-candidate experiment: rejected for normal tracking
+
+A fresh protocol was documented before annotating reserved frames 260–299.
+Earlier sparse/dense labels, including the historical held_out split, are now
+explicitly development evidence. Candidate: keep 35px initialization, admit
+25px components only within 0.18s of a confirmed observation. This improved
+development from 63/83 to 81/83 correct associations, with two lost easy matches,
+zero wrong observations, and unchanged zero/30 negative associations.
+
+Reserved same-video review had 37 visible/three uncertain labels. Audited baseline:
+34 correct, zero wrong, three missed. Candidate: 22 correct, two wrong, 13 missed.
+Candidate coverage rose 34 to 37 but extra candidates rose 31 to 71. Two coarse
+manual centers were corrected after source-only enlarged review; annotations
+and docs/tracking-refinement.md disclose original and audited scores. No rules
+were retuned after reserved inspection. Candidate was rejected and is disabled
+in normal workers/API. Only offline --small-candidate-continuation enables it.
+
+82 tests passed. Final default per-frame records and scores equal the exported
+142d5be baseline exactly on the reserved labels. No production quality gain is
+claimed. See evaluation/ball-validation.json and docs/tracking-refinement.md.
+The newly inspected validation interval is no longer untouched for future tuning.
+
 ## Next step
 
-Define a new development/holdout protocol before changing the area threshold or
-initialization rules. Previously inspected sparse and dense labels may support
-development but cannot serve as an untouched test. Compare candidate coverage,
-false candidates and actual associations against the frozen baseline on newly
-annotated, previously uninspected segments or a new fixed-camera video. Lowering
-minimum area alone can bring back clothing fragments. Contact/rally inference
-still waits for reliable evidence, not merely a direction change.
+Investigate temporal/appearance evidence distinguishing ball candidates from
+player/racket fragments before relaxing area filtering. More candidate coverage
+alone harmed association and is insufficient. Define another untouched interval
+or obtain a separate fixed-camera clip for the next candidate. Do not keep tuning
+against 260–299. Keep uncertainty explicit; contact/rally inference still waits
+for independent evidence and documented rules.
 
 Contacts, racket interactions, rally timing, event timeline, scoring, physical
 speed, and 3D reconstruction are not implemented. Direction changes alone cannot

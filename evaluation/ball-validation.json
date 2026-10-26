@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "sha256": "de1be132d44deb1be6e932585b2b029a8092a3fc4aa65c6774368ec5cad28fc1",
+  "source_dimensions": [
+    768,
+    432
+  ],
+  "frame_indexing": "zero_based_decoded",
+  "search_region": [
+    170,
+    70,
+    625,
+    330
+  ],
+  "matching_tolerance_px": 8,
+  "annotation_method": "Approximate manual visible-blur midpoints read from unmarked source crops at native resolution; no interpolation and no detector-assisted centers. Single reviewer, not expert reviewed.",
+  "protocol": "Reserved same-video validation 260-299. Rules selected and frozen on previous development labels before manual review/scoring here. Baseline commit 142d5be; candidate retains 35px initialization and uses 25px only within 0.18s of a confirmed observation. No retuning against this interval. Historical held_out labels are now development evidence. No independent-video generalization claim.",
+  "sequences": [
+    {
+      "name": "reserved_260_299",
+      "samples": [
+        {
+          "frame_index": 260,
+          "visibility": "visible",
+          "center": [
+            459,
+            128
+          ]
+        },
+        {
+          "frame_index": 261,
+          "visibility": "visible",
+          "center": [
+            464,
+            125
+          ]
+        },
+        {
+          "frame_index": 262,
+          "visibility": "visible",
+          "center": [
+            469,
+            123
+          ]
+        },
+        {
+          "frame_index": 263,
+          "visibility": "visible",
+          "center": [
+            473,
+            120
+          ]
+        },
+        {
+          "frame_index": 264,
+          "visibility": "visible",
+          "center": [
+            477,
+            118
+          ]
+        },
+        {
+          "frame_index": 265,
+          "visibility": "visible",
+          "center": [
+            482,
+            115
+          ]
+        },
+        {
+          "frame_index": 266,
+          "visibility": "visible",
+          "center": [
+            486,
+            113
+          ]
+        },
+        {
+          "frame_index": 267,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 268,
+          "visibility": "visible",
+          "center": [
+            478,
+            114
+          ]
+        },
+        {
+          "frame_index": 269,
+          "visibility": "visible",
+          "center": [
+            465,
+            125
+          ]
+        },
+        {
+          "frame_index": 270,
+          "visibility": "visible",
+          "center": [
+            450,
+            124
+          ]
+        },
+        {
+          "frame_index": 271,
+          "visibility": "visible",
+          "center": [
+            435,
+            128
+          ]
+        },
+        {
+          "frame_index": 272,
+          "visibility": "visible",
+          "center": [
+            421,
+            134
+          ]
+        },
+        {
+          "frame_index": 273,
+          "visibility": "visible",
+          "center": [
+            407,
+            138
+          ]
+        },
+        {
+          "frame_index": 274,
+          "visibility": "visible",
+          "center": [
+            392,
+            143
+          ]
+        },
+        {
+          "frame_index": 275,
+          "visibility": "visible",
+          "center": [
+            379,
+            155
+          ]
+        },
+        {
+          "frame_index": 276,
+          "visibility": "visible",
+          "center": [
+            365,
+            155
+          ]
+        },
+        {
+          "frame_index": 277,
+          "visibility": "visible",
+          "center": [
+            353,
+            158
+          ]
+        },
+        {
+          "frame_index": 278,
+          "visibility": "visible",
+          "center": [
+            341,
+            163
+          ]
+        },
+        {
+          "frame_index": 279,
+          "visibility": "visible",
+          "center": [
+            329,
+            167
+          ]
+        },
+        {
+          "frame_index": 280,
+          "visibility": "visible",
+          "center": [
+            318,
+            173
+          ]
+        },
+        {
+          "frame_index": 281,
+          "visibility": "visible",
+          "center": [
+            308,
+            175
+          ]
+        },
+        {
+          "frame_index": 282,
+          "visibility": "visible",
+          "center": [
+            299,
+            178
+          ]
+        },
+        {
+          "frame_index": 283,
+          "visibility": "visible",
+          "center": [
+            289,
+            180
+          ]
+        },
+        {
+          "frame_index": 284,
+          "visibility": "visible",
+          "center": [
+            281,
+            183
+          ]
+        },
+        {
+          "frame_index": 285,
+          "visibility": "visible",
+          "center": [
+            272,
+            185
+          ]
+        },
+        {
+          "frame_index": 286,
+          "visibility": "visible",
+          "center": [
+            263,
+            187
+          ]
+        },
+        {
+          "frame_index": 287,
+          "visibility": "visible",
+          "center": [
+            254,
+            190
+          ]
+        },
+        {
+          "frame_index": 288,
+          "visibility": "visible",
+          "center": [
+            246,
+            192
+          ]
+        },
+        {
+          "frame_index": 289,
+          "visibility": "visible",
+          "center": [
+            239,
+            195
+          ]
+        },
+        {
+          "frame_index": 290,
+          "visibility": "visible",
+          "center": [
+            231,
+            197
+          ]
+        },
+        {
+          "frame_index": 291,
+          "visibility": "visible",
+          "center": [
+            224,
+            200
+          ]
+        },
+        {
+          "frame_index": 292,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 293,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 294,
+          "visibility": "visible",
+          "center": [
+            231,
+            214
+          ]
+        },
+        {
+          "frame_index": 295,
+          "visibility": "visible",
+          "center": [
+            241,
+            218
+          ]
+        },
+        {
+          "frame_index": 296,
+          "visibility": "visible",
+          "center": [
+            253,
+            222
+          ]
+        },
+        {
+          "frame_index": 297,
+          "visibility": "visible",
+          "center": [
+            265,
+            228
+          ]
+        },
+        {
+          "frame_index": 298,
+          "visibility": "visible",
+          "center": [
+            277,
+            233
+          ]
+        },
+        {
+          "frame_index": 299,
+          "visibility": "visible",
+          "center": [
+            289,
+            238
+          ]
+        }
+      ]
+    }
+  ],
+  "annotation_audit": "After the first frozen scoring run, enlarged source-only grid review corrected coarse manual centers at 268 from [480,122] to [478,114] and 274 from [393,151] to [392,143]. Detector/tracker parameters remained frozen; report both preliminary and audited totals. This is a single-reviewer correction, not independent annotation validation."
+}

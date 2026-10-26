@@ -89,6 +89,20 @@ class BallDetectorTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 find_ball_candidates(self.background, self.background, region)
 
+    def test_small_candidate_area_override_scales_with_source(self):
+        current = self.background.copy()
+        cv2.circle(current, (200, 150), 3, (245, 245, 245), -1)
+        self.assertEqual(find_ball_candidates(self.background, current, self.region).candidates, [])
+        for scale in (1, 2):
+            batch = find_ball_candidates(cv2.resize(self.background, None, fx=scale, fy=scale),
+                                         cv2.resize(current, None, fx=scale, fy=scale),
+                                         tuple(value * scale for value in self.region), minimum_area=25)
+            self.assertEqual(len(batch.candidates), 1)
+            self.assertAlmostEqual(batch.candidates[0].x, 200 * scale, delta=2)
+        for invalid in (0, -1, 181, float('nan')):
+            with self.assertRaises(ValueError):
+                find_ball_candidates(self.background, current, self.region, minimum_area=invalid)
+
 
 class CandidateEvaluationTests(unittest.TestCase):
     def test_one_reference_ball_cannot_match_two_observations(self):

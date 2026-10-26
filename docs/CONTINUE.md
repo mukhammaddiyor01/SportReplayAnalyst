@@ -2,6 +2,29 @@
 
 Checkpoint: clean replay workflow, source-frame stepping, full_shape_v1 and gap review.
 
+## Session handoff — stop here until the user resumes
+
+The user requested a session checkpoint and will continue tomorrow. Do not start
+additional feature work or schedule an automatic run. Resume when they return.
+The last implementation commit is 0a02c0b on develop. Recent completed increments:
+
+- 8fac9da: full_shape_v1 detector, same-video reserved evaluation, worker integration.
+- 4c066b0: source-timed missing-observation intervals and browser review navigation.
+- 5f39a41: simplified upload, calibration, analysis and review interface.
+- 0a02c0b: actual-source frame stepping, keyboard controls, decoder boundary fix.
+
+At checkpoint, implementation changes were committed and the working tree was
+clean. Keep develop pushed; master remains 42a6008. Current verification is 94
+passing Python tests plus JS syntax and real-video/browser checks documented below.
+No contact/rally inference or deployment is complete or authorized by this handoff.
+
+On resume, read this file and AGENTS.md, check Git status before edits, then follow
+Next step below. Preserve the clean interface and existing core logic. Do not
+interpret a missing observation as a contact, occlusion, or rally end. Browser job
+results/copies expire after one hour and are not persistent project memory; reload
+the user's source video and rerun tracking when needed. Do not expect today's
+browser result to survive until tomorrow. Sources/docs are the durable checkpoint.
+
 ## Agreement and repository
 
 Speak Uzbek; code, interface, comments, and documentation are English.

@@ -14,6 +14,9 @@ and plain HTML/CSS/JavaScript. Video processing stays on this computer.
   experimental; moving false objects and missed balls are still possible.
   See [detector evaluation](docs/appearance-detector.md).
 
+Tracking results also include source-timed [gap review](docs/tracking-review.md):
+select an unobserved interval to pause and inspect its first frame.
+
 Table contacts, rally boundaries, shot classification, scoring, and physical
 measurements are not implemented. Image-space tracks are not 3D trajectories.
 An airborne ball cannot be mapped to its true table coordinates with a table-plane

@@ -1,6 +1,6 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: full_shape_v1 promoted after same-video reserved validation.
+Checkpoint: full_shape_v1 with source-timed tracking gap review.
 
 ## Agreement and repository
 
@@ -177,6 +177,24 @@ sparse held_out is now development: 6/6 vs 5/6. No independent-video claim.
 spawned worker: 360 records equal offline output, explicit delete left zero
 private job directories, original preserved. Final default and legacy reserved
 records/scores equal frozen evaluations. No browser retest this increment.
+
+## Tracking gap review
+
+TrackingRun.result now returns review_gaps from a plain Python service, preserving
+source first/last indices/times, frame counts, statuses, boundary classification,
+and adjacent track IDs/resume time. No physical duration, contact, occlusion, or
+rally is inferred. Dense indices, monotonic times and observation/status consistency
+are checked. Frontend renders actual interval buttons that pause/seek to the first
+missing frame. Clear result or clip changes clear review. Timestamp fallback or
+source/playback dimension mismatch disables navigation. See tracking-review.md.
+94 Python tests and JS syntax checks passed. Actual browser tracking returned
+360 frames, 227 associations and 11 review intervals (runtime counts, not accuracy).
+Clicking 4.972s selected source frame 149 with no observation/marker. Seeking to
+6.006s showed frame 180 and cleared the active review indication. Clear result
+hid the list. Final browser warn/error logs were empty, screenshot outside Git.
+An actual HTTP/ASGI spawned-worker check matched offline 360-frame output;
+explicit deletion left zero private job directories and preserved the original.
+The final browser result is retained normally for review.
 
 ## Next step
 

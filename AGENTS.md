@@ -21,7 +21,9 @@ classification. Original motion-clipped tracking is available offline for baseli
 comparisons; its rejected small-candidate continuation remains offline-only.
 Labels through 339 have now been inspected; reserve new data before further tuning.
 See docs/appearance-detector.md and docs/tracking-refinement.md.
-Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
+Source-timed gap review now groups missing observations and supports browser seek
+navigation. These intervals are evidence-review aids, not detected sports events.
+See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent
 work in small, independently verified steps. Do not modify reference projects.
 Conversation is in Uzbek; code, interface, comments, and documentation are English.

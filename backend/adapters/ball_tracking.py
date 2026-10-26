@@ -7,6 +7,7 @@ from backend.adapters.video_reader import VideoError, VideoFrame
 from backend.config import BALL_CONTINUATION_MIN_AREA, BALL_MIN_AREA, TRACK_MAX_GAP_SECONDS
 from backend.services.ball_observations import CandidateBatch
 from backend.services.ball_tracker import BallTracker
+from backend.services.tracking_review import tracking_gaps
 
 
 class TrackingRun:
@@ -51,5 +52,6 @@ class TrackingRun:
                 "detector": "full_shape_v1" if self.appearance_filter else "motion_clipped_v1",
                 "search_region": list(self.region),
                 "status_counts": dict(self.counts), "frames": self.frames,
+                "review_gaps": tracking_gaps(self.frames),
                 "track_count": self.tracker.next_track_id - 1 if self.tracker else 0,
                 "warning": "Experimental associations in image pixels. Predictions are not observations; contacts and rallies are not inferred."}

@@ -2,16 +2,27 @@
   "schema_version": 1,
   "recording_id": "lion-recording",
   "source_sha256": "36b9bea5db38130117c8e57900b87ef771ef4610a1c59632e5427ec81e61ffb2",
+  "coordinate_space": "source_image_xyxy",
   "source_dimensions": [
     720,
     860
   ],
-  "coordinate_space": "source_image_xyxy",
-  "annotation_method": "Manual visible-extent review; single reviewer, not independently verified.",
+  "annotation_method": "Approximate manual visible-extent boxes from native source crops/grids; single reviewer, no model-generated boxes. Development smoke-training labels, not independent ground truth. Uncertain box extents excluded.",
   "labels": [
     {
       "frame_index": 20,
       "image_sha256": "77324440642a09ac8bb1ffdacf53e53f532bfcc741baef36f49abf2b1ec1fbef",
+      "visibility": "visible",
+      "bbox": [
+        220,
+        450,
+        241,
+        459
+      ]
+    },
+    {
+      "frame_index": 21,
+      "image_sha256": "f234982e8b66ffe8a421a51d2e4d7ae2e5b998bbaf4c08f4276dc3fef77f976a",
       "visibility": "visible",
       "bbox": [
         220,
@@ -32,10 +43,55 @@
       ]
     },
     {
+      "frame_index": 23,
+      "image_sha256": "88a2f78a2a3a73f4dee035312a67321efa9f45443aa28a0ba6addea023965c56",
+      "visibility": "visible",
+      "bbox": [
+        235,
+        453,
+        256,
+        463
+      ]
+    },
+    {
       "frame_index": 24,
       "image_sha256": "73012915fc6b4172b50dcfc4340dcb071b86f524bd2a0c7696c45ecb08d2b593",
       "visibility": "uncertain",
       "bbox": null
+    },
+    {
+      "frame_index": 25,
+      "image_sha256": "e3426de067191d246dabd30e154e197665798e22e325cc0abedb5252e99587cd",
+      "visibility": "uncertain",
+      "bbox": null
+    },
+    {
+      "frame_index": 26,
+      "image_sha256": "444fe793790d7d38e9e81d2c0b59daae925212d5d88de517c7ff771c30dba0b6",
+      "visibility": "uncertain",
+      "bbox": null
+    },
+    {
+      "frame_index": 27,
+      "image_sha256": "f0bd6a7d8f5ca0b196a07d1d16d9df0a20adbbb60066f807398e2dab7863bcaf",
+      "visibility": "visible",
+      "bbox": [
+        261,
+        407,
+        281,
+        430
+      ]
+    },
+    {
+      "frame_index": 28,
+      "image_sha256": "895fa46e7e17e9793a44cc08b68d3a6fa7094eca8ee83c4dfd49036ada05034d",
+      "visibility": "visible",
+      "bbox": [
+        261,
+        407,
+        281,
+        430
+      ]
     },
     {
       "frame_index": 29,
@@ -48,5 +104,6 @@
         409.37
       ]
     }
-  ]
+  ],
+  "extent_review": "Second visual extent check before training: expanded clipped blur tails; no prediction-assisted edits."
 }

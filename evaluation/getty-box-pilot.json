@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "recording_id": "getty-recording",
+  "source_sha256": "de1be132d44deb1be6e932585b2b029a8092a3fc4aa65c6774368ec5cad28fc1",
+  "coordinate_space": "source_image_xyxy",
+  "source_dimensions": [
+    768,
+    432
+  ],
+  "annotation_method": "Approximate manual visible-extent boxes from native source crops/grids; single reviewer, no model-generated boxes. Development smoke-training labels, not independent ground truth. Uncertain box extents excluded.",
+  "labels": [
+    {
+      "frame_index": 140,
+      "image_sha256": "57c056a6a2314c735e131db410728e0fa5e3416daa9e71d4c0631dfc967fb1c9",
+      "visibility": "uncertain",
+      "bbox": null
+    },
+    {
+      "frame_index": 143,
+      "image_sha256": "18c5e4cee25218c56db6c2de611dd5ccec71aa933a3bf03d7c9283f210548605",
+      "visibility": "visible",
+      "bbox": [
+        474,
+        200,
+        497,
+        213
+      ]
+    },
+    {
+      "frame_index": 146,
+      "image_sha256": "ee5e4692a949801e8f8010f6f02b9bfdbe20c87b7b2f9a5ebeb345ef648ec9bd",
+      "visibility": "visible",
+      "bbox": [
+        426,
+        189,
+        450,
+        200
+      ]
+    },
+    {
+      "frame_index": 149,
+      "image_sha256": "b456828840511c85508c13f9ae3630d710dcb5a362ff37b2caf380bb31809c46",
+      "visibility": "visible",
+      "bbox": [
+        376,
+        179,
+        397,
+        191
+      ]
+    },
+    {
+      "frame_index": 152,
+      "image_sha256": "7f2adb282ef75c9dae5ed92f6a7d2d21def9c8b86f317eb2c4ef5bab170ce452",
+      "visibility": "visible",
+      "bbox": [
+        327,
+        170,
+        348,
+        182
+      ]
+    },
+    {
+      "frame_index": 155,
+      "image_sha256": "3d44f13953e1b5e04cbad99f49e4fff692781fd744ea996d43491525c83edd10",
+      "visibility": "visible",
+      "bbox": [
+        289,
+        160,
+        308,
+        172
+      ]
+    },
+    {
+      "frame_index": 158,
+      "image_sha256": "a521b093fb25143a1231e4d081f26a6f1a84afa838f9f8c6f1bfc71607820304",
+      "visibility": "visible",
+      "bbox": [
+        253,
+        155,
+        274,
+        167
+      ]
+    },
+    {
+      "frame_index": 161,
+      "image_sha256": "477f587ead2349ffb76de967d9d2ec477ece99cc075f5a4644d0ecec3c5184cd",
+      "visibility": "visible",
+      "bbox": [
+        219,
+        149,
+        238,
+        161
+      ]
+    },
+    {
+      "frame_index": 164,
+      "image_sha256": "0a7d0e2416199f24b3964ea3a631723b3c7c34d982848733cb688f48fef8d117",
+      "visibility": "visible",
+      "bbox": [
+        185,
+        144,
+        207,
+        155
+      ]
+    },
+    {
+      "frame_index": 167,
+      "image_sha256": "dad9d4d94a2193b812f2595a48fe0d17bbc05f083df0bd53aa072574c6251400",
+      "visibility": "uncertain",
+      "bbox": null
+    }
+  ],
+  "extent_review": "Second visual extent check before training: expanded clipped blur tails; no prediction-assisted edits."
+}

@@ -63,6 +63,24 @@ The last project server is 127.0.0.1:8014; check before starting another. Port 8
 belongs to another project. Restarting ends temporary video review jobs. Annotator
 labels are tab-local until downloaded; saved exports/weights do not expire with jobs.
 
+## Saved portfolio and user preferences
+
+The owner requested a develop push and durable handoff on 2026-10-27.
+Implementation through b44e96a and generated portfolio visuals through 8445ada
+were already committed/pushed before this handoff. The worktree was clean when
+checked. Last verified application suite: 127 passing tests; no application code
+changed during this documentation-only checkpoint.
+
+Three purpose-focused original AI concepts are saved in portfolio-assets:
+cover, detection/association/review workflow, and manual annotation/local YOLO
+preparation. They are 1672×941 PNGs with concept captions; no user footage was
+uploaded to the image generator. Exact prompts are retained in purpose-prompts-v2.md.
+The user rejected a long portfolio write-up and prefers a concise 3-page case
+study: one large image, short title, one compact paragraph and a few facts/features
+per page. The accepted English copy/image mapping is in portfolio-assets/case-study.md.
+Keep conversation Uzbek, portfolio/UI/docs English, and avoid unverified accuracy
+or deployed-neural-detector claims. No portfolio site or public demo was deployed.
+
 ## Next action
 
 Expand independently reviewed boxes and full-frame/ROI-appropriate hard negatives

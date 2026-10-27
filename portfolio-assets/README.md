@@ -25,6 +25,8 @@ Exact prompts and targeted refinements: [purpose-prompts-v2.md](purpose-prompts-
 The final refinement removed pale dashed prediction-like bridges from both
 tracking visuals while preserving the two separated observed segments.
 
+Concise three-page English case-study copy: [case-study.md](case-study.md).
+
 ## Earlier preparation-only concepts
 
 The earlier assets are retained without replacement:

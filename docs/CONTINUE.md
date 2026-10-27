@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-27, real local YOLO11n baseline completed; not promoted.
-114 Python tests pass. See docs/yolo-benchmark.md for the latest measurements and decision.
+Checkpoint: 2026-10-27, exact-frame manual ball annotation and YOLO export verified.
+120 Python tests pass. See docs/ball-annotation.md for the current workflow.
 
 ## Previous session handoff — resumed 2026-10-27
 
@@ -340,19 +340,34 @@ Do not promote this model. See docs/yolo-benchmark.md for exact provenance,
 measurements, dependencies, license link and reproduction. The model/environment
 are temporary outside Git and may need recreation. 114 tests passed; no UI change.
 
+## Exact-frame annotation checkpoint
+
+The replay header links to /labels. A separate browser-only PNG annotator supports
+two-corner/numeric source boxes, a 4x pixel loupe, explicit not-visible and uncertain
+states, download and resume. Images are not uploaded. Use evaluation.ball_dataset
+prepare/export outside Git; the bounded manifest preserves source/image hashes,
+decoded indices and timestamps. Export includes only saved visible/negative labels
+and produces YOLO images/labels plus provenance; split remains unassigned.
+
+Actual Lion20–29 pilot: 3 manual boxes (20,22,29), 1 uncertain bbox extent (24),
+6 unreviewed. Saved to evaluation/lion-box-pilot.json as numeric metadata only.
+The browser download resumed 4/10 labels; foreign-source import was rejected.
+Real CLI export produced 3 images/labels, excluding uncertainty/unreviewed frames.
+120 Python tests and JS syntax passed. Browser console empty. See ball-annotation.md.
+Local review bundle, labels JSON and YOLO export are in the conversation’s local
+visualization artifacts, outside Git. The annotator tab is a user-facing deliverable.
+Restarted this project server on 127.0.0.1:8014 after adding the route.
+
 ## Next step
 
-Prepare independently reviewed table-tennis bounding boxes and hard negatives
-for a neural-detector experiment. Current approximate point labels are not YOLO
-training boxes; never fabricate constant-size boxes or silently treat uncertain
-frames as negatives. Split by recording/session to avoid neighboring-frame
-leakage. Reserve fresh validation before fine-tuning or configuration selection.
-Lion90–179 remain unscored in these new experiments, but were previously viewed
-in the original prefix review; prefer a new recording for independent validation.
-Keep full_shape_v1 and both rejected offline experiments reproducible. Keep media,
-models and raw results out of Git. Do not broaden ROI silently: a prior broad-window
-experiment followed a hand. Do not claim YOLO is generally unsuitable from this
-single pretrained configuration.
+Expand manual boxes and real hard negatives across recordings, then obtain
+independent review before neural training. Existing 3 pilot boxes are a workflow
+check, not sufficient training data. Reuse recording IDs across derived crops;
+split independent sessions before preparing train/validation YAML. Do not fabricate
+boxes from point labels. Keep uncertain frames excluded and all original source
+provenance explicit. Lion90–179 were viewed during original prefix review; prefer
+a new recording for independent validation. Neither offline detector candidate
+was promoted, and no YOLO fine-tuning has run. Preserve normal full_shape_v1 replay.
 
 Contacts, racket interactions, rally timing, event timeline, scoring, physical
 speed, and 3D reconstruction are not implemented. Direction changes alone cannot

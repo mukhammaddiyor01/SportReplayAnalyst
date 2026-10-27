@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "recording_id": "lion-recording",
+  "source_sha256": "36b9bea5db38130117c8e57900b87ef771ef4610a1c59632e5427ec81e61ffb2",
+  "source_dimensions": [
+    720,
+    860
+  ],
+  "coordinate_space": "source_image_xyxy",
+  "annotation_method": "Manual visible-extent review; single reviewer, not independently verified.",
+  "labels": [
+    {
+      "frame_index": 20,
+      "image_sha256": "77324440642a09ac8bb1ffdacf53e53f532bfcc741baef36f49abf2b1ec1fbef",
+      "visibility": "visible",
+      "bbox": [
+        220,
+        450,
+        241,
+        459
+      ]
+    },
+    {
+      "frame_index": 22,
+      "image_sha256": "0769b576c76cda110a8f8672d8790239787f6d13775d5bce44ff03e5542f5423",
+      "visibility": "visible",
+      "bbox": [
+        235,
+        453,
+        256,
+        463
+      ]
+    },
+    {
+      "frame_index": 24,
+      "image_sha256": "73012915fc6b4172b50dcfc4340dcb071b86f524bd2a0c7696c45ecb08d2b593",
+      "visibility": "uncertain",
+      "bbox": null
+    },
+    {
+      "frame_index": 29,
+      "image_sha256": "56db2c9147db6b92985e9e8410d3789c963d582dc84e80996ee0eb8e4d14cc5e",
+      "visibility": "visible",
+      "bbox": [
+        274.55,
+        392.83,
+        289.25,
+        409.37
+      ]
+    }
+  ]
+}

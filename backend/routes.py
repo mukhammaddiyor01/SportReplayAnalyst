@@ -18,6 +18,11 @@ def workspace(request: Request):
     return templates.TemplateResponse(request=request, name="index.html", context={"limits": limits})
 
 
+@router.get("/labels")
+def label_workspace(request: Request):
+    return templates.TemplateResponse(request=request, name="labels.html")
+
+
 @router.get("/health")
 def health():
     return {"status": "ok"}

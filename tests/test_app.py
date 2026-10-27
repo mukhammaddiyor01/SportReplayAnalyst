@@ -21,6 +21,15 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.headers["cache-control"], "no-store")
         self.assertIn("frame-ancestors 'none'", response.headers["content-security-policy"])
 
+    async def test_annotation_tool_is_local_and_separate_from_replay(self):
+        self.assertIn('href="/labels"', (await self.client.get('/')).text)
+        response = await self.client.get('/labels')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Save ball box', response.text)
+        self.assertIn('Uncertain', response.text)
+        self.assertEqual(response.headers['cache-control'], 'no-store')
+        self.assertEqual((await self.client.get('/static/js/ball-labels.js')).status_code, 200)
+
     async def test_private_files_are_not_served(self):
         for path in ["/AGENTS.md", "/.git/config", "/.env", "/static/../AGENTS.md"]:
             self.assertEqual((await self.client.get(path)).status_code, 404)

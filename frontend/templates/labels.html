@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Label ball frames · Sports Replay Analyst</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+  <script src="{{ url_for('static', path='/js/ball-labels.js') }}" defer></script>
+</head>
+<body>
+  <header class="app-header">
+    <a href="/" class="brand">Sports Replay Analyst</a>
+    <a href="/" class="text-button">Back to replay</a>
+  </header>
+  <main>
+    <div class="page-heading"><div><h1>Label ball frames</h1><p>Mark what you can see. Keep uncertain frames separate.</p></div></div>
+    <section class="source-bar" aria-label="Review source">
+      <div class="file-picker"><label for="label-files">Open prepared frames</label><input id="label-files" type="file" multiple accept=".json,.png"></div>
+      <div class="source-details"><p id="label-source">Select manifest.json and its PNG frames together.</p><p id="label-progress">No frames loaded</p></div>
+      <button id="label-download" class="secondary-button" type="button" disabled>Download labels</button>
+    </section>
+    <div class="label-workspace">
+      <section class="replay" aria-label="Exact source frame">
+        <div class="viewer-heading"><h2 id="label-frame-name">Source frame</h2><output id="label-frame-time"></output></div>
+        <div id="label-empty" class="label-empty"><h2>Start with exact decoded frames</h2><p>Prepare a local review bundle, then open its manifest and images.</p><details><summary>Prepare frames</summary><p>Run the local dataset tool with a recording ID and source-frame range. See the project’s docs/ball-annotation.md for commands. Images stay on your computer.</p></details></div>
+        <div id="label-image-area" class="label-frame" hidden><canvas id="label-canvas" aria-label="Select two opposite corners around the visible ball; coordinate inputs are also available"></canvas></div>
+        <div class="label-navigation" role="group" aria-label="Source-frame navigation">
+          <button id="label-prev" class="secondary-button" type="button" disabled>Previous</button>
+          <label for="label-select" class="visually-hidden">Source frame</label><select id="label-select" disabled><option>No frames</option></select>
+          <button id="label-next" class="secondary-button" type="button" disabled>Next</button>
+        </div>
+      </section>
+      <aside class="preparation label-inspector" aria-label="Ball annotation">
+        <section class="inspector-section">
+          <div class="section-heading"><h2>Review this frame</h2><output id="label-state" class="corner-count">Unreviewed</output></div>
+          <p class="section-description">Click two opposite corners around the entire visible ball or blur. A second pair replaces the draft.</p>
+          <canvas id="label-loupe" width="200" height="160" aria-label="Magnified source pixels around the pointer"></canvas>
+          <form id="label-box-form">
+            <div class="coordinate-fields">
+              <label>Left x<input id="box-left" type="number" min="0" step="any" required></label>
+              <label>Top y<input id="box-top" type="number" min="0" step="any" required></label>
+              <label>Right x<input id="box-right" type="number" min="0" step="any" required></label>
+              <label>Bottom y<input id="box-bottom" type="number" min="0" step="any" required></label>
+            </div>
+            <button id="label-save" class="primary-button" type="submit" disabled>Save ball box</button>
+          </form>
+          <div class="label-decisions">
+            <button id="label-absent" class="secondary-button" type="button" disabled>Ball not visible</button>
+            <button id="label-uncertain" class="secondary-button" type="button" disabled>Uncertain — skip training</button>
+            <button id="label-remove" class="text-button" type="button" disabled>Clear this label</button>
+          </div>
+          <p id="label-message" class="label-message" role="status" aria-live="polite">Open prepared frames to begin.</p>
+        </section>
+        <section class="inspection-panel">
+          <h2>Keep your review</h2>
+          <p class="section-description">Labels stay in this tab. Download before closing or opening another bundle. Images are never uploaded.</p>
+          <div class="file-picker label-import"><label for="label-import">Resume from labels JSON</label><input id="label-import" type="file" accept=".json" disabled></div>
+          <p class="analysis-note">Only saved boxes and explicitly not-visible frames can be exported for training. Uncertain and unreviewed frames are excluded.</p>
+        </section>
+      </aside>
+    </div>
+    <footer><p>One ball per frame. Source pixels and timestamps stay unchanged. These are manual labels, not model predictions.</p></footer>
+  </main>
+</body>
+</html>

@@ -93,13 +93,16 @@ def score_sequence(samples: list[dict], records: dict, tolerance: float) -> dict
 
 
 def evaluate(video: Path, annotations: dict, *, small_candidate_continuation: bool = False,
-             appearance_filter: bool = True) -> dict:
+             appearance_filter: bool = True, sparse_motion: bool = False) -> dict:
     appearance_filter = appearance_filter and not small_candidate_continuation
+    sparse_motion = sparse_motion and appearance_filter
     sequences = annotations['sequences']
     records = collect_records(video, annotations, max(
         row['frame_index'] for seq in sequences for row in seq['samples']), include_candidates=True,
-        small_candidate_continuation=small_candidate_continuation, appearance_filter=appearance_filter)
-    return {'appearance_filter': appearance_filter, 'small_candidate_continuation': small_candidate_continuation,
+        small_candidate_continuation=small_candidate_continuation,
+        appearance_filter=appearance_filter, sparse_motion=sparse_motion)
+    return {'sparse_motion': sparse_motion, 'appearance_filter': appearance_filter,
+            'small_candidate_continuation': small_candidate_continuation,
             'protocol': annotations['protocol'], 'sequences': {
         seq['name']: score_sequence(seq['samples'], records, annotations['matching_tolerance_px'])
         for seq in sequences},
@@ -113,11 +116,12 @@ def main():
     parser.add_argument('--small-candidate-continuation', action='store_true',
                         help='Offline experiment: admit smaller candidates only during recent confirmed tracks.')
     parser.add_argument('--legacy-detector', action='store_true', help='Use the original motion-clipped detector.')
+    parser.add_argument('--sparse-motion', action='store_true', help='Experimental bounded temporal seeds and relative background contrast.')
     args = parser.parse_args()
     try:
         result = evaluate(args.video, json.loads(args.annotations.read_text()),
                           small_candidate_continuation=args.small_candidate_continuation,
-                          appearance_filter=not args.legacy_detector)
+                          appearance_filter=not args.legacy_detector, sparse_motion=args.sparse_motion)
     except (ValueError, OSError, VideoError) as error:
         parser.exit(1, f'Sequence evaluation failed: {error}\n')
     print(json.dumps(result, indent=2))

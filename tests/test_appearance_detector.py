@@ -69,3 +69,28 @@ class AppearanceDetectorTests(unittest.TestCase):
         batch = find_appearance_candidates(before, current, self.region)
         self.assertTrue(batch.truncated)
         self.assertEqual(len(batch.candidates), 12)
+
+
+class RelativeBackgroundTests(unittest.TestCase):
+    region = AppearanceDetectorTests.region
+    image = AppearanceDetectorTests.image
+    def test_relative_contrast_rescues_only_high_contrast_bright_background(self):
+        for value, expected in ((170, 1), (200, 0)):
+            before, current = self.image(160, value=value, radius=3), self.image(200, value=value, radius=3)
+            diagnostics = []
+            candidates = find_appearance_candidates(before, current, self.region,
+                                                     relative_background=True, on_component=diagnostics.append)
+            self.assertEqual(len(candidates.candidates), expected)
+            if expected:
+                self.assertTrue(any(row['foreground_value'] is not None for row in diagnostics))
+            self.assertEqual(find_appearance_candidates(before, current, self.region).candidates, [])
+
+    def test_experiment_remains_opt_in_and_legacy_is_reproducible(self):
+        run = TrackingRun(self.region, sparse_motion=True)
+        legacy = TrackingRun(self.region, sparse_motion=True, appearance_filter=False)
+        for i, x in enumerate((None, 200, None, 210, None, 220)):
+            run.consume(VideoFrame(i, i / 60, 'presentation', self.image(x, value=170, radius=3)))
+        self.assertEqual(run.result()['detector'], 'full_shape_relative_v1')
+        self.assertEqual(run.result()['initialization'], 'bounded_paths_v1')
+        self.assertEqual(run.frames[-1]['observation'], (220, 150))
+        self.assertFalse(legacy.sparse_motion)

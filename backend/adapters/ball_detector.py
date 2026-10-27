@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 from backend.config import (BALL_APPEARANCE_MIN_AREA, BALL_BACKGROUND_PADDING,
-                            BALL_MAX_BACKGROUND_VALUE, BALL_MIN_FILL_RATIO,
+                            BALL_MAX_BACKGROUND_VALUE, BALL_MIN_BACKGROUND_CONTRAST, BALL_MIN_FILL_RATIO,
                             BALL_MIN_MOVING_FRACTION, BALL_MIN_MOVING_PIXELS, BALL_CONTRAST_WINDOW, BALL_MAX_AREA, BALL_MAX_ASPECT, BALL_MAX_CANDIDATES,
                             BALL_MAX_EXTENT, BALL_MAX_SATURATION, BALL_MIN_AREA,
                             BALL_MIN_CONTRAST, BALL_MIN_MOTION, BALL_MIN_VALUE,
@@ -55,7 +55,8 @@ def find_ball_candidates(previous: np.ndarray, current: np.ndarray,
 
 def find_appearance_candidates(previous: np.ndarray, current: np.ndarray,
                                region: tuple[int, int, int, int], *,
-                               on_component: Callable[[dict], None] | None = None) -> CandidateBatch:
+                               on_component: Callable[[dict], None] | None = None,
+                               relative_background: bool = False) -> CandidateBatch:
     """Measure full bright shapes; motion validates them without clipping centers."""
     if previous.shape != current.shape or current.ndim != 3 or current.shape[2] != 3:
         raise ValueError("Candidate frames must have matching BGR source dimensions.")
@@ -82,6 +83,7 @@ def find_appearance_candidates(previous: np.ndarray, current: np.ndarray,
         reason = None
         moving_pixels = None
         background_value = None
+        foreground_value = None
         fill = area / (blob_width * blob_height)
         if not BALL_APPEARANCE_MIN_AREA * scale ** 2 <= area <= BALL_MAX_AREA * scale ** 2:
             reason = "area"
@@ -106,10 +108,14 @@ def find_appearance_candidates(previous: np.ndarray, current: np.ndarray,
                 background_value = float(np.median(hsv[y0:y1, x0:x1, 2][ring]))
             if background_value is None or background_value > BALL_MAX_BACKGROUND_VALUE:
                 reason = "background"
+                if relative_background and background_value is not None:
+                    foreground_value = float(np.median(hsv[y:y + blob_height, x:x + blob_width, 2][component]))
+                    if foreground_value - background_value >= BALL_MIN_BACKGROUND_CONTRAST:
+                        reason = None
         if on_component is not None:
             on_component(dict(center=[float(center_x + left), float(center_y + top)],
                               box=[x, y, blob_width, blob_height], area=area, fill=fill,
-                              moving_pixels=moving_pixels, background_value=background_value,
+                              moving_pixels=moving_pixels, background_value=background_value, foreground_value=foreground_value,
                               rejection_reason=reason))
         if reason is None:
             candidates.append(BallCandidate(float(center_x + left), float(center_y + top), area,

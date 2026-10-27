@@ -25,8 +25,12 @@ diagnostics now distinguish first component-filter rejection from association
 failure; early frames 0–29 were reviewed without tuning. See
 docs/tracking-loss-diagnostics.md. A second supplied edited portrait clip was
 reviewed via a bounded cropped 180-frame prefix: neither broad nor table-derived
-search windows confirmed a track. No accuracy score is available for that source.
-See docs/lion-footage-review.md before tuning or claiming successful tracking.
+search windows confirmed a track. A frozen offline sparse-motion candidate gained
+3/30 development observations but remained 0/12 on reserved visible frames; it
+was not promoted. Normal worker/browser tracking remains full_shape_v1.
+See docs/lion-footage-review.md and docs/sparse-motion-protocol.md before tuning
+or claiming successful tracking. Lion frames 20–49 and 60–89 are now inspected
+and cannot serve as fresh validation. 108 Python tests passed at this checkpoint.
 Source-timed gap review now groups missing observations and supports browser seek
 navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.

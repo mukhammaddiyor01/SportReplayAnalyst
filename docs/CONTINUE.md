@@ -1,6 +1,7 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-27, second-footage baseline reveals zero confirmed tracks.
+Checkpoint: 2026-10-27, frozen sparse-motion experiment completed; not promoted.
+108 Python tests pass. See docs/sparse-motion-protocol.md for measurements and decision.
 
 ## Previous session handoff — resumed 2026-10-27
 
@@ -300,15 +301,26 @@ outside Git. Client JS syntax passed. Server restarted on 127.0.0.1:8014.
 See docs/lion-footage-review.md for provenance,
 full limits and the two different search-window experiments.
 
+## Latest increment: sparse-motion experiment
+
+Recorded numerical manual source-grid labels for Lion development 20–49 and
+reserved 60–89. Frozen bounded temporal hypotheses plus relative ring contrast
+remain offline-only (`--sparse-motion`). Default worker/browser tracking is
+unchanged. Development correct observations increased 0/30 to 3/30 (22,44,48),
+but reserved stayed 0/12; 18 reserved frames are uncertain. No wrong associations
+on scored visible frames, no observations on 46 reused Getty negatives. Getty
+frame 10 loses a former match; other dense sequence totals are unchanged.
+These data do not establish usable continuous tracking or whole-video identity.
+108 Python tests passed; no new frontend changes. See sparse-motion-protocol.md.
+
 ## Next step
 
-Use this second recording to label a small diagnostic subset and establish a new
-validation protocol before changing temporal confirmation, motion handling or ROI
-selection. The first frozen run failed to confirm any track; retain that baseline.
-Do not call this footage successfully tracked. Table corners are not a sufficient
-airborne search window for every viewpoint. Avoid exact-duplicate assumptions.
-Keep raw media/frames/results out of Git. Existing labels on the old clip remain
-development evidence, including previously inspected 300–339.
+Diagnose elongated blur and motion evidence on the now-inspected Lion labels.
+Only 1/12 reserved visible frames produced a near-reference candidate, so further
+initialization relaxation is insufficient. Reserve another interval before any
+new detector tuning; Lion 20–49 and 60–89 are now development evidence. Keep the
+baseline and offline experiment reproducible. Do not broaden ROI silently: an
+exploratory broad-window tracker followed a hand. Keep media/results out of Git.
 
 Contacts, racket interactions, rally timing, event timeline, scoring, physical
 speed, and 3D reconstruction are not implemented. Direction changes alone cannot

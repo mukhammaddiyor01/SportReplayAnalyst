@@ -5,7 +5,8 @@ from math import hypot, isfinite
 from backend.config import (TRACK_AMBIGUITY_MARGIN_DIAGONAL, TRACK_BASE_GATE_DIAGONAL,
                             TRACK_CONFIRMATION_COUNT, TRACK_GATE_GROWTH_DIAGONAL,
                             TRACK_MAX_GAP_SECONDS, TRACK_MAX_SPEED_DIAGONAL,
-                            TRACK_MIN_INITIAL_DISPLACEMENT_DIAGONAL)
+                            TRACK_MIN_INITIAL_DISPLACEMENT_DIAGONAL, TRACK_INITIAL_GAP_SECONDS,
+                            TRACK_MAX_INITIAL_HYPOTHESES)
 from backend.services.ball_observations import BallCandidate, CandidateBatch
 
 
@@ -29,9 +30,10 @@ class Observation:
 
 
 class BallTracker:
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, *, temporal_initialization: bool = False):
         if width < 2 or height < 2:
             raise ValueError("Source dimensions must be positive.")
+        self.temporal_initialization = temporal_initialization
         self.width = width
         self.height = height
         self.diagonal = hypot(width, height)
@@ -43,6 +45,7 @@ class BallTracker:
         self.last_observation = None
         self.velocity = (0.0, 0.0)
         self.seeds = []
+        self.hypotheses = []
         self.track_id = None
         self.next_track_id = 1
 
@@ -62,6 +65,8 @@ class BallTracker:
             self.last_observation = None
             self.track_id = None
             self.seeds = []
+        if self.last_observation is None and self.temporal_initialization:
+            return self._initialize_temporal(batch, index, timestamp)
         if self.last_observation is None:
             return self._initialize(batch, index, timestamp)
 
@@ -123,6 +128,58 @@ class BallTracker:
         self.velocity = ((last.x - previous.x) / elapsed, (last.y - previous.y) / elapsed)
         self.last_observation = last
         self.seeds = []
+        return TrackUpdate(index, timestamp, "observed", self.track_id, (last.x, last.y))
+
+    def _initialize_temporal(self, batch: CandidateBatch, index: int, timestamp: float) -> TrackUpdate:
+        if batch.truncated:
+            self.hypotheses = []
+            return TrackUpdate(index, timestamp, "ambiguous")
+        # Keep actual observations only; no point is inserted for a missing frame.
+        paths = [path for path in self.hypotheses
+                 if timestamp - path[-1].timestamp <= TRACK_INITIAL_GAP_SECONDS]
+        extended = []
+        for path in paths:
+            last = path[-1]
+            elapsed = timestamp - last.timestamp
+            matches = []
+            for candidate in batch.candidates:
+                if hypot(candidate.x - last.x, candidate.y - last.y) / elapsed > self.diagonal * TRACK_MAX_SPEED_DIAGONAL:
+                    continue
+                if len(path) >= 2:
+                    before = path[-2]
+                    duration = last.timestamp - before.timestamp
+                    predicted = (last.x + (last.x - before.x) / duration * elapsed,
+                                 last.y + (last.y - before.y) / duration * elapsed)
+                    if hypot(candidate.x - predicted[0], candidate.y - predicted[1]) > self.diagonal * TRACK_BASE_GATE_DIAGONAL:
+                        continue
+                matches.append(candidate)
+            if not matches:
+                extended.append(path)
+            for candidate in matches:
+                observation = Observation(index, timestamp, candidate.x, candidate.y)
+                extended.append((path + [observation])[-TRACK_CONFIRMATION_COUNT:])
+        extended.extend([[Observation(index, timestamp, c.x, c.y)] for c in batch.candidates])
+        unique = {tuple((o.frame_index, o.x, o.y) for o in path): path for path in extended}
+        if len(unique) > TRACK_MAX_INITIAL_HYPOTHESES:
+            self.hypotheses = []
+            return TrackUpdate(index, timestamp, "ambiguous")
+        self.hypotheses = list(unique.values())
+        # Competing complete histories with the same endpoint are still ambiguous.
+        complete = [path for path in self.hypotheses
+                    if len(path) == TRACK_CONFIRMATION_COUNT and path[-1].frame_index == index and
+                    hypot(path[-1].x - path[0].x, path[-1].y - path[0].y) >=
+                    self.diagonal * TRACK_MIN_INITIAL_DISPLACEMENT_DIAGONAL]
+        if len(complete) != 1:
+            state = ("ambiguous" if len(complete) > 1 or len(batch.candidates) > 1 else
+                     "tentative" if batch.candidates else "searching")
+            return TrackUpdate(index, timestamp, state)
+        previous, last = complete[0][-2:]
+        elapsed = last.timestamp - previous.timestamp
+        self.velocity = ((last.x - previous.x) / elapsed, (last.y - previous.y) / elapsed)
+        self.last_observation = last
+        self.track_id = self.next_track_id
+        self.next_track_id += 1
+        self.hypotheses = []
         return TrackUpdate(index, timestamp, "observed", self.track_id, (last.x, last.y))
 
     def _missing(self, index: int, timestamp: float, status: str,

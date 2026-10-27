@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "sha256": "36b9bea5db38130117c8e57900b87ef771ef4610a1c59632e5427ec81e61ffb2",
+  "source_dimensions": [
+    720,
+    860
+  ],
+  "frame_indexing": "zero_based_decoded",
+  "search_region": [
+    161,
+    326,
+    563,
+    517
+  ],
+  "matching_tolerance_px": 8,
+  "annotation_method": "Single-reviewer approximate visible-blur midpoints from native source-only coordinate grids. No interpolated centers; no expert review. Uncertain labels excluded from accuracy counts.",
+  "original_sha256": "2194ffcd9f572fde42861c1ffd56d3844bb69dd5d9349880d3f33aa02d36f18e",
+  "source_transform": "First 180 decoded frames, crop [0,140,720,1000), H264 reencoding; original x=x, original y=y+140, original index=index.",
+  "protocol": "Source-only labels after freezing docs/sparse-motion-protocol.md and before scoring either method. Reserved for one frozen comparison; inspected data thereafter. Blurred player/racket overlaps without an identifiable ball are uncertain, not negatives.",
+  "sequences": [
+    {
+      "name": "lion_validation",
+      "samples": [
+        {
+          "frame_index": 60,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 61,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 62,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 63,
+          "visibility": "visible",
+          "center": [
+            418,
+            360
+          ]
+        },
+        {
+          "frame_index": 64,
+          "visibility": "visible",
+          "center": [
+            418,
+            360
+          ]
+        },
+        {
+          "frame_index": 65,
+          "visibility": "visible",
+          "center": [
+            436,
+            389
+          ]
+        },
+        {
+          "frame_index": 66,
+          "visibility": "visible",
+          "center": [
+            439,
+            378
+          ]
+        },
+        {
+          "frame_index": 67,
+          "visibility": "visible",
+          "center": [
+            439,
+            378
+          ]
+        },
+        {
+          "frame_index": 68,
+          "visibility": "visible",
+          "center": [
+            469,
+            410
+          ]
+        },
+        {
+          "frame_index": 69,
+          "visibility": "visible",
+          "center": [
+            469,
+            410
+          ]
+        },
+        {
+          "frame_index": 70,
+          "visibility": "visible",
+          "center": [
+            492,
+            443
+          ]
+        },
+        {
+          "frame_index": 71,
+          "visibility": "visible",
+          "center": [
+            492,
+            443
+          ]
+        },
+        {
+          "frame_index": 72,
+          "visibility": "visible",
+          "center": [
+            517,
+            467
+          ]
+        },
+        {
+          "frame_index": 73,
+          "visibility": "visible",
+          "center": [
+            517,
+            467
+          ]
+        },
+        {
+          "frame_index": 74,
+          "visibility": "visible",
+          "center": [
+            517,
+            467
+          ]
+        },
+        {
+          "frame_index": 75,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 76,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 77,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 78,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 79,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 80,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 81,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 82,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 83,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 84,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 85,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 86,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 87,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 88,
+          "visibility": "uncertain",
+          "center": null
+        },
+        {
+          "frame_index": 89,
+          "visibility": "uncertain",
+          "center": null
+        }
+      ]
+    }
+  ]
+}

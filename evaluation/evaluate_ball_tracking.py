@@ -10,11 +10,12 @@ from evaluation.evaluate_ball_candidates import verify_source
 
 
 def collect_records(video: Path, annotations: dict, last_index: int, *, include_candidates: bool = False,
-                    small_candidate_continuation: bool = False, appearance_filter: bool = True) -> dict:
+                    small_candidate_continuation: bool = False, appearance_filter: bool = True, sparse_motion: bool = False) -> dict:
     """Run all preceding frames as inference context, without consulting labels."""
     verify_source(video, annotations)
     run = TrackingRun(tuple(annotations["search_region"]),
-                      small_candidate_continuation=small_candidate_continuation, appearance_filter=appearance_filter)
+                      small_candidate_continuation=small_candidate_continuation,
+                      appearance_filter=appearance_filter, sparse_motion=sparse_motion)
     reader = read_frames(video)
     try:
         for frame in reader:

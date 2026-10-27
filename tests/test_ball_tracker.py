@@ -118,3 +118,67 @@ class BallTrackerTests(unittest.TestCase):
         self.tracker.update(batch(), 1, .033)
         self.assertEqual(self.tracker.update(batch((120, 150)), 2, .066).status, "tentative")
         self.assertEqual(self.tracker.update(batch((130, 150)), 3, .099).status, "tentative")
+
+
+class SparseInitializationTests(unittest.TestCase):
+    def setUp(self):
+        self.tracker = BallTracker(768, 432, temporal_initialization=True)
+
+    def test_missing_frames_are_not_backfilled_as_observations(self):
+        updates = [self.tracker.update(batch(*points), i, i / 60)
+                   for i, points in enumerate([[(100, 150)], [], [(110, 150)], [], [(120, 150)]])]
+        self.assertEqual([u.observation for u in updates], [None, None, None, None, (120, 150)])
+        self.assertTrue(updates[-1].break_before)
+        self.assertTrue(all(u.prediction is None for u in updates))
+        missing = self.tracker.update(batch(), 5, 5 / 60)
+        recovered = self.tracker.update(batch((130, 150)), 6, 6 / 60)
+        self.assertIsNone(missing.observation)
+        self.assertEqual(recovered.track_id, updates[-1].track_id)
+        self.assertTrue(recovered.break_before)
+
+    def test_two_coherent_paths_remain_ambiguous(self):
+        for i in range(3):
+            result = self.tracker.update(batch((100 + 10*i, 150), (500 + 10*i, 300)), i, i / 60)
+        self.assertEqual(result.status, 'ambiguous')
+        self.assertIsNone(result.observation)
+
+    def test_stationary_path_cannot_confirm_but_does_not_hide_unique_moving_path(self):
+        for i in range(3):
+            result = self.tracker.update(batch((100 + 10*i, 150), (500, 300)), i, i / 60)
+        self.assertEqual(result.observation, (120, 150))
+        self.tracker.reset()
+        for i in range(10):
+            result = self.tracker.update(batch((100, 150)), i, i / 60)
+            self.assertIsNone(result.observation)
+
+    def test_expired_seeds_and_impossible_jumps_cannot_confirm(self):
+        self.tracker.update(batch((100, 150)), 0, 0)
+        self.tracker.update(batch((110, 150)), 4, .067)
+        self.assertIsNone(self.tracker.update(batch((120, 150)), 5, .084).observation)
+        self.assertEqual(self.tracker.update(batch((130, 150)), 6, .101).observation, (130, 150))
+        self.tracker.reset()
+        for i, x in enumerate((100, 600, 110)):
+            self.assertIsNone(self.tracker.update(batch((x, 150)), i, i / 60).observation)
+
+    def test_saturation_and_path_overflow_discard_all_seeds(self):
+        self.tracker.update(batch((100, 150)), 0, 0)
+        result = self.tracker.update(batch((110, 150), truncated=True), 1, 1 / 60)
+        self.assertEqual(result.status, 'ambiguous')
+        self.assertEqual(self.tracker.hypotheses, [])
+        # Twelve nearby alternatives produce more than the bounded 64 paths.
+        for i in (2, 3):
+            result = self.tracker.update(batch(*[(100 + j, 150) for j in range(12)]), i, i / 60)
+        self.assertEqual(result.status, 'ambiguous')
+        self.assertEqual(self.tracker.hypotheses, [])
+        self.assertIsNone(self.tracker.update(batch((120, 150)), 4, 4 / 60).observation)
+
+    def test_reset_and_long_active_loss_require_fresh_evidence(self):
+        for i in range(3):
+            first = self.tracker.update(batch((100 + i*10, 150)), i, i / 60)
+        self.tracker.update(batch((300, 150)), 20, 20 / 60)
+        self.tracker.update(batch((310, 150)), 21, 21 / 60)
+        second = self.tracker.update(batch((320, 150)), 22, 22 / 60)
+        self.assertNotEqual(first.track_id, second.track_id)
+        self.tracker.reset()
+        self.assertEqual(self.tracker.hypotheses, [])
+        self.assertEqual(self.tracker.update(batch((100, 150)), 0, 0).status, 'tentative')

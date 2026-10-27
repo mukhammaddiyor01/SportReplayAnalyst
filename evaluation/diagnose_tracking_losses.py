@@ -11,7 +11,7 @@ from evaluation.evaluate_ball_tracking import collect_records
 MAX_NEARBY_COMPONENTS = 16
 
 
-def diagnose_frame(previous, current, region, center, tolerance):
+def diagnose_frame(previous, current, region, center, tolerance, *, sparse_motion: bool = False):
     nearby = []
     omitted = 0
 
@@ -27,19 +27,20 @@ def diagnose_frame(previous, current, region, center, tolerance):
         else:
             omitted += 1
 
-    batch = find_appearance_candidates(previous, current, region, on_component=inspect)
+    batch = find_appearance_candidates(previous, current, region, on_component=inspect,
+                                       relative_background=sparse_motion)
     near_candidates = sum(hypot(c.x - center[0], c.y - center[1]) <= tolerance
                           for c in batch.candidates)
     return dict(near_reference_candidates=near_candidates, candidate_batch_truncated=batch.truncated,
                 nearby_components=nearby, omitted_nearby_components=omitted)
 
 
-def diagnose(video: Path, annotations: dict):
+def diagnose(video: Path, annotations: dict, *, sparse_motion: bool = False):
     labels = {row['frame_index']: row for seq in annotations['sequences']
               for row in seq['samples'] if row['visibility'] == 'visible'}
     if not labels:
         raise ValueError('Diagnostics need at least one visible manual reference.')
-    records = collect_records(video, annotations, max(labels))
+    records = collect_records(video, annotations, max(labels), sparse_motion=sparse_motion)
     if any(index not in records for index in labels):
         raise ValueError('The source ended before all diagnostic labels were processed.')
     tolerance = annotations['matching_tolerance_px']
@@ -59,7 +60,7 @@ def diagnose(video: Path, annotations: dict):
                                   note='First frame has no previous image for motion evidence.')
                 else:
                     detail = diagnose_frame(previous, frame.image, tuple(annotations['search_region']),
-                                            label['center'], tolerance)
+                                            label['center'], tolerance, sparse_motion=sparse_motion)
                 details.append(dict(frame_index=frame.index, timestamp_seconds=frame.timestamp_seconds,
                                     manual_center=label['center'], status=records[frame.index]['status'],
                                     observation=records[frame.index]['observation'], **detail))
@@ -68,7 +69,8 @@ def diagnose(video: Path, annotations: dict):
                 break
     finally:
         reader.close()
-    return dict(visible_labels=len(labels), failed_associations=len(failures), frames=details,
+    return dict(sparse_motion=sparse_motion, visible_labels=len(labels),
+                failed_associations=len(failures), frames=details,
                 limitation='Spatially nearby component boxes are diagnostic context, not confirmed ball identity. Only the first failed filter is reported; later metrics are null. A null rejection means component filters passed, not guaranteed retention after candidate truncation. No component can also mean brightness, saturation or contrast masking failed. No threshold was tuned.')
 
 
@@ -76,9 +78,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('video', type=Path)
     parser.add_argument('--annotations', type=Path, default=Path(__file__).with_name('ball-sequences.json'))
+    parser.add_argument('--sparse-motion', action='store_true',
+                        help='Diagnose the offline relative-background/temporal-path candidate.')
     args = parser.parse_args()
     try:
-        result = diagnose(args.video, json.loads(args.annotations.read_text()))
+        result = diagnose(args.video, json.loads(args.annotations.read_text()),
+                          sparse_motion=args.sparse_motion)
     except (ValueError, OSError, VideoError) as error:
         parser.exit(1, f'Tracking diagnostics failed: {error}\n')
     print(json.dumps(result, indent=2))

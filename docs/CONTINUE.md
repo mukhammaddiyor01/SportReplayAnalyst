@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-27, frozen sparse-motion experiment completed; not promoted.
-108 Python tests pass. See docs/sparse-motion-protocol.md for measurements and decision.
+Checkpoint: 2026-10-27, sparse-motion component losses diagnosed; not promoted.
+110 Python tests pass. See docs/sparse-motion-protocol.md for measurements and decision.
 
 ## Previous session handoff — resumed 2026-10-27
 
@@ -312,6 +312,16 @@ on scored visible frames, no observations on 46 reused Getty negatives. Getty
 frame 10 loses a former match; other dense sequence totals are unchanged.
 These data do not establish usable continuous tracking or whole-video identity.
 108 Python tests passed; no new frontend changes. See sparse-motion-protocol.md.
+
+## Component diagnosis checkpoint
+
+The diagnostic CLI now supports --sparse-motion and uses matched association and
+component modes. In the 12-visible-frame Lion review, nearby pieces are rejected
+by area (5), fill (4), motion (2), or pass detection without confirmation (1).
+No runtime threshold was tuned. See docs/lion-component-diagnosis.md.
+110 Python tests passed. The user asked about YOLO/PyTorch; investigate a local
+pretrained-model benchmark rather than claiming that current OpenCV filters are
+neural object detection. Existing point labels are not training bounding boxes.
 
 ## Next step
 

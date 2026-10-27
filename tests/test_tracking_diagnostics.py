@@ -71,3 +71,22 @@ class TrackingDiagnosticsTests(unittest.TestCase):
         with patch('evaluation.diagnose_tracking_losses.collect_records', return_value={}):
             with self.assertRaisesRegex(ValueError, 'source ended'):
                 diagnose(Path('unused.mp4'), annotations)
+
+
+    def test_sparse_diagnostic_uses_same_relative_filter_as_experiment(self):
+        before = self.scene(value=170)
+        current = before.copy()
+        cv2.circle(current, (200, 150), 3, (245, 245, 245), -1)
+        conservative = diagnose_frame(before, current, self.region, (200, 150), 8)
+        sparse = diagnose_frame(before, current, self.region, (200, 150), 8, sparse_motion=True)
+        self.assertEqual(conservative['near_reference_candidates'], 0)
+        self.assertEqual(sparse['near_reference_candidates'], 1)
+        self.assertIsNone(sparse['nearby_components'][0]['rejection_reason'])
+        self.assertEqual(sparse['nearby_components'][0]['foreground_value'], 245)
+
+    def test_sparse_diagnostic_passes_mode_to_association(self):
+        annotations = dict(sequences=[dict(samples=[dict(frame_index=99, visibility='visible', center=[10, 10])])])
+        with patch('evaluation.diagnose_tracking_losses.collect_records', return_value={}) as collect:
+            with self.assertRaisesRegex(ValueError, 'source ended'):
+                diagnose(Path('unused.mp4'), annotations, sparse_motion=True)
+        self.assertTrue(collect.call_args.kwargs['sparse_motion'])

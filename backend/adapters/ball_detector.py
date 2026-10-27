@@ -1,4 +1,6 @@
 """Experimental bright-moving-blob candidates, not confirmed ball observations."""
+from collections.abc import Callable
+
 import cv2
 import numpy as np
 
@@ -52,7 +54,8 @@ def find_ball_candidates(previous: np.ndarray, current: np.ndarray,
 
 
 def find_appearance_candidates(previous: np.ndarray, current: np.ndarray,
-                               region: tuple[int, int, int, int]) -> CandidateBatch:
+                               region: tuple[int, int, int, int], *,
+                               on_component: Callable[[dict], None] | None = None) -> CandidateBatch:
     """Measure full bright shapes; motion validates them without clipping centers."""
     if previous.shape != current.shape or current.ndim != 3 or current.shape[2] != 3:
         raise ValueError("Candidate frames must have matching BGR source dimensions.")
@@ -73,29 +76,43 @@ def find_appearance_candidates(previous: np.ndarray, current: np.ndarray,
     padding = max(1, round(BALL_BACKGROUND_PADDING * scale))
     candidates = []
     for label in range(1, count):
-        x, y, blob_width, blob_height, area = map(int, statistics[label])
-        if not BALL_APPEARANCE_MIN_AREA * scale ** 2 <= area <= BALL_MAX_AREA * scale ** 2:
-            continue
-        if max(blob_width, blob_height) > BALL_MAX_EXTENT * scale:
-            continue
-        if max(blob_width, blob_height) / min(blob_width, blob_height) > BALL_MAX_ASPECT:
-            continue
-        if area / (blob_width * blob_height) < BALL_MIN_FILL_RATIO:
-            continue
-        component = labels[y:y + blob_height, x:x + blob_width] == label
-        x, y = x + left, y + top
-        moving_pixels = np.count_nonzero(component &
-            (motion[y:y + blob_height, x:x + blob_width] >= BALL_MIN_MOTION))
-        if moving_pixels < max(BALL_MIN_MOVING_PIXELS * scale ** 2, BALL_MIN_MOVING_FRACTION * area):
-            continue
-        x0, y0 = max(0, x - padding), max(0, y - padding)
-        x1, y1 = min(width, x + blob_width + padding), min(height, y + blob_height + padding)
-        ring = np.ones((y1 - y0, x1 - x0), dtype=bool)
-        ring[y - y0:y - y0 + blob_height, x - x0:x - x0 + blob_width] = False
-        if not np.any(ring) or np.median(hsv[y0:y1, x0:x1, 2][ring]) > BALL_MAX_BACKGROUND_VALUE:
-            continue
+        local_x, local_y, blob_width, blob_height, area = map(int, statistics[label])
+        x, y = local_x + left, local_y + top
         center_x, center_y = centers[label]
-        candidates.append(BallCandidate(float(center_x + left), float(center_y + top), area,
-                                        (x, y, blob_width, blob_height)))
+        reason = None
+        moving_pixels = None
+        background_value = None
+        fill = area / (blob_width * blob_height)
+        if not BALL_APPEARANCE_MIN_AREA * scale ** 2 <= area <= BALL_MAX_AREA * scale ** 2:
+            reason = "area"
+        elif max(blob_width, blob_height) > BALL_MAX_EXTENT * scale:
+            reason = "extent"
+        elif max(blob_width, blob_height) / min(blob_width, blob_height) > BALL_MAX_ASPECT:
+            reason = "aspect"
+        elif fill < BALL_MIN_FILL_RATIO:
+            reason = "fill"
+        if reason is None:
+            component = labels[local_y:local_y + blob_height, local_x:local_x + blob_width] == label
+            moving_pixels = int(np.count_nonzero(component &
+                (motion[y:y + blob_height, x:x + blob_width] >= BALL_MIN_MOTION)))
+            if moving_pixels < max(BALL_MIN_MOVING_PIXELS * scale ** 2, BALL_MIN_MOVING_FRACTION * area):
+                reason = "motion"
+        if reason is None:
+            x0, y0 = max(0, x - padding), max(0, y - padding)
+            x1, y1 = min(width, x + blob_width + padding), min(height, y + blob_height + padding)
+            ring = np.ones((y1 - y0, x1 - x0), dtype=bool)
+            ring[y - y0:y - y0 + blob_height, x - x0:x - x0 + blob_width] = False
+            if np.any(ring):
+                background_value = float(np.median(hsv[y0:y1, x0:x1, 2][ring]))
+            if background_value is None or background_value > BALL_MAX_BACKGROUND_VALUE:
+                reason = "background"
+        if on_component is not None:
+            on_component(dict(center=[float(center_x + left), float(center_y + top)],
+                              box=[x, y, blob_width, blob_height], area=area, fill=fill,
+                              moving_pixels=moving_pixels, background_value=background_value,
+                              rejection_reason=reason))
+        if reason is None:
+            candidates.append(BallCandidate(float(center_x + left), float(center_y + top), area,
+                                            (x, y, blob_width, blob_height)))
     candidates.sort(key=lambda candidate: (-candidate.area, candidate.x, candidate.y))
     return CandidateBatch(candidates[:BALL_MAX_CANDIDATES], len(candidates) > BALL_MAX_CANDIDATES)

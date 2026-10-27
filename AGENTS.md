@@ -20,7 +20,10 @@ sequence results but still loses some easy observations and is not semantic ball
 classification. Original motion-clipped tracking is available offline for baseline
 comparisons; its rejected small-candidate continuation remains offline-only.
 Labels through 339 have now been inspected; reserve new data before further tuning.
-See docs/appearance-detector.md and docs/tracking-refinement.md.
+See docs/appearance-detector.md and docs/tracking-refinement.md. Offline loss
+diagnostics now distinguish first component-filter rejection from association
+failure; early frames 0–29 were reviewed without tuning. See
+docs/tracking-loss-diagnostics.md.
 Source-timed gap review now groups missing observations and supports browser seek
 navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.

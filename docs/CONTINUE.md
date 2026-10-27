@@ -1,11 +1,11 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: clean replay workflow, source-frame stepping, full_shape_v1 and gap review.
+Checkpoint: 2026-10-27, tracking loss diagnostics and early initialization review.
 
-## Session handoff — stop here until the user resumes
+## Previous session handoff — resumed 2026-10-27
 
-The user requested a session checkpoint and will continue tomorrow. Do not start
-additional feature work or schedule an automatic run. Resume when they return.
+The prior session was saved for a user-triggered continuation. The user resumed
+on 2026-10-27. The following list records the earlier implementation checkpoint.
 The last implementation commit is 0a02c0b on develop. Recent completed increments:
 
 - 8fac9da: full_shape_v1 detector, same-video reserved evaluation, worker integration.
@@ -251,13 +251,34 @@ Final frame 181 showed an associated marker. Browser warn/error logs empty;
 proof outside Git. 94 Python tests and JS syntax passed. No detector/event rule
 changed. See docs/replay-usability.md.
 
+## Loss diagnostics and initialization review (2026-10-27)
+
+Added optional component rejection reporting in the appearance detector and an
+offline evaluation.diagnose_tracking_losses CLI. Normal workers/API omit those
+diagnostics. Source coordinates, first failed filters and null unevaluated metrics
+are explicit; nearby boxes are context, not confirmed ball identity. Reports
+retain at most 16 nearby components per failure and expose omissions.
+
+Known misses: 142 has a nearby candidate but tentative confirmation. 149, 215,
+248 and 249 show large-area/over-extent nearby components; source line/watermark
+overlap is a plausible cause, not a proven object classification. The detector's
+minimum-area setting is not the cause of these particular failures. No thresholds
+or association rules changed. All 360 source records match the pre-refactor snapshot.
+
+New ball-initialization-review.json labels frames 0–29: 25 visible, five uncertain,
+19 near-reference associations, zero away, six missing (5–9 and 17). The fixed
+search window differs from browser ROI. Four coarse centers were audited after
+initial scoring; the annotation metadata and report disclose changes. This is
+same-video single-reviewer evidence, not an untouched test or whole-clip validation.
+100 Python tests passed. See docs/tracking-loss-diagnostics.md for exact findings.
+
 ## Next step
 
-Review the four lost easy observations and full-video false-track intervals.
-Do not retune against reserved 300–339, now inspected. Obtain a distinct fixed-
-camera clip for independent evaluation and eventual contact evidence. Moving
-compact false objects, light backgrounds, watermark overlap, merged ball/racket
-shapes and motionless balls remain limitations. Keep uncertainty explicit.
+Obtain a distinct fixed-camera recording with the entire table and visible ball
+interactions for independent evaluation and eventual contact evidence. Existing
+inspected frames support development only. Do not retune against 300–339 as a
+holdout. Review other full-video false-track intervals when appropriate; the new
+early review only covers 0–29. Keep the clean interface and explicit uncertainty.
 
 Contacts, racket interactions, rally timing, event timeline, scoring, physical
 speed, and 3D reconstruction are not implemented. Direction changes alone cannot

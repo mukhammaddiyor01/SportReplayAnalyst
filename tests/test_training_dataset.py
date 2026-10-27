@@ -64,3 +64,27 @@ class TrainingDatasetTests(unittest.TestCase):
             (b/'provenance.json').write_text(json.dumps(provenance))
             with self.assertRaisesRegex(ValueError,'pixel_sha256'):
                 assemble([a],[b],root/'dataset')
+
+
+    def test_training_rechecks_labels_and_refuses_changed_yaml(self):
+        from evaluation.train_ball_model import check_dataset
+        with TemporaryDirectory() as directory:
+            root=Path(directory);a=self.export(root,'one',10);b=self.export(root,'two',20)
+            dataset=root/'dataset';assemble([a],[b],dataset)
+            self.assertEqual(check_dataset(dataset)['purpose'],'development_smoke_test')
+            label=next((dataset/'labels/train').glob('*.txt'));original=label.read_text()
+            label.write_text('0 .9 .9 .1 .1\n')
+            with self.assertRaisesRegex(ValueError,'label changed'):check_dataset(dataset)
+            label.write_text(original)
+            (dataset/'data.yaml').write_text('download: forbidden\n')
+            with self.assertRaisesRegex(ValueError,'unchanged dataset'):check_dataset(dataset)
+
+    def test_training_rejects_source_path_injection(self):
+        from evaluation.train_ball_model import check_dataset
+        with TemporaryDirectory() as directory:
+            root=Path(directory);a=self.export(root,'one',10);b=self.export(root,'two',20)
+            dataset=root/'dataset';assemble([a],[b],dataset)
+            report=json.loads((dataset/'dataset.json').read_text())
+            report['splits']['train']['examples'][0]['recording_id']='../outside'
+            (dataset/'dataset.json').write_text(json.dumps(report))
+            with self.assertRaisesRegex(ValueError,'source-frame identity'):check_dataset(dataset)

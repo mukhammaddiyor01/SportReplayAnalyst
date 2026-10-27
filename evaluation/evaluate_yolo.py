@@ -27,7 +27,7 @@ def verify_model(path: Path, expected_sha256: str) -> None:
         raise ValueError('Model checksum does not match the pinned SHA256.')
 
 
-def candidates_from_boxes(rows, region) -> CandidateBatch:
+def candidates_from_boxes(rows, region, *, ball_class: int = 32) -> CandidateBatch:
     """Map crop-space xyxy/conf/class boxes to source coordinates without scaling."""
     left, top, right, bottom = region
     candidates = []
@@ -37,7 +37,7 @@ def candidates_from_boxes(rows, region) -> CandidateBatch:
         x1, y1, x2, y2, confidence, class_id = row
         if not (0 <= confidence <= 1 and class_id == int(class_id)):
             raise ValueError('YOLO returned an invalid confidence or class.')
-        if class_id != 32:
+        if class_id != ball_class:
             continue
         if not (0 <= x1 < x2 <= right-left and 0 <= y1 < y2 <= bottom-top):
             raise ValueError('YOLO box is outside the original crop.')
@@ -48,7 +48,7 @@ def candidates_from_boxes(rows, region) -> CandidateBatch:
     return CandidateBatch(candidates[:BALL_MAX_CANDIDATES], len(candidates) > BALL_MAX_CANDIDATES)
 
 
-def evaluate(video: Path, annotations: dict, model_path: Path, model_sha256: str) -> dict:
+def evaluate(video: Path, annotations: dict, model_path: Path, model_sha256: str, *, ball_class: int = 32) -> dict:
     verify_source(video, annotations)
     verify_model(model_path, model_sha256)
     # Optional dependencies are never imported by normal workers or unit tests.
@@ -59,8 +59,8 @@ def evaluate(video: Path, annotations: dict, model_path: Path, model_sha256: str
     import torch
     torch.set_num_threads(1)
     model = YOLO(str(model_path.resolve()), task='detect')
-    if model.names.get(32) != 'sports ball':
-        raise ValueError('This frozen baseline requires COCO class32 sports ball.')
+    if model.names.get(ball_class) not in ('sports ball', 'ball'):
+        raise ValueError('Select a ball class matching the local model names.')
     last_index = max(r['frame_index'] for s in annotations['sequences'] for r in s['samples'])
     region = tuple(annotations['search_region'])
     width, height = annotations['source_dimensions']
@@ -76,10 +76,10 @@ def evaluate(video: Path, annotations: dict, model_path: Path, model_sha256: str
                 raise ValueError('Annotation dimensions do not match the source.')
             started = perf_counter()
             result = model.predict(frame.image[top:bottom, left:right], imgsz=640,
-                                   conf=.25, iou=.7, classes=[32], max_det=13,
+                                   conf=.25, iou=.7, classes=[ball_class], max_det=13,
                                    device='cpu', verbose=False, save=False)[0]
             durations.append(perf_counter()-started)
-            batch = candidates_from_boxes(result.boxes.data.cpu().tolist(), region)
+            batch = candidates_from_boxes(result.boxes.data.cpu().tolist(), region, ball_class=ball_class)
             record = asdict(tracker.update(batch, frame.index, frame.timestamp_seconds))
             record.update(timestamp_source=frame.timestamp_source,
                           candidates=[(c.x, c.y) for c in batch.candidates],
@@ -89,8 +89,8 @@ def evaluate(video: Path, annotations: dict, model_path: Path, model_sha256: str
                 break
     finally:
         reader.close()
-    return dict(model_sha256=model_sha256, detector='yolo_coco_640_conf025',
-                source_sha256=annotations['sha256'], source_dimensions=[width, height],
+    return dict(model_sha256=model_sha256, detector='yolo_640_conf025',
+                ball_class=ball_class, source_sha256=annotations['sha256'], source_dimensions=[width, height],
                 search_region=list(region),
                 initialization='consecutive_v1', processed_frames=len(records),
                 mean_predict_seconds=sum(durations)/len(durations) if durations else None,
@@ -106,10 +106,11 @@ def main():
     parser.add_argument('--annotations', type=Path, required=True)
     parser.add_argument('--model', type=Path, required=True)
     parser.add_argument('--model-sha256', required=True)
+    parser.add_argument('--ball-class', type=int, default=32, help='32 for COCO;0 for the custom ball model.')
     args = parser.parse_args()
     try:
         print(json.dumps(evaluate(args.video, json.loads(args.annotations.read_text()),
-                                  args.model, args.model_sha256), indent=2))
+                                  args.model, args.model_sha256, ball_class=args.ball_class), indent=2))
     except (ValueError, OSError, VideoError, ImportError) as error:
         parser.exit(1, f'Local YOLO benchmark failed: {error}\n')
 

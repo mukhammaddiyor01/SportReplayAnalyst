@@ -38,8 +38,13 @@ still use OpenCV and do not import torch/Ultralytics. A separate /labels workspa
 now reviews exact prepared PNG frames and exports/resumes numeric manual labels.
 The local dataset tool preserves hashes/indices/times and exports only reviewed
 visible/negative frames to YOLO format outside Git; uncertainty is excluded and
-split remains unassigned. See docs/ball-annotation.md. The 3-box manual workflow
-pilot is not a training dataset or independently reviewed truth. 120 tests passed.
+single-review exports remain unassigned. See docs/ball-annotation.md.
+A subsequent assembler verifies recording-separated train/val exports and rejects
+source/image/pixel overlap. Manual pilots total 15 visible boxes and 5 uncertain
+extents across 2 recordings. A fixed 2-epoch local custom YOLO smoke run completed,
+but source-point evaluation confirmed no observations and showed false candidates;
+it is not promoted. See docs/model-development.md. 127 tests passed. README.md is
+the current status/priority guide; docs/CONTINUE.md is the concise resume checkpoint.
 Source-timed gap review now groups missing observations and supports browser seek
 navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.

@@ -36,3 +36,9 @@ class YoloEvaluationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'checksum'):
                 verify_model(p, '0'*64)
             verify_model(p, hashlib.sha256(p.read_bytes()).hexdigest())
+
+
+    def test_custom_ball_class_keeps_source_geometry_and_ignores_coco_class(self):
+        result = candidates_from_boxes([[10,20,20,30,.8,0],[50,20,60,30,.9,32]], (100,200,300,400), ball_class=0)
+        self.assertEqual(len(result.candidates),1)
+        self.assertEqual((result.candidates[0].x,result.candidates[0].y),(115,225))

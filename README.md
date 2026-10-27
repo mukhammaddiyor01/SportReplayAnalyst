@@ -1,33 +1,31 @@
 # Sports Replay Analyst
 
-A local table tennis replay workspace built with Python, OpenCV, FastAPI, Jinja2,
-and plain HTML/CSS/JavaScript. Video processing stays on this computer.
+Local analysis of prerecorded table tennis video. Python 3.12, OpenCV, NumPy,
+FastAPI/Jinja2 and plain HTML/CSS/JavaScript. Video processing stays on this computer.
 
-## Current behavior
+## Project status and priority
 
-- Local playback, seeking, manual source-coordinate table corners, and validated
-  unit-table-plane geometry.
-- Bounded background frame inspection, camera-movement estimates, progress,
-  cancellation, explicit clearing, and private temporary-file cleanup.
-- Experimental temporal ball association and a synchronized image-space 2D trail.
-  Full-shape brightness, motion, and surrounding-appearance filters remain
-  experimental; moving false objects and missed balls are still possible.
-  See [detector evaluation](docs/appearance-detector.md).
+| Stage | Current state |
+| --- | --- |
+| Video review | Working: local playback, seeking, actual-source frame stepping |
+| Table geometry | Working: manual corners, frame-local calibration, camera-drift checks |
+| Background processing | Working: bounded workers, progress, cancel, expiry and cleanup |
+| Ball tracking | Experimental OpenCV candidates, temporal association and observed-only 2D trail |
+| Neural detector | Optional local YOLO baseline/training/evaluation; no model promoted |
+| Training data | 15 manual boxes, 5 uncertain extents, 2 recordings; not a sufficient dataset |
+| Contacts and rallies | Not implemented; require stronger ball and independent interaction evidence |
 
-Tracking results also include source-timed [gap review](docs/tracking-review.md):
-select an unobserved interval to pause and inspect its first frame.
-The upload toolbar, calibration/analysis panel and collapsible inspection details
-keep the [review workflow](docs/replay-usability.md) focused. After tracking,
-−1/+1 and playback arrow keys step through recorded source-frame intervals.
+The current bottleneck is ball detection on the edited portrait recording. The
+small YOLO smoke-training run completed, but produced many false candidates and
+no confirmed observations on evaluated intervals. It is not used by the app.
 
-Table contacts, rally boundaries, shot classification, scoring, and physical
-measurements are not implemented. Image-space tracks are not 3D trajectories.
-An airborne ball cannot be mapped to its true table coordinates with a table-plane
-homography. A direction change alone does not establish table contact.
+Keep one critical path: **reviewed data → useful detector → verified temporal
+tracking → contact evidence → rally rules**. Complete the next step before adding
+another interface, model family or sports feature.
 
 ## Run locally
 
-Use Python 3.12 and this project's own environment:
+Use Python 3.12 and this project’s own environment:
 
 ```bash
 python3.12 -m venv .venv
@@ -35,84 +33,76 @@ python3.12 -m venv .venv
 .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8014
 ```
 
-Open http://127.0.0.1:8014. Use one Uvicorn worker and keep the server local.
-The job directory is exclusively locked by one app instance. Only intended
-frontend assets are publicly mounted; videos/results use token-scoped job APIs.
+Open http://127.0.0.1:8014. Use one Uvicorn worker. Port 8000 belongs to another
+project in the current workspace; do not stop it. No model is downloaded at startup.
 
-## Review a video and try tracking
+1. Choose a local clip, pause, and mark four table corners clockwise from upper-left.
+2. Check calibration, then Track ball. Inspect video only is available in details.
+3. Review observed-only trails, missing intervals and source-frame stepping.
+4. Clear result removes the temporary local copy; the original remains untouched.
 
-1. Choose a browser-playable local clip. Selection alone does not upload it.
-2. Pause on a clear frame. Select four table corners clockwise from upper-left,
-   using the image or numeric source-coordinate controls.
-3. Check calibration. It validates this frame's geometry and derives a coarse
-   padded image search window for tracking. That window is not a table homography.
-4. Select **Track ball (experimental)** to stream a temporary copy to the local
-   server and decode/associate it in a spawned worker process. **Inspect video**
-   remains available for inspection without tracking.
-5. Play or seek to inspect the cyan trail. Only associated observations are
-   rendered; gaps and reinitializations break the line. The current label names
-   missing/ambiguous states. Predictions and tentative seeds are never rendered
-   as measured points. The checkbox hides the overlay.
-6. **Cancel analysis** stops active work. **Clear result** deletes the local copy,
-   records, and displayed trail. Your original file is never deleted.
+Playback/seek clears manual corners. Camera movement blocks calibration reuse.
+An airborne image point cannot be mapped to its real table coordinates using a
+table-plane homography. Predictions and missing frames are never measured points.
 
-Playback/seek clears manual frame calibration. It retains valid source-coordinate
-tracking records for the same video. Replacing/removing the video clears them.
-Camera drift blocks unattended table-plane reuse; raw-image tracking does not
-stabilize the scene. If source timestamps are estimated or decoded dimensions
-mismatch browser playback, the overlay is disabled to avoid false synchronization.
+## Neural-detector workflow
 
-## Limits and privacy
+Use the normal app environment for data tools. Prepare exact PNG frames outside
+Git, review them at `/labels`, download numeric labels, then export reviewed
+images/YOLO text files. Commands and limits: [annotation guide](docs/ball-annotation.md).
 
-Maximum 100 MiB, 60 seconds, 1920x1080, and 120 FPS. The server counts streamed
-bytes and validates actual decoding, not just browser/container metadata.
-One receiving/running job is admitted at a time; there is no pending queue.
-Inputs and results live outside public assets in ignored private job directories.
-Completed artifacts expire after one hour; failed/cancelled copies are removed
-once their worker exits. Shutdown/restart ends the review session and removes
-orphaned artifacts. Cleanup failures are exposed and retried.
+Assemble reviewed exports by recording, without a random neighboring-frame split:
 
-The UI explains retention before sending a local copy. Tokens remain in browser
-memory, never URLs or localStorage. Page-exit cleanup is best effort, backed by
-server deadlines. No cloud inference, remote fonts, analytics, or model download
-is used. Do not commit videos, frames, credentials, weights, or local environments.
+```bash
+.venv/bin/python -m evaluation.training_dataset --train /path/to/train-export --val /path/to/val-export --output /path/to/dataset
+```
 
-## Verification and real-video limitations
+Shared recording IDs, source hashes, image hashes, identical decoded pixels and
+modified labels are rejected. Related excerpts/transcodes must keep the same
+recording ID. The generated data.yaml and dataset.json stay outside Git.
+
+Install requirements-yolo.txt in a **separate** Python 3.12 environment; do not mix
+its OpenCV/PyTorch dependencies into the running app environment. Use an explicitly
+downloaded local model with a verified SHA256. The fixed development smoke run is:
+
+```bash
+python -m evaluation.train_ball_model /path/to/dataset --model /path/to/yolo11n.pt --model-sha256 0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1 --output /path/to/new-training-run
+python -m evaluation.evaluate_yolo /path/to/clip.mov --annotations evaluation/lion-validation.json --model /path/to/best.pt --model-sha256 CHECKPOINT_SHA256 --ball-class 0
+```
+
+The trainer runs 2 CPU epochs with fixed arguments to test the plumbing. It does
+not establish model quality. Training and evaluation are offline, explicit CLI
+operations; neither silently changes normal worker tracking. See
+[fixed protocol and actual results](docs/model-development.md).
+
+## Next work, in order
+
+1. Expand reviewed boxes, hard negatives and independent recordings. Preserve
+   uncertain states, source groups and held-out data; review box extents independently.
+2. Freeze a meaningful training/evaluation protocol. Measure candidate coverage,
+   false candidates and actual temporal associations separately. Compare against
+   the existing OpenCV baseline before integrating a neural detector into workers.
+3. Only then define evidence for racket/table interactions and rally boundaries.
+   Direction reversal or a missing frame alone is insufficient.
+
+## Verification and limits
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-70 automated checks pass across HTTP policies, geometry, decoding, camera evidence,
-candidates, association, source timing, isolation, worker lifecycle, and cleanup.
-The real supplied 360-frame clip was also exercised through the browser, including
-tracking, playback/seek synchronization, ambiguity, overlay toggling, cancellation,
-and clearing. These checks do not measure general tracking accuracy.
+127 automated tests pass without torch, a GPU or model downloads. The annotation
+browser→JSON→YOLO export and the real local training/evaluation path were also
+exercised. These checks do not establish general tracking accuracy.
 
-A small same-video pilot uses approximate manual source centers. The frozen
-candidate baseline found nearby candidates for all six held-out visible labels
-but produced four extra candidates. Temporal association produced five nearby
-observations, no wrong labeled observations, and one withheld ambiguous result.
-Three held-out search-region negatives had no associated observations. This sparse
-reused pilot is not dense temporal identity or generalization ground truth.
+Local video limits: 100 MiB, 60 seconds, 1920×1080, 120 FPS. One active worker, no
+pending queue. Token-scoped copies/results expire after one hour, explicit clear,
+or server shutdown. Failed/cancelled work is cleaned once its worker exits.
+Annotation exports/training outputs are explicitly saved local artifacts and
+remain until their owner removes them; the job expiry policy does not delete them.
+Never commit videos, frames, weights, credentials, caches or environments.
 
-The preview's overhead view, watermark, blur, and estimated camera drift still
-limit reliability. The detector can follow clothing or miss small/occluded balls.
-No physical contact locations, rallies, or accuracy percentages are inferred.
-
-## Offline diagnostics
-
-```bash
-.venv/bin/python -m backend.inspect_video /path/to/clip.mp4
-.venv/bin/python -m evaluation.evaluate_ball_candidates /path/to/clip.mp4 --split held_out
-.venv/bin/python -m evaluation.evaluate_ball_tracking /path/to/clip.mp4 --split held_out
-```
-
-Evaluation verifies the source hash before applying tracked pilot labels. Frame
-indices and timestamps stay in source coordinates; FPS fallback is explicit.
-The final frame timestamp is not the full container playback duration.
-
-See docs/temporal-tracking.md, docs/ball-candidate-baseline.md,
-docs/camera-motion.md, and docs/background-jobs.md for evidence and limitations.
-Read AGENTS.md for development rules. Initial setup remains on master; subsequent
-verified work belongs only on develop. docs/CONTINUE.md records the resume state.
+[Current handoff](docs/CONTINUE.md) · [OpenCV evaluation](docs/appearance-detector.md) ·
+[YOLO baseline](docs/yolo-benchmark.md) · [Job/privacy rules](docs/background-jobs.md).
+Read AGENTS.md before changes. Verified implementation belongs on develop;
+master remains at the initial setup. Deployment is outside the current scope.

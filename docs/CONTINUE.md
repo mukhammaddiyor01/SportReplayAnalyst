@@ -1,6 +1,6 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-27, tracking loss diagnostics and early initialization review.
+Checkpoint: 2026-10-27, second-footage baseline reveals zero confirmed tracks.
 
 ## Previous session handoff — resumed 2026-10-27
 
@@ -272,13 +272,43 @@ initial scoring; the annotation metadata and report disclose changes. This is
 same-video single-reviewer evidence, not an untouched test or whole-clip validation.
 100 Python tests passed. See docs/tracking-loss-diagnostics.md for exact findings.
 
+## Second supplied footage (2026-10-27)
+
+The user provided The Ultimate Table Tennis Battle...mp4 in Downloads. Original
+SHA256 2194ffcd9f572fde42861c1ffd56d3844bb69dd5d9349880d3f33aa02d36f18e.
+Metadata: 720x1280, 60 FPS, 431 frames; OpenCV decoded 426. Do not certify the
+whole edited source as intact/static. Height exceeds the existing 1080px cap.
+Prepared an image-only local copy of decoded frames 0–179, crop [0,140,720,1000),
+720x860 with no resize. Source timestamps i/60 checked before encoding. OpenCV
+mp4v + native avconvert produced lion-table-first-180.mov (H.264), 180 frames,
+3.0s, no fallback. Copy/provenance remain outside Git in visualization artifacts.
+Analysis SHA256 36b9bea5db38130117c8e57900b87ef771ef4610a1c59632e5427ec81e61ffb2.
+Map analysis x,y to original x,y+140; frame i remains original decoded frame i.
+
+Frozen full_shape_v1 confirms zero observations on this prefix: broad ROI
+[0,120,720,760) has 33 tentative/23 ambiguous/124 searching frames, longest run
+of exactly one candidate = one frame. Browser-derived ROI [161,326,563,517)
+has seven tentative/173 searching, zero confirmed IDs. No accuracy/contacts/rallies
+were measured. Camera estimate is uncertain (5/6 supported, max .659px vs5.608px);
+calibration reuse remains blocked. Re-encoded adjacent frames are not pixel-identical,
+so do not assume exact-duplicate removal solves the confirmation issue.
+Actual browser loads the local MOV and completes the real 180-frame job. A newly
+found zero-observation message bug is corrected: do not say associations are ready
+when status_counts.observed is zero. Final browser run confirmed corrected copy
+and zero observations in expanded details; warning/error logs empty, screenshot
+outside Git. Client JS syntax passed. Server restarted on 127.0.0.1:8014.
+See docs/lion-footage-review.md for provenance,
+full limits and the two different search-window experiments.
+
 ## Next step
 
-Obtain a distinct fixed-camera recording with the entire table and visible ball
-interactions for independent evaluation and eventual contact evidence. Existing
-inspected frames support development only. Do not retune against 300–339 as a
-holdout. Review other full-video false-track intervals when appropriate; the new
-early review only covers 0–29. Keep the clean interface and explicit uncertainty.
+Use this second recording to label a small diagnostic subset and establish a new
+validation protocol before changing temporal confirmation, motion handling or ROI
+selection. The first frozen run failed to confirm any track; retain that baseline.
+Do not call this footage successfully tracked. Table corners are not a sufficient
+airborne search window for every viewpoint. Avoid exact-duplicate assumptions.
+Keep raw media/frames/results out of Git. Existing labels on the old clip remain
+development evidence, including previously inspected 300–339.
 
 Contacts, racket interactions, rally timing, event timeline, scoring, physical
 speed, and 3D reconstruction are not implemented. Direction changes alone cannot

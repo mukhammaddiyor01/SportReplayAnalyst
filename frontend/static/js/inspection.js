@@ -103,7 +103,12 @@
     const cleanupNote = state.cleanup_pending ? " Temporary file cleanup is pending; the server will retry." : "";
     if (state.status === "completed") {
       const cameraNote = state.result.camera_motion ? ` ${state.result.camera_motion.message}` : "";
-      const trackingNote = state.result.tracking ? " Experimental 2D associations are ready. Contacts and rallies were not evaluated." : " Ball tracking was not run.";
+      let trackingNote = " Ball tracking was not run.";
+      if (state.result.tracking) {
+        trackingNote = state.result.tracking.status_counts.observed > 0 ?
+          " Experimental 2D associations are ready. Contacts and rallies were not evaluated." :
+          " No observations were confirmed. Review the unobserved intervals. Contacts and rallies were not evaluated.";
+      }
       setMessage(`${state.decoded_frames} frames inspected.${cameraNote}${trackingNote}${cleanupNote}`);
       showResult(state.result);
       if (state.result.tracking && !handle.trackingPublished) {

@@ -23,7 +23,10 @@ Labels through 339 have now been inspected; reserve new data before further tuni
 See docs/appearance-detector.md and docs/tracking-refinement.md. Offline loss
 diagnostics now distinguish first component-filter rejection from association
 failure; early frames 0–29 were reviewed without tuning. See
-docs/tracking-loss-diagnostics.md.
+docs/tracking-loss-diagnostics.md. A second supplied edited portrait clip was
+reviewed via a bounded cropped 180-frame prefix: neither broad nor table-derived
+search windows confirmed a track. No accuracy score is available for that source.
+See docs/lion-footage-review.md before tuning or claiming successful tracking.
 Source-timed gap review now groups missing observations and supports browser seek
 navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.

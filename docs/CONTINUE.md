@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-27, sparse-motion component losses diagnosed; not promoted.
-110 Python tests pass. See docs/sparse-motion-protocol.md for measurements and decision.
+Checkpoint: 2026-10-27, real local YOLO11n baseline completed; not promoted.
+114 Python tests pass. See docs/yolo-benchmark.md for the latest measurements and decision.
 
 ## Previous session handoff — resumed 2026-10-27
 
@@ -323,14 +323,36 @@ No runtime threshold was tuned. See docs/lion-component-diagnosis.md.
 pretrained-model benchmark rather than claiming that current OpenCV filters are
 neural object detection. Existing point labels are not training bounding boxes.
 
+## Local neural baseline checkpoint
+
+The user asked about YOLO, PyTorch and CNN. Tested official YOLO11n weights with
+release SHA256 validation in a separate temporary Python3.12 environment, offline
+with socket connections blocked. Pinned optional requirements-yolo.txt and the
+local-only evaluation/evaluate_yolo.py keep normal app workers unchanged. It
+requires an existing local .pt model and expected SHA256; no startup download.
+
+Frozen COCO sports-ball class32, CPU1thread,640,.25 confidence,.7 NMS, same crops:
+Lion 0/42 visible labels have near-center candidates; Getty 5/168 do. The original
+consecutive tracker confirms zero YOLO observations on these labeled intervals.
+Five unmatched candidates on visible Getty labels, no candidates on 46 Getty
+negative labels. Existing data are reused diagnostics, not fresh validation.
+Do not promote this model. See docs/yolo-benchmark.md for exact provenance,
+measurements, dependencies, license link and reproduction. The model/environment
+are temporary outside Git and may need recreation. 114 tests passed; no UI change.
+
 ## Next step
 
-Diagnose elongated blur and motion evidence on the now-inspected Lion labels.
-Only 1/12 reserved visible frames produced a near-reference candidate, so further
-initialization relaxation is insufficient. Reserve another interval before any
-new detector tuning; Lion 20–49 and 60–89 are now development evidence. Keep the
-baseline and offline experiment reproducible. Do not broaden ROI silently: an
-exploratory broad-window tracker followed a hand. Keep media/results out of Git.
+Prepare independently reviewed table-tennis bounding boxes and hard negatives
+for a neural-detector experiment. Current approximate point labels are not YOLO
+training boxes; never fabricate constant-size boxes or silently treat uncertain
+frames as negatives. Split by recording/session to avoid neighboring-frame
+leakage. Reserve fresh validation before fine-tuning or configuration selection.
+Lion90–179 remain unscored in these new experiments, but were previously viewed
+in the original prefix review; prefer a new recording for independent validation.
+Keep full_shape_v1 and both rejected offline experiments reproducible. Keep media,
+models and raw results out of Git. Do not broaden ROI silently: a prior broad-window
+experiment followed a hand. Do not claim YOLO is generally unsuitable from this
+single pretrained configuration.
 
 Contacts, racket interactions, rally timing, event timeline, scoring, physical
 speed, and 3D reconstruction are not implemented. Direction changes alone cannot

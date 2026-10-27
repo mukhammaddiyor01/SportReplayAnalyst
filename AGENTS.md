@@ -30,7 +30,11 @@ search windows confirmed a track. A frozen offline sparse-motion candidate gaine
 was not promoted. Normal worker/browser tracking remains full_shape_v1.
 See docs/lion-footage-review.md and docs/sparse-motion-protocol.md before tuning
 or claiming successful tracking. Lion frames 20–49 and 60–89 are now inspected
-and cannot serve as fresh validation. 108 Python tests passed at this checkpoint.
+and cannot serve as fresh validation. A subsequent isolated local YOLO11n COCO
+baseline found candidates near 0/42 Lion and 5/168 Getty visible labels, with zero
+confirmed associated observations in labeled intervals; it was not promoted. See docs/yolo-benchmark.md.
+The optional evaluator requires local checksum-verified weights; normal workers
+still use OpenCV and do not import torch/Ultralytics. 114 Python tests passed.
 Source-timed gap review now groups missing observations and supports browser seek
 navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.

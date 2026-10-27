@@ -1,0 +1,6 @@
+# Optional isolated offline benchmark environment; not app runtime requirements.
+ultralytics==8.4.190
+torch==2.14.1
+torchvision==0.29.1
+numpy==2.5.4
+opencv-python==4.13.0.92

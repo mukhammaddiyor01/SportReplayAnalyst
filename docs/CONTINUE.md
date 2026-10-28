@@ -85,13 +85,22 @@ or deployed-neural-detector claims. No portfolio site or public demo was deploye
 
 ## Next action
 
-Expand independently reviewed boxes and full-frame/ROI-appropriate hard negatives
-across recordings, retaining source groups and fresh validation. Then freeze the
-next detector-training/evaluation experiment. Avoid another UI or model-family
-branch while data is the blocker. Do not tune thresholds against these smoke
-results or call 2 epochs on 8 images a useful ball tracker. Preserve full_shape_v1
-and rejected offline baselines. Introduce contacts/rallies only after ball and
-independent interaction evidence support them.
+Follow the owner's four-stage completion plan in README.md:
+
+1. Reliable tracking across videos: baseline, recording inventory, independent
+   evaluation protocol and source-timed association checks.
+2. Useful YOLO model: reviewed data, frozen quality-training protocol, comparative
+   evaluation and qualified worker integration; then repeat stage 1 verification.
+3. Table contacts: independent interaction evidence, uncertain candidates,
+   deduplication and event evaluation before replay markers.
+4. Rallies: explicit start/end/gap/truncation rules and independently evaluated
+   intervals before presenting durations.
+
+Immediate work remains stages 1–2 data review: more recordings and independent
+box/negative review. Preserve recording groups and untouched evaluation data.
+Do not tune the rejected smoke checkpoint or call it useful. No contact/rally
+inference until tracking and independent interaction evidence support it.
+The stage numbers describe deliveries; stage 2 can be necessary to complete stage 1.
 
 ## Quick verification
 
@@ -125,3 +134,11 @@ these previously inspected intervals are development material, not a fresh split
 No training, threshold tuning or worker change was performed. Frozen smoke results
 remain unchanged. Next: independent review and more recording diversity before
 freezing a meaningful new training/evaluation experiment.
+
+## Four-stage scope agreed (2026-10-28)
+
+The owner explicitly requested the four deliveries listed above. README.md is the
+single completion plan with tasks, dependencies and evidence gates for each.
+This checkpoint organizes future work; none of the four quality gates is newly
+completed. No runtime, training settings or annotations changed. Last executed
+application suite remains 127 passing tests from the data-increment checkpoint.

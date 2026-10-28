@@ -105,32 +105,94 @@ not establish model quality. Training and evaluation are offline, explicit CLI
 operations; neither silently changes normal worker tracking. See
 [fixed protocol and actual results](docs/model-development.md).
 
-## Next work, in order
+## Four-stage completion plan
 
-The 2026-10-28 increment adds 10 Getty boxes and 6 explicitly reviewed full-frame
-negatives in evaluation/getty-box-expansion.json and getty-negative-pilot.json.
-These are single-reviewer development labels from previously inspected intervals.
-They have not been trained on; the frozen 15-box smoke dataset/result is unchanged.
-More recordings and independent label review are still needed.
+These are the owner's four delivery stages. Stage 1 establishes and evaluates the
+tracking baseline; stage 2 supplies a useful neural detector and rechecks stage 1.
+Do not declare reliable tracking complete before the final detector/tracker pair
+passes the frozen evaluation. Stages 3 and 4 depend on that evidence.
 
-| Order | Deliverable | Required evidence before moving on |
+| Stage | Current state | Required result |
 | --- | --- | --- |
-| 1 — current | Expand manually reviewed data | Visible box extents reviewed independently; explicit full-frame negatives; uncertainty excluded; recording groups and untouched evaluation data identified |
-| 2 | Freeze the next training/evaluation protocol | Dataset/version, recording splits, model checksum, settings, metrics and promotion criteria written before running or tuning |
-| 3 | Evaluate detector and temporal tracking | Candidate coverage, false candidates, overflow, correct/wrong associations and gaps reported separately; compare with OpenCV on the same frozen evaluation data |
-| 4 | Consider worker integration | A useful result on independent recordings that meets the frozen criteria, plus verified source coordinates, timing, cancellation and runtime bounds |
-| 5 | Define contact and rally rules | Independent interaction evidence, explicit uncertainty, event deduplication and time-based rally boundaries supported by labeled examples |
+| 1. Reliable tracking across videos | Active; experimental OpenCV baseline only | Verified source-timed observations and bounded recovery on independent recordings |
+| 2. Useful YOLO model | Development pipeline works; quality gate not met | A reviewed dataset and trained detector that improves useful tracking over the baseline |
+| 3. Table-contact detection | Not started; waiting for tracking and contact evidence | Evaluated contact candidates with explicit uncertainty and duplicate suppression |
+| 4. Rally start, end and duration | Not started; waiting for interaction evidence | Evaluated rally intervals with supported boundaries and timing uncertainty |
 
-For the next data increment, first inventory recordings and their prior exposure.
-Use existing recordings as development material; obtain an independent recording
-for fresh evaluation before claiming generalization. Review exact source frames,
-then export and verify labels with the existing tools. A search-region negative
-cannot become a full-frame YOLO negative unless the entire image is reviewed.
-Keep related excerpts and transcodes in the same recording group.
+### 1. Reliable tracking across videos
 
-Do not repeat the positive-only 2-epoch smoke run as a quality experiment. Useful
-data and frozen criteria come before a larger training run. A direction reversal
-or missing observation alone cannot establish a contact or rally end.
+- Inventory recordings, camera conditions, transformations and prior inspection.
+  Keep related clips in one recording group; reserve independent evaluation video.
+- Review ball positions, missing/ambiguous intervals and track identity across
+  different backgrounds, blur and short occlusions. Separate data review from tuning.
+- Freeze evaluation intervals, metrics and numerical acceptance criteria before
+  further experiments. Report per-recording counts and denominators, not just totals.
+- Evaluate correct/wrong observations, false tracks, gaps in seconds, fragmentation
+  and recovery. Keep source indices, dimensions and actual timestamps throughout.
+- Test bounded runtime, cancellation, camera-drift handling and observed-only UI.
+
+Completion evidence: a reproducible per-recording report for the selected detector
+and tracker meeting the predeclared criteria on independent data. Preserve the
+OpenCV baseline and failures. Current results do not meet this gate.
+
+### 2. Useful YOLO model
+
+- Expand visible-extent boxes and explicit full-frame hard negatives; exclude
+  uncertainty and obtain independent label review. Keep recording-based splits.
+- Freeze dataset versions, local model checksum, training settings, resource bounds,
+  detection/association metrics and promotion criteria before training.
+- Train locally in the separate PyTorch/Ultralytics environment. The existing fixed
+  2-epoch smoke command tests the pipeline; a quality-training protocol still needs
+  to be defined and implemented explicitly. Do not silently enlarge that smoke run.
+- Measure box detection and false candidates separately from temporal association.
+  Compare against OpenCV on the same fixed data, then evaluate untouched recordings.
+- Integrate only a qualifying local checkpoint through an adapter and bounded worker;
+  verify coordinates, time, cancellation and fallback behavior, then repeat stage 1.
+
+Completion evidence: saved protocol, dataset/checkpoint hashes, comparative results
+and verified worker integration. Training completion alone does not pass this gate.
+The current smoke checkpoint remains rejected and full_shape_v1 remains active.
+
+### 3. Table-contact detection
+
+- First establish what independent contact evidence the footage actually provides.
+  Label contact intervals, racket interactions and ambiguous cases separately.
+- Define temporal continuity and table/camera assumptions. A 2D turn, table-plane
+  projection or missing observation alone cannot establish a contact.
+- Implement plain Python candidate rules only when evidence supports them; preserve
+  an uncertain/no-decision result and deduplicate candidates over time.
+- Evaluate matched events, missed/false events and source-time error with a matching
+  tolerance frozen before evaluation. Only then show supported markers in replay.
+
+Completion evidence: independent contact annotations and a reproducible event report
+meeting predeclared criteria. If contact is unobservable, retain no decision; do not
+force event labels or claim physical coordinates from airborne image points.
+
+### 4. Rally start, end and duration
+
+- Define start confirmation, tolerated gaps in seconds, supported end evidence,
+  resets, editing/camera interruptions and video-boundary truncation before coding.
+- Implement isolated per-video rally state in a plain Python service. A lost frame
+  does not end a rally; detection absence is different from confirmed termination.
+- Return supported start/end times, duration and boundary uncertainty. A clipped
+  interval is partial, not a claimed complete rally.
+- Test short gaps, false starts, duplicate events, scene cuts, resets and partial
+  boundaries. Compare intervals and timing against independently reviewed rallies.
+- Add replay navigation and durations only from verified results.
+
+Completion evidence: frozen rally rules, service tests and independent interval/
+timing evaluation meeting predeclared criteria, followed by browser verification.
+
+### Immediate next action
+
+Continue stages 1–2 with data review. Current labels total 25 visible boxes, 6
+full-frame negatives and 5 uncertain extents across 2 already-inspected recordings.
+The 2026-10-28 increment is in evaluation/getty-box-expansion.json and
+getty-negative-pilot.json; it has not been trained on. The frozen 15-box smoke
+experiment remains unchanged. Independent label review and new recording diversity
+are still missing. A search-region negative requires full-image review before it
+can become a full-frame training negative. No model promotion, contact rules or
+rally implementation is justified by the present dataset.
 
 ## Verification and limits
 

@@ -43,7 +43,11 @@ A subsequent assembler verifies recording-separated train/val exports and reject
 source/image/pixel overlap. Manual pilots total 15 visible boxes and 5 uncertain
 extents across 2 recordings. A fixed 2-epoch local custom YOLO smoke run completed,
 but source-point evaluation confirmed no observations and showed false candidates;
-it is not promoted. See docs/model-development.md. 127 tests passed. README.md is
+it is not promoted. See docs/model-development.md. A later development-only increment
+adds 10 Getty boxes and 6 explicitly reviewed full-frame negatives, bringing totals
+to 25 visible boxes, 6 negatives and 5 uncertain extents across the same 2 recordings.
+These single-reviewer labels do not alter the frozen smoke run or provide fresh
+validation. Independent review and more recordings remain necessary. 127 tests passed. README.md is
 the current status/priority guide; docs/CONTINUE.md is the concise resume checkpoint.
 Source-timed gap review now groups missing observations and supports browser seek
 navigation. These intervals are evidence-review aids, not detected sports events.

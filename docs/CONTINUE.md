@@ -33,9 +33,11 @@ See ball-annotation.md for the verified browser flow and privacy distinction.
   lion-footage-review.md. The full portrait original exceeds the app’s height cap.
 - All old point labels and Lion 20–49/60–89 have been inspected; they are development
   evidence. Do not present reused data as fresh validation.
-- Manual bbox pilots now contain Getty 8 visible/2 uncertain and Lion 7 visible/3
-  uncertain. These 15 single-reviewer boxes are not a sufficient training dataset;
-  no hard negatives or independent box review have been added.
+- Current manual labels contain Getty 18 visible/6 full-frame negatives/2 uncertain
+  and Lion 7 visible/3 uncertain: 25 boxes, 6 negatives, 5 uncertain. The 2026-10-28
+  increment is separate from the frozen 15-box smoke dataset. Labels remain
+  single-reviewer development evidence; independent review and more recordings
+  are still missing.
 - evaluation.training_dataset verifies exports and rejects train/val group,
   source-byte, PNG and exact-decoded-pixel overlaps plus duplicate source indices.
   Recording IDs must connect related crops/transcodes; hashes cannot prove independence.
@@ -110,3 +112,16 @@ contact/rally rules. The next action is still data review, not model promotion o
 new UI. Full-frame training negatives require full-frame review; old ROI negatives
 cannot be reused as full-frame labels without that review. No application behavior,
 thresholds, labels or model settings changed in this documentation checkpoint.
+
+## Data increment (2026-10-28)
+
+Exact prepared Getty frames 230:260:3 received 10 source-coordinate visible-extent
+boxes after full-frame, enlarged crop and box-overlay inspection. Frames 80:110:5
+received 6 explicit full-frame not-visible labels after full-image review, not
+conversion from old ROI negatives. Numeric labels are in getty-box-expansion.json
+and getty-negative-pilot.json. Images, manifests and verified exports remain in
+the conversation artifact folder outside Git. Same getty-recording/source group;
+these previously inspected intervals are development material, not a fresh split.
+No training, threshold tuning or worker change was performed. Frozen smoke results
+remain unchanged. Next: independent review and more recording diversity before
+freezing a meaningful new training/evaluation experiment.

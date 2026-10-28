@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "recording_id": "getty-recording",
+  "source_sha256": "de1be132d44deb1be6e932585b2b029a8092a3fc4aa65c6774368ec5cad28fc1",
+  "coordinate_space": "source_image_xyxy",
+  "source_dimensions": [
+    768,
+    432
+  ],
+  "annotation_method": "Manual full-source-frame review, with nearest-neighbor enlarged extent and overlay checks for visible boxes. Single reviewer; approximate development labels, not independent ground truth. No model predictions used.",
+  "review_date": "2026-10-28",
+  "evaluation_status": "Previously inspected recording/intervals; development only. Keep all Getty excerpts in getty-recording. Not fresh validation.",
+  "negative_scope": "Full source image visually reviewed; no identifiable ball. This labels visible absence only, not physical absence. Not copied from ROI-negative point labels.",
+  "labels": [
+    {
+      "frame_index": 80,
+      "image_sha256": "d10232395169990c7afd0be69177ad9daa31ae92282e5316077d0cf2e7400660",
+      "visibility": "not_visible",
+      "bbox": null
+    },
+    {
+      "frame_index": 85,
+      "image_sha256": "1c3f1ef32de8f45fc80900f5683d0cfbc2af3b74ff7ae49998b56d1d5e5b4c6e",
+      "visibility": "not_visible",
+      "bbox": null
+    },
+    {
+      "frame_index": 90,
+      "image_sha256": "a6159ad12492058a71529ccac9547b76c29315c27598865308dfdc71df29a880",
+      "visibility": "not_visible",
+      "bbox": null
+    },
+    {
+      "frame_index": 95,
+      "image_sha256": "1eab6b2969c18939f401a61db3bd7a9adf0bef91871826689d897078387c8906",
+      "visibility": "not_visible",
+      "bbox": null
+    },
+    {
+      "frame_index": 100,
+      "image_sha256": "f5cda4c804c82eb9da08ca33426f42a75bfdaa53fad544ec19c59bbe6f571e8a",
+      "visibility": "not_visible",
+      "bbox": null
+    },
+    {
+      "frame_index": 105,
+      "image_sha256": "bbb8f2857330bd75234b8f551d25a0fac71a634d1b0df7aa89026d961c2667cb",
+      "visibility": "not_visible",
+      "bbox": null
+    }
+  ]
+}

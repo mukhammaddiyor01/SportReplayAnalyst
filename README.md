@@ -12,7 +12,7 @@ FastAPI/Jinja2 and plain HTML/CSS/JavaScript. Video processing stays on this com
 | Background processing | Working: bounded workers, progress, cancel, expiry and cleanup |
 | Ball tracking | Experimental OpenCV candidates, temporal association and observed-only 2D trail |
 | Neural detector | Optional local YOLO baseline/training/evaluation; no model promoted |
-| Training data | 15 manual boxes, 5 uncertain extents, 2 recordings; not a sufficient dataset |
+| Training data | 25 manual boxes, 6 full-frame negatives, 5 uncertain extents, 2 recordings; still insufficient |
 | Contacts and rallies | Not implemented; require stronger ball and independent interaction evidence |
 
 The current bottleneck is ball detection on the edited portrait recording. The
@@ -106,6 +106,12 @@ operations; neither silently changes normal worker tracking. See
 [fixed protocol and actual results](docs/model-development.md).
 
 ## Next work, in order
+
+The 2026-10-28 increment adds 10 Getty boxes and 6 explicitly reviewed full-frame
+negatives in evaluation/getty-box-expansion.json and getty-negative-pilot.json.
+These are single-reviewer development labels from previously inspected intervals.
+They have not been trained on; the frozen 15-box smoke dataset/result is unchanged.
+More recordings and independent label review are still needed.
 
 | Order | Deliverable | Required evidence before moving on |
 | --- | --- | --- |

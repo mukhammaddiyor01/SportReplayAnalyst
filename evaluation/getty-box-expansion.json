@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "recording_id": "getty-recording",
+  "source_sha256": "de1be132d44deb1be6e932585b2b029a8092a3fc4aa65c6774368ec5cad28fc1",
+  "coordinate_space": "source_image_xyxy",
+  "source_dimensions": [
+    768,
+    432
+  ],
+  "annotation_method": "Manual full-source-frame review, with nearest-neighbor enlarged extent and overlay checks for visible boxes. Single reviewer; approximate development labels, not independent ground truth. No model predictions used.",
+  "review_date": "2026-10-28",
+  "evaluation_status": "Previously inspected recording/intervals; development only. Keep all Getty excerpts in getty-recording. Not fresh validation.",
+  "labels": [
+    {
+      "frame_index": 230,
+      "image_sha256": "0ae909378b95a3365f7ffcc179a7e9f7519b50e643fd06ca463f39b10af2994e",
+      "visibility": "visible",
+      "bbox": [
+        193,
+        199,
+        208,
+        209
+      ]
+    },
+    {
+      "frame_index": 233,
+      "image_sha256": "13f8672fa52d3384f3478157026b8ce1bd96bd0bcd2b31c4953e0f71a10ac65b",
+      "visibility": "visible",
+      "bbox": [
+        204,
+        195,
+        219,
+        204
+      ]
+    },
+    {
+      "frame_index": 236,
+      "image_sha256": "55fbe55868b9e5987cb28d7d78f288b6c5a8433623bc960a23fd53cc849c8db8",
+      "visibility": "visible",
+      "bbox": [
+        238,
+        188,
+        254,
+        198
+      ]
+    },
+    {
+      "frame_index": 239,
+      "image_sha256": "3cb9e791d76be42ef7fcbb07c8a53386c314c130895e24e4b869b65dfa192e9b",
+      "visibility": "visible",
+      "bbox": [
+        271,
+        180,
+        288,
+        191
+      ]
+    },
+    {
+      "frame_index": 242,
+      "image_sha256": "ba4c1713437c70da65d9fd99e48f13055514f80d602ca4e98b7e9f90cc93453a",
+      "visibility": "visible",
+      "bbox": [
+        305,
+        172,
+        323,
+        183
+      ]
+    },
+    {
+      "frame_index": 245,
+      "image_sha256": "cb1a1254424b62d9d9e78b3f60f32e07a12a704e7f9caa00c3b51e14d43d1793",
+      "visibility": "visible",
+      "bbox": [
+        339,
+        164,
+        357,
+        175
+      ]
+    },
+    {
+      "frame_index": 248,
+      "image_sha256": "a1958a1d48896a5e088b0d5b765a674b313305f5971d49341f3903c4998b371b",
+      "visibility": "visible",
+      "bbox": [
+        373,
+        156,
+        388,
+        167
+      ]
+    },
+    {
+      "frame_index": 251,
+      "image_sha256": "735e78a5cf0c46aaefdfa827ff6f733b4e6529f953ab8c320b88860a18e12e7d",
+      "visibility": "visible",
+      "bbox": [
+        405,
+        148,
+        422,
+        159
+      ]
+    },
+    {
+      "frame_index": 254,
+      "image_sha256": "742996f3481fbcc6edc6d62a5e8fb4dc1b40d97265ed96b564a6497128242b7e",
+      "visibility": "visible",
+      "bbox": [
+        427,
+        140,
+        439,
+        151
+      ]
+    },
+    {
+      "frame_index": 257,
+      "image_sha256": "1a7af572356e739c08adcdccde51d44bfe226ff7e26503a2fb283f517b61f996",
+      "visibility": "visible",
+      "bbox": [
+        440,
+        132,
+        453,
+        142
+      ]
+    }
+  ]
+}

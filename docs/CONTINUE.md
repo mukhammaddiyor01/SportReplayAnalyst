@@ -1,6 +1,6 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-27. Data assembly and a real local YOLO smoke-training/evaluation
+Checkpoint: 2026-10-28. Data assembly and a real local YOLO smoke-training/evaluation
 flow are verified. 127 Python tests pass. Normal app tracking remains OpenCV.
 Use README.md as the single current status/priority guide; this file is the handoff.
 
@@ -100,3 +100,13 @@ independent interaction evidence support them.
 
 Model commands and current milestones are in README.md; frozen experiment details
 are in model-development.md. Previous dated checkpoints remain in Git history.
+
+## Logic organization checkpoint (2026-10-28)
+
+Read AGENTS.md and this handoff before resuming. README.md now maps the existing
+runtime and offline data flows to their implementation files, and defines the
+ordered evidence gates from reviewed data to worker integration and eventual
+contact/rally rules. The next action is still data review, not model promotion or
+new UI. Full-frame training negatives require full-frame review; old ROI negatives
+cannot be reused as full-frame labels without that review. No application behavior,
+thresholds, labels or model settings changed in this documentation checkpoint.

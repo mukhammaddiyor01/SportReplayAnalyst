@@ -23,6 +23,36 @@ Keep one critical path: **reviewed data → useful detector → verified tempora
 tracking → contact evidence → rally rules**. Complete the next step before adding
 another interface, model family or sports feature.
 
+## Logic and ownership
+
+The application follows this existing flow:
+
+`Local clip → bounded job → decoded source frames → OpenCV candidates → temporal association → observed-only trail and gap review`
+
+Manual table corners define geometry and the search region. Camera-drift checks
+can block calibration reuse; calibration does not turn airborne observations into
+physical table positions. Every tracking result retains source indices and time.
+
+| Responsibility | Existing implementation |
+| --- | --- |
+| Validate requests and coordinate review | backend/routes.py, backend/inspection_routes.py |
+| Bound jobs, progress, cancellation and cleanup | backend/jobs.py, backend/adapters/inspection_worker.py |
+| Decode frames with source geometry and timestamps | backend/adapters/video_reader.py |
+| Produce candidates and compose tracking | backend/adapters/ball_detector.py, backend/adapters/ball_tracking.py |
+| Associate candidates and describe missing intervals | backend/services/ball_tracker.py, backend/services/tracking_review.py |
+| Present playback, measured trails and review controls | frontend/templates/, frontend/static/ |
+
+Keep plain tracking rules in services and library/inference operations in adapters.
+An observed position, a prediction and an uncertain/missing state remain distinct.
+Gap review is a navigation aid, not a detected rally boundary.
+
+The separate development flow is:
+
+`Exact frames → manual review → verified YOLO export → recording-separated dataset → offline training → detector and association evaluation`
+
+Tools under evaluation/ run this flow explicitly. They do not select or replace the
+normal worker detector. Current worker behavior remains full_shape_v1.
+
 ## Run locally
 
 Use Python 3.12 and this project’s own environment:
@@ -77,13 +107,24 @@ operations; neither silently changes normal worker tracking. See
 
 ## Next work, in order
 
-1. Expand reviewed boxes, hard negatives and independent recordings. Preserve
-   uncertain states, source groups and held-out data; review box extents independently.
-2. Freeze a meaningful training/evaluation protocol. Measure candidate coverage,
-   false candidates and actual temporal associations separately. Compare against
-   the existing OpenCV baseline before integrating a neural detector into workers.
-3. Only then define evidence for racket/table interactions and rally boundaries.
-   Direction reversal or a missing frame alone is insufficient.
+| Order | Deliverable | Required evidence before moving on |
+| --- | --- | --- |
+| 1 — current | Expand manually reviewed data | Visible box extents reviewed independently; explicit full-frame negatives; uncertainty excluded; recording groups and untouched evaluation data identified |
+| 2 | Freeze the next training/evaluation protocol | Dataset/version, recording splits, model checksum, settings, metrics and promotion criteria written before running or tuning |
+| 3 | Evaluate detector and temporal tracking | Candidate coverage, false candidates, overflow, correct/wrong associations and gaps reported separately; compare with OpenCV on the same frozen evaluation data |
+| 4 | Consider worker integration | A useful result on independent recordings that meets the frozen criteria, plus verified source coordinates, timing, cancellation and runtime bounds |
+| 5 | Define contact and rally rules | Independent interaction evidence, explicit uncertainty, event deduplication and time-based rally boundaries supported by labeled examples |
+
+For the next data increment, first inventory recordings and their prior exposure.
+Use existing recordings as development material; obtain an independent recording
+for fresh evaluation before claiming generalization. Review exact source frames,
+then export and verify labels with the existing tools. A search-region negative
+cannot become a full-frame YOLO negative unless the entire image is reviewed.
+Keep related excerpts and transcodes in the same recording group.
+
+Do not repeat the positive-only 2-epoch smoke run as a quality experiment. Useful
+data and frozen criteria come before a larger training run. A direction reversal
+or missing observation alone cannot establish a contact or rally end.
 
 ## Verification and limits
 

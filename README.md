@@ -185,6 +185,12 @@ timing evaluation meeting predeclared criteria, followed by browser verification
 
 ### Immediate next action
 
+[Recording inventory and timing diagnostics](docs/tracking-evaluation.md) now
+record prior exposure and source-time loss/reacquisition measurements. Regressions
+preserve the existing Getty/Lion observation counts; Lion still has no confirmed
+observations on its 30 development frames. These are development checks, not a
+fresh independent benchmark.
+
 Continue stages 1–2 with data review. Current labels total 25 visible boxes, 6
 full-frame negatives and 5 uncertain extents across 2 already-inspected recordings.
 The 2026-10-28 increment is in evaluation/getty-box-expansion.json and
@@ -200,7 +206,7 @@ rally implementation is justified by the present dataset.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-127 automated tests pass without torch, a GPU or model downloads. The annotation
+131 automated tests pass without torch, a GPU or model downloads. The annotation
 browser→JSON→YOLO export and the real local training/evaluation path were also
 exercised. These checks do not establish general tracking accuracy.
 

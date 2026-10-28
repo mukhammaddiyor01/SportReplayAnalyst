@@ -1,7 +1,7 @@
 """Dense same-video diagnostics; missing predictions never become ground truth."""
 import argparse
 import json
-from math import hypot
+from math import hypot, isfinite
 from pathlib import Path
 
 from backend.adapters.video_reader import VideoError
@@ -22,12 +22,21 @@ def score_sequence(samples: list[dict], records: dict, tolerance: float) -> dict
     losses = []
     loss = None
     previous_correct_id = None
+    previous_correct_record = None
+    previous_timestamp = None
+    reacquisitions = []
     previous_was_correct = False
     for label in samples:
         index = label['frame_index']
         if index not in records:
             raise ValueError('The source ended before all sequence labels were processed.')
         row = records[index]
+        timestamp = row['timestamp_seconds']
+        if (isinstance(timestamp, bool) or not isinstance(timestamp, (int, float)) or
+                not isfinite(timestamp) or timestamp < 0 or
+                (previous_timestamp is not None and timestamp <= previous_timestamp)):
+            raise ValueError('Sequence scoring requires finite increasing source timestamps.')
+        previous_timestamp = timestamp
         visibility = label['visibility']
         observed = row['observation']
         correct = False
@@ -72,7 +81,19 @@ def score_sequence(samples: list[dict], records: dict, tolerance: float) -> dict
             loss['end_frame'] = index
             loss['end_seconds'] = row['timestamp_seconds']
             loss['frame_count'] += 1
+            loss['sample_span_seconds'] = loss['end_seconds'] - loss['start_seconds']
         elif loss is not None:
+            if correct and previous_correct_record is not None:
+                previous_id = previous_correct_record['track_id']
+                current_id = row['track_id']
+                reacquisitions.append(dict(
+                    last_correct_frame=previous_correct_record['frame_index'],
+                    first_loss_frame=loss['start_frame'], last_loss_frame=loss['end_frame'],
+                    reacquired_frame=index, visible_loss_frames=loss['frame_count'],
+                    loss_sample_span_seconds=loss['sample_span_seconds'],
+                    elapsed_since_last_correct_seconds=timestamp - previous_correct_record['timestamp_seconds'],
+                    same_track_id=(previous_id == current_id) if previous_id is not None and current_id is not None else None,
+                    break_before=row['break_before']))
             losses.append(loss)
             loss = None
         if correct:
@@ -82,14 +103,18 @@ def score_sequence(samples: list[dict], records: dict, tolerance: float) -> dict
             if previous_correct_id is not None and identity != previous_correct_id:
                 counts['id_changes_between_correct_observations'] += 1
             previous_correct_id = identity
+            previous_correct_record = dict(frame_index=index, timestamp_seconds=timestamp, track_id=identity)
         elif visibility != 'visible':
             # Unknown/negative intervals cannot establish identity continuity.
             previous_correct_id = None
+            previous_correct_record = None
         previous_was_correct = correct
     if loss is not None:
         losses.append(loss)
     return {'counts': counts, 'detection': detection, 'frames': details, 'visible_loss_runs': losses,
-            'longest_visible_loss_frames': max((r['frame_count'] for r in losses), default=0)}
+            'longest_visible_loss_frames': max((r['frame_count'] for r in losses), default=0),
+            'longest_visible_loss_sample_span_seconds': max((r['sample_span_seconds'] for r in losses), default=0.0),
+            'visible_reacquisitions': reacquisitions}
 
 
 def evaluate(video: Path, annotations: dict, *, small_candidate_continuation: bool = False,
@@ -106,7 +131,10 @@ def evaluate(video: Path, annotations: dict, *, small_candidate_continuation: bo
             'protocol': annotations['protocol'], 'sequences': {
         seq['name']: score_sequence(seq['samples'], records, annotations['matching_tolerance_px'])
         for seq in sequences},
-        'limitation': 'Approximate single-reviewer same-video labels. Loss intervals bound labeled frames, not physical occlusion durations. ID changes are diagnostic, not a standard MOT identity score.'}
+        'limitation': ('Approximate single-reviewer same-video labels. Loss intervals bound labeled frames, '
+                       'not physical occlusion durations. Loss sample spans exclude unknown frame exposure '
+                       'durations; reacquisition elapsed time is between scored correct samples, not physical '
+                       'occlusion. ID changes are diagnostic, not a standard MOT identity score.')}
 
 
 def main():

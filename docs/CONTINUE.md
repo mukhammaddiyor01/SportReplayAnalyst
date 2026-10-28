@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
 Checkpoint: 2026-10-28. Data assembly and a real local YOLO smoke-training/evaluation
-flow are verified. 127 Python tests pass. Normal app tracking remains OpenCV.
+flow are verified. 131 Python tests pass. Normal app tracking remains OpenCV.
 Use README.md as the single current status/priority guide; this file is the handoff.
 
 ## Repository and working rules
@@ -142,3 +142,17 @@ single completion plan with tasks, dependencies and evidence gates for each.
 This checkpoint organizes future work; none of the four quality gates is newly
 completed. No runtime, training settings or annotations changed. Last executed
 application suite remains 127 passing tests from the data-increment checkpoint.
+
+## Tracking timing checkpoint (2026-10-28)
+
+Sequence scoring now reports visible-loss sample spans and bounded reacquisitions
+using real source timestamps, and rejects invalid/non-increasing times. Uncertain/
+negative frames reset continuity; leading/trailing losses do not invent recovery.
+Both offline OpenCV and YOLO use this scorer; normal worker tracking is unchanged.
+See tracking-evaluation.md for the source inventory, exact metric semantics and
+real-video regression table. Getty counts stayed 24/26, 27/29, 27/28 with zero
+negative observations on 30 labels; Lion stayed 0/30 with a 0.483333s loss sample
+span. Four added tests and the full 131-test suite pass. No model was trained.
+An independent-video-path question was asked in chat; check for the owner's answer.
+If none is supplied, there is no new independent source. Continue useful development
+work without describing reused recordings or repeated review as independent evidence.

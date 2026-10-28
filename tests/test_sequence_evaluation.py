@@ -78,3 +78,42 @@ class SequenceEvaluationTests(unittest.TestCase):
         self.assertEqual(result['detection']['negative_frames_with_candidates'], 1)
         self.assertEqual(result['detection']['truncated_frames'], 1)
         self.assertEqual(result['counts']['observations_on_negatives'], 0)
+
+    def test_loss_span_and_reacquisition_use_irregular_source_time(self):
+        rows = {0: record(0, [10, 10]), 1: record(1), 2: record(2),
+                3: record(3, [10, 10], identity=2, boundary=True)}
+        for row, timestamp in zip(rows.values(), [0.1, 0.13, 0.21, 0.28]):
+            row['timestamp_seconds'] = timestamp
+        result = score_sequence([label(i) for i in range(4)], rows, 8)
+        self.assertAlmostEqual(result['longest_visible_loss_sample_span_seconds'], .08)
+        recovered = result['visible_reacquisitions'][0]
+        self.assertEqual((recovered['first_loss_frame'], recovered['last_loss_frame']), (1, 2))
+        self.assertEqual(recovered['reacquired_frame'], 3)
+        self.assertAlmostEqual(recovered['elapsed_since_last_correct_seconds'], .18)
+        self.assertFalse(recovered['same_track_id'])
+        self.assertTrue(recovered['break_before'])
+
+    def test_single_loss_sample_has_zero_span_not_invented_frame_duration(self):
+        rows = {0: record(0, [10, 10]), 1: record(1), 2: record(2, [10, 10])}
+        result = score_sequence([label(i) for i in range(3)], rows, 8)
+        self.assertEqual(result['visible_loss_runs'][0]['sample_span_seconds'], 0)
+        self.assertAlmostEqual(result['visible_reacquisitions'][0]['elapsed_since_last_correct_seconds'], .08)
+        self.assertTrue(result['visible_reacquisitions'][0]['same_track_id'])
+
+    def test_uncertain_negative_or_leading_loss_cannot_establish_reacquisition(self):
+        for state in ['uncertain', 'not_visible_in_search_region']:
+            rows = {0: record(0, [10, 10]), 1: record(1), 2: record(2),
+                    3: record(3), 4: record(4, [10, 10])}
+            labels = [label(0), label(1), label(2, state), label(3), label(4)]
+            result = score_sequence(labels, rows, 8)
+            self.assertEqual(result['visible_reacquisitions'], [])
+        result = score_sequence([label(0), label(1)],
+                                {0: record(0), 1: record(1, [10, 10])}, 8)
+        self.assertEqual(result['visible_reacquisitions'], [])
+
+    def test_invalid_timestamps_cannot_produce_timing_metrics(self):
+        for timestamp in [0, -.1, float('nan'), float('inf'), '0.1', True]:
+            rows = {0: record(0), 1: record(1)}
+            rows[1]['timestamp_seconds'] = timestamp
+            with self.subTest(timestamp=timestamp), self.assertRaises(ValueError):
+                score_sequence([label(0), label(1)], rows, 8)

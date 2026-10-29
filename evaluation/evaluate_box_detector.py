@@ -9,7 +9,7 @@ from unittest.mock import patch
 import cv2
 
 from evaluation.ball_dataset import MAX_BUNDLE_BYTES, digest
-from evaluation.evaluate_yolo import verify_model
+from evaluation.evaluate_yolo import verify_model, verify_ball_class
 from evaluation.training_dataset import MAX_EXAMPLES, load_export
 
 CONFIDENCE = .25
@@ -91,7 +91,9 @@ def reviewed_examples(exports):
     return examples
 
 
-def evaluate(exports, model_path, model_sha256, *, ball_class=0):
+def evaluate(exports, model_path, model_sha256, *, ball_class=0, image_size=640, expected_class_name=None):
+    if image_size not in (640,960):
+        raise ValueError('Use a supported explicit inference image size.')
     examples = reviewed_examples(exports)
     verify_model(model_path, model_sha256)
     if type(ball_class) is not int or ball_class < 0:
@@ -105,8 +107,7 @@ def evaluate(exports, model_path, model_sha256, *, ball_class=0):
         import torch
         torch.set_num_threads(1)
         model = YOLO(str(model_path.resolve()), task='detect')
-        if model.names.get(ball_class) not in ('ball', 'sports ball'):
-            raise ValueError('Select a ball class matching the local model names.')
+        verify_ball_class(model.names, ball_class, expected_class_name)
         frames = []
         for example in examples:
             # Recheck bytes immediately before inference, after initial export validation.
@@ -116,7 +117,7 @@ def evaluate(exports, model_path, model_sha256, *, ball_class=0):
             if pixels is None:
                 raise ValueError('Reviewed image cannot be decoded.')
             dimensions = list(pixels.shape[:2][::-1])
-            result = model.predict(pixels, imgsz=640, conf=CONFIDENCE, iou=NMS_IOU,
+            result = model.predict(pixels, imgsz=image_size, conf=CONFIDENCE, iou=NMS_IOU,
                                    classes=[ball_class], max_det=MAX_DETECTIONS,
                                    device='cpu', verbose=False, save=False)[0]
             predictions = result.boxes.data.cpu().tolist()
@@ -129,7 +130,7 @@ def evaluate(exports, model_path, model_sha256, *, ball_class=0):
                                timestamp_source=example['timestamp_source'], visibility=example['visibility'],
                                detection_limit_reached=len(predictions) >= MAX_DETECTIONS, **score))
     return dict(schema_version=1, purpose='development_box_evaluation', model_sha256=model_sha256,
-                settings=dict(ball_class=ball_class, image_size=640, confidence=CONFIDENCE,
+                settings=dict(ball_class=ball_class, expected_class_name=expected_class_name, image_size=image_size, confidence=CONFIDENCE,
                               matching_iou=MATCH_IOU, nms_iou=NMS_IOU, max_detections=MAX_DETECTIONS,
                               coordinate_space='full_source_image_xyxy'),
                 reviewed_export_sha256=[digest(directory/'provenance.json') for directory in exports],
@@ -148,10 +149,12 @@ def main():
     parser.add_argument('--model', type=Path, required=True)
     parser.add_argument('--model-sha256', required=True)
     parser.add_argument('--ball-class', type=int, default=0)
+    parser.add_argument('--expected-class-name',help='Explicit model label name after verifying its semantic mapping.')
+    parser.add_argument('--image-size',type=int,choices=(640,960),default=640)
     args = parser.parse_args()
     try:
         print(json.dumps(evaluate(args.exports, args.model, args.model_sha256,
-                                  ball_class=args.ball_class), indent=2))
+                                  ball_class=args.ball_class,image_size=args.image_size,expected_class_name=args.expected_class_name), indent=2))
     except (ValueError, OSError, KeyError, TypeError, ImportError) as error:
         parser.exit(1, f'Box evaluation failed: {error}\n')
 

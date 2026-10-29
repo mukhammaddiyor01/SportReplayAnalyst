@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
 Checkpoint: 2026-10-29. Data assembly and a real local YOLO smoke-training/evaluation
-flow are verified. 146 Python tests pass. Normal app tracking remains OpenCV.
+flow are verified. 149 Python tests pass. Normal app tracking remains OpenCV.
 Use README.md as the single current status/priority guide; this file is the handoff.
 
 ## Repository and working rules
@@ -283,3 +283,31 @@ Source/license attribution remains OSAI OpenTTGames / CC BY-NC-SA 4.0. No data
 redistribution. Prepared 17 review PNGs, indices14:256:15, are in
 openttgames-game1-cfr-review. Only four full frames inspected so far; no manual
 boxes saved or added to training. Keep this group distinct from reserved test_2.
+
+## Input contract and published-model diagnosis (2026-10-29)
+
+Added explicit evaluate_yolo --input-mode source_frame (default legacy roi_crop),
+with --image-size 640/960 in both point and box evaluators. Source boxes keep native
+coordinates; filter ROI centers before association cap, conservatively withhold
+when full-frame detection limit100 reached. Numeric model names require explicit
+--expected-class-name and prior semantic mapping; defaults stay ball/sports ball.
+149 tests pass. Normal worker unaffected. See neural-input-contract.md for actual
+results: own model source_frame/960 gives Lion development30/30 but review0/12,
+external1/72, several Getty regressions. External boxes0/10; no promotion.
+An additional public table-tennis YOLO checkpoint was source/digest checked and
+class0 verified against publisher labels, then evaluated once at source_frame/640:
+Lion2/30, review0/12, Getty0/83, external0/72. Not adopted. Publisher archive, extracted
+weights and metadata/results stay outside Git with pingpong-community prefixes.
+Its upstream overlap is unknown; do not import author claims as our accuracy.
+
+Game_1 manual pilot now saved locally as openttgames-game1-manual-box-review.json:
+3 visible boxes44/104/149, 3 uncertain14/29/134; remaining11 prepared frames remain
+unreviewed. Points only helped locate crops; extents manually read from pixels,
+no fixed-radius boxes or target-model predictions. Export verified3 labels in
+openttgames-game1-manual-box-export. Review SHA256:
+c6df53ff9b730b97041cdd040fccb11d5cfc3d6c80085d45d4ee3ab3b7d3e8bb.
+This pilot is development-only and NOT yet used for training; it adds 3 local boxes
+beyond the prior Getty/Lion38, preserving the frozen development-v1 dataset/run.
+No external data or derivative numeric labels entered Git. Source license attribution
+remains in local provenance. More representative training data and independent
+extent review are still needed; no contacts/rallies were implemented.

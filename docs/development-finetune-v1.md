@@ -85,4 +85,3 @@ d0bfc9796e37b00672875fa26c7d970cccd7d8fe3fd444522c6f950a3a694130.
 Run receipt SHA256:ae1ccbec3b48513524d57f1d97daa46ddbd474f5286a17b639392bd7771f36ec.
 All raw reports/logs/weights remain outside Git in ball-development-run-v1 and
 ball-development-evaluation-v1.json. No post-result parameter sweep occurred.
-

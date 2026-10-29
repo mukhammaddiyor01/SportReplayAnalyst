@@ -13,6 +13,7 @@ FastAPI/Jinja2 and plain HTML/CSS/JavaScript. Video processing stays on this com
 | Ball tracking | Experimental OpenCV candidates, temporal association and observed-only 2D trail |
 | Neural detector | Optional local YOLO baseline/training/evaluation; no model promoted |
 | Training data | 38 manual boxes, 6 full-frame negatives, 9 uncertain extents, 2 recordings; still insufficient |
+| Additional training-source pilot | 3 local OpenTTGames game_1 boxes, 3 uncertain; not yet trained, separate from frozen runs |
 | Reserved box evaluation | 10 local manual boxes, 5 uncertain extents from OpenTTGames test_2; evaluation_only, excluded from training |
 | Contacts and rallies | Not implemented; require stronger ball and independent interaction evidence |
 
@@ -120,7 +121,9 @@ requires --purpose development_finetune_v1 at assembly and --profile development
 at training. It uses Getty/Lion for training and reserves OpenTTGames for validation;
 the original smoke defaults and checkpoints are preserved. The real run improved
 Lion development to 26/30 correct observations but failed the external gate and
-regressed on other intervals. It remains offline; see the actual-result table.
+regressed on other intervals. It remains offline; see the actual-result table. [Explicit full-frame input diagnostics](docs/neural-input-contract.md)
+then reached 30/30 on the overlapping Lion development interval but still failed
+review/external intervals; no detector is promoted.
 
 ## Four-stage completion plan
 
@@ -232,7 +235,7 @@ rally implementation is justified by the present dataset.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-146 automated tests pass without torch, a GPU or model downloads. The annotation
+149 automated tests pass without torch, a GPU or model downloads. The annotation
 browser→JSON→YOLO export and the real local training/evaluation path were also
 exercised. These checks do not establish general tracking accuracy.
 

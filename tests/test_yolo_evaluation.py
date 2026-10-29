@@ -3,7 +3,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from evaluation.evaluate_yolo import candidates_from_boxes, verify_model
+from evaluation.evaluate_yolo import candidates_from_boxes, verify_model, verify_ball_class
 
 
 class YoloEvaluationTests(unittest.TestCase):
@@ -42,3 +42,31 @@ class YoloEvaluationTests(unittest.TestCase):
         result = candidates_from_boxes([[10,20,20,30,.8,0],[50,20,60,30,.9,32]], (100,200,300,400), ball_class=0)
         self.assertEqual(len(result.candidates),1)
         self.assertEqual((result.candidates[0].x,result.candidates[0].y),(115,225))
+
+    def test_full_source_boxes_keep_coordinates_and_filter_roi_before_candidate_cap(self):
+        outside=[[10+i,20,20+i,30,.9,0] for i in range(20)]
+        inside=[110,220,130,240,.8,0]
+        result=candidates_from_boxes(outside+[inside],(100,200,300,400),ball_class=0,source_dimensions=[640,480])
+        self.assertEqual(len(result.candidates),1)
+        self.assertEqual((result.candidates[0].x,result.candidates[0].y),(120,230))
+        self.assertEqual(result.candidates[0].box,(110,220,20,20))
+        self.assertFalse(result.truncated)
+
+    def test_full_source_box_may_cross_roi_edge_but_center_must_be_inside(self):
+        rows=[[90,210,130,230,.8,0],[290,210,310,230,.8,0]]
+        result=candidates_from_boxes(rows,(100,200,300,400),ball_class=0,source_dimensions=[640,480])
+        self.assertEqual(len(result.candidates),1)
+        self.assertEqual(result.candidates[0].x,110)
+        with self.assertRaisesRegex(ValueError,'outside the source'):
+            candidates_from_boxes([], (100,200,700,400),source_dimensions=[640,480])
+        with self.assertRaisesRegex(ValueError,'declared input'):
+            candidates_from_boxes([[0,0,650,20,.8,0]],(100,200,300,400),ball_class=0,source_dimensions=[640,480])
+
+    def test_numeric_publisher_class_requires_explicit_verified_name(self):
+        with self.assertRaisesRegex(ValueError,'matching'):
+            verify_ball_class({0:'0',1:'1'},0)
+        verify_ball_class({0:'0',1:'1'},0,'0')
+        with self.assertRaisesRegex(ValueError,'matching'):
+            verify_ball_class({0:'0',1:'1'},1,'0')
+        with self.assertRaisesRegex(ValueError,'nonnegative'):
+            verify_ball_class({0:'ball'},True)

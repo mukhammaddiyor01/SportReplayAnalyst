@@ -109,7 +109,7 @@ class BoxEvaluationTests(unittest.TestCase):
                 with self.assertRaisesRegex(OSError, 'Offline box evaluation'):
                     socket.socket.connect(None, None)
                 self.assertEqual(pixels.shape, (40, 80, 3))
-                self.assertEqual(kwargs['imgsz'], 640)
+                self.assertEqual(kwargs['imgsz'], expected_image_size)
                 self.assertFalse(kwargs['save'])
                 rows = [[10, 5, 30, 15, .9, 0]] if not calls else [[50, 5, 60, 15, .8, 0]]
                 calls.append(kwargs)
@@ -121,8 +121,11 @@ class BoxEvaluationTests(unittest.TestCase):
             modules = {'ultralytics':SimpleNamespace(YOLO=factory),
                        'ultralytics.utils':SimpleNamespace(SETTINGS=Mock()),
                        'torch':SimpleNamespace(set_num_threads=Mock())}
-            with patch.dict('sys.modules', modules):
-                result = evaluate([export], model_path, digest(model_path))
+            for expected_image_size in (640,960):
+                calls.clear()
+                with patch.dict('sys.modules', modules):
+                    result = evaluate([export], model_path, digest(model_path), image_size=expected_image_size)
+                self.assertEqual(result['settings']['image_size'],expected_image_size)
             self.assertEqual(len(calls), 2)
             self.assertEqual(result['summary']['true_positives'], 1)
             self.assertEqual(result['summary']['false_positives'], 1)

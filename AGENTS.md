@@ -77,7 +77,12 @@ other intervals regressed. It is not promoted. See docs/development-finetune-v1.
 An additional official OpenTTGames game_1 prefix is admitted for future manual
 training-box review using bounded byte ranges; no new boxes yet. Original sparse
 source is incomplete and must never be submitted to app. See docs/CONTINUE.md.
-Latest suite: 146 tests. Source-timed gap review now groups
+Explicit offline source_frame/960 evaluation now preserves full-frame coordinates
+and matches training input style; own Lion development30/30 but external1/72 and
+review0/12, so no promotion. A checksum-verified public YOLO candidate also failed.
+See docs/neural-input-contract.md. Local game_1 pilot now has 3 visible boxes and
+3 uncertain labels, not yet used for training; no derivative labels redistributed.
+Latest suite: 149 tests. Source-timed gap review now groups
 missing observations and supports browser seek navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent

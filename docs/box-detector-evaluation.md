@@ -123,3 +123,11 @@ The report's protocol hash and per-frame/per-recording totals were rechecked.
 This checkpoint changes measured documentation only; the previously verified
 139-test application/evaluation suite is unchanged. No contact/rally implementation
 or runtime model promotion occurred.
+
+## Explicit inference size and class declarations
+
+The default remains 640; --image-size 960 selects a separate recorded contract.
+Numeric class names are not inferred to mean ball. --expected-class-name permits
+only an exact declared name match after source annotation inspection. See
+neural-input-contract.md for source-frame point filtering, the actual 960 diagnosis
+and the rejected publisher candidate. These changes do not overwrite prior results.

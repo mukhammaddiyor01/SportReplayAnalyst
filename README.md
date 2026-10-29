@@ -12,7 +12,7 @@ FastAPI/Jinja2 and plain HTML/CSS/JavaScript. Video processing stays on this com
 | Background processing | Working: bounded workers, progress, cancel, expiry and cleanup |
 | Ball tracking | Experimental OpenCV candidates, temporal association and observed-only 2D trail |
 | Neural detector | Optional local YOLO baseline/training/evaluation; no model promoted |
-| Training data | 25 manual boxes, 6 full-frame negatives, 5 uncertain extents, 2 recordings; still insufficient |
+| Training data | 38 manual boxes, 6 full-frame negatives, 9 uncertain extents, 2 recordings; still insufficient |
 | Contacts and rallies | Not implemented; require stronger ball and independent interaction evidence |
 
 The current bottleneck is ball detection on the edited portrait recording. The
@@ -199,11 +199,13 @@ preserve the existing Getty/Lion observation counts; Lion still has no confirmed
 observations on its 30 development frames. These are development checks, not a
 fresh independent benchmark.
 
-Continue stages 1–2 with data review. Current labels total 25 visible boxes, 6
-full-frame negatives and 5 uncertain extents across 2 already-inspected recordings.
-The 2026-10-28 increment is in evaluation/getty-box-expansion.json and
-getty-negative-pilot.json; it has not been trained on. The frozen 15-box smoke
-experiment remains unchanged. Independent label review and new recording diversity
+Continue stages 1–2 with data review. Current labels total 38 visible boxes, 6
+full-frame negatives and 9 uncertain extents across 2 already-inspected recordings.
+The later development increments are in evaluation/getty-box-expansion.json,
+getty-negative-pilot.json and lion-box-expansion-a.json / lion-box-expansion-b.json.
+They have not been trained on; the Lion increment adds 13 boxes and 4 uncertain
+extents after full-image/crop/overlay review. See [label review notes](docs/ball-annotation.md).
+The frozen 15-box smoke experiment remains unchanged. Independent label review and new recording diversity
 are still missing. A search-region negative requires full-image review before it
 can become a full-frame training negative. No model promotion, contact rules or
 rally implementation is justified by the present dataset.

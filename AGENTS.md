@@ -57,7 +57,11 @@ its synthetic framework tests are not model-quality evidence. A subsequent real
 CPU run on 31 reused reviewed frames found 0/25 matching boxes and 81 false boxes
 at confidence .25 / IoU .5, with predictions on all 6 negatives. This confirms the
 smoke checkpoint remains rejected; it is not independent validation. 139 tests passed
-at the latest checkpoint. Source-timed gap review now groups
+at the latest checkpoint. A later Lion-only annotation increment adds 13 visible
+boxes and 4 uncertain extents from previously inspected frames. Current totals are
+38 boxes, 6 full-frame negatives and 9 uncertain extents across the same 2 recordings.
+These remain single-reviewer development labels; frozen experiments are unchanged.
+See docs/ball-annotation.md. Source-timed gap review now groups
 missing observations and supports browser seek navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent

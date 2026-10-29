@@ -80,3 +80,35 @@ The first desktop visual check found a CSS grid-area collision with the replay
 sidebar. It was fixed; the source frame now fits the viewport height and the
 pixel loupe remains separate from the original image. Desktop browser verification
 was performed; responsive CSS is provided but no device-size test was performed.
+
+## Further Lion development labels (2026-10-29)
+
+Two additional exact-frame bundles from the same prepared Lion source were reviewed:
+30:50:3 and 60:90:3. Full-image inspection was followed by enlarged pixel crops and
+box-overlay extent checks. No detector predictions were used to construct boxes.
+
+- evaluation/lion-box-expansion-a.json: 7 visible boxes at 30,33,36,39,42,45,48.
+- evaluation/lion-box-expansion-b.json: 6 visible boxes at 63,66,69,72,78,81;
+  uncertain extents at 60,75,84,87. Frame 75 crosses a bright table edge; unclear
+  extents were not forced into boxes or relabeled as negatives.
+
+These source-image coordinates refer to the prepared 720×860 crop. Original x=x,
+original y=y+140 and original decoded index=index. The frame 78 box crosses the old point-evaluation
+ROI right edge; the frame 81 box lies fully beyond it. Full-image visible boxes
+do not convert or contradict the ROI's uncertain point labels. Existing point and pilot files were
+preserved. No table contact was inferred from the ball's image position.
+
+Both actual YOLO exports were verified: 7 and 6 class-0 label files, respectively;
+the 4 uncertain images were excluded. All six reviewed exports revalidate as 44
+usable images (38 visible, 6 explicit negatives) without duplicate source indices.
+Numeric labels alone enter Git; exact PNGs, manifests, crop/overlay review images
+and exported YOLO directories remain outside it. Current annotation totals include
+9 uncertain extents, excluded from training. No new training/inference occurred.
+
+All labels remain approximate single-reviewer development evidence from two
+already-inspected recordings. Neighboring frames are correlated, and stride 3 does
+not establish distinct motion or independent samples. Existing smoke train/val
+membership and the measured 31-image detector report remain frozen. Independent
+label review, additional recordings and a separately frozen quality-training
+protocol are still needed. The last application suite passed 139 tests; this
+annotation-only increment was verified through real exports, not new rule tests.

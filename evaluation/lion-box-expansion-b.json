@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "recording_id": "lion-recording",
+  "source_sha256": "36b9bea5db38130117c8e57900b87ef771ef4610a1c59632e5427ec81e61ffb2",
+  "coordinate_space": "source_image_xyxy",
+  "source_dimensions": [
+    720,
+    860
+  ],
+  "review_date": "2026-10-29",
+  "annotation_method": "Approximate manual full-source-image visible-extent boxes from exact decoded frames, nearest-neighbor enlarged crops and box overlays. Single reviewer, no detector-prediction assistance; independent extent review still needed.",
+  "evaluation_status": "Development only: previously inspected recording and point-evaluation intervals. Same lion-recording group as existing clips/labels; not independent validation.",
+  "source_transform": "Prepared 720x860 source is the first 180 original decoded frames cropped [0,140,720,1000) then reencoded. Original x=x, original y=y+140, original decoded index=index.",
+  "scope_note": "Boxes concern the entire prepared image, not the old [161,326,563,517] point-evaluation ROI. Visible boxes at 78 and 81 lie outside that ROI; existing uncertain point labels remain unchanged. Border/occluded ambiguous extents remain uncertain.",
+  "labels": [
+    {
+      "frame_index": 60,
+      "image_sha256": "1d531c139c066ba0823ae3b539502c2b0563782aa2191fa604a13fa3e82c115a",
+      "visibility": "uncertain",
+      "bbox": null
+    },
+    {
+      "frame_index": 63,
+      "image_sha256": "1db3b7b906cd5ce4f1c733ae4ac5eaf84d7f61a27e316e54482c4369b170a55d",
+      "visibility": "visible",
+      "bbox": [
+        402,
+        345,
+        432,
+        369
+      ]
+    },
+    {
+      "frame_index": 66,
+      "image_sha256": "60815fa45d5fa2ba48a913ee8f5fbeaa29fe2af1c2d0566fad6dbebf0b667d77",
+      "visibility": "visible",
+      "bbox": [
+        422,
+        362,
+        455,
+        393
+      ]
+    },
+    {
+      "frame_index": 69,
+      "image_sha256": "96b9144da4b76263784fed7cd90ded9b9f200c3ecb000131e2a17612e3099b6c",
+      "visibility": "visible",
+      "bbox": [
+        458,
+        395,
+        486,
+        431
+      ]
+    },
+    {
+      "frame_index": 72,
+      "image_sha256": "7db38d705e1fe58feb46784f889397299134518779ed6ee6436361216c4cbd0a",
+      "visibility": "visible",
+      "bbox": [
+        508,
+        464,
+        530,
+        474
+      ]
+    },
+    {
+      "frame_index": 75,
+      "image_sha256": "ef7bcfdf5216f938f74fe68755e5958ccd83588ca0398eb3d30bec2f3059751f",
+      "visibility": "uncertain",
+      "bbox": null
+    },
+    {
+      "frame_index": 78,
+      "image_sha256": "f0c1207c79e7c2fdd592fb9d9487a8f5a1d05b2448e1ad1fd6d416aeebfb5865",
+      "visibility": "visible",
+      "bbox": [
+        548,
+        471,
+        582,
+        490
+      ]
+    },
+    {
+      "frame_index": 81,
+      "image_sha256": "ab2cdc17924d58b2870d5b673ffd49a09b373050cf01da4d51f1901a512455c0",
+      "visibility": "visible",
+      "bbox": [
+        579,
+        487,
+        607,
+        509
+      ]
+    },
+    {
+      "frame_index": 84,
+      "image_sha256": "4bc0b04cf9dcef71ff8cabe28c3f4c46562826db48f7990d88e553d972089a7d",
+      "visibility": "uncertain",
+      "bbox": null
+    },
+    {
+      "frame_index": 87,
+      "image_sha256": "3ef985133f3e9538c2161ef53129377238028b4b429975ede3825aa7927827ed",
+      "visibility": "uncertain",
+      "bbox": null
+    }
+  ]
+}

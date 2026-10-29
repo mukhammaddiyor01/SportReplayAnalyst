@@ -34,9 +34,9 @@ See ball-annotation.md for the verified browser flow and privacy distinction.
 - All old point labels and Lion 20–49/60–89 have been inspected; they are development
   evidence. Do not present reused data as fresh validation.
 - Current manual labels contain Getty 18 visible/6 full-frame negatives/2 uncertain
-  and Lion 7 visible/3 uncertain: 25 boxes, 6 negatives, 5 uncertain. The 2026-10-28
-  increment is separate from the frozen 15-box smoke dataset. Labels remain
-  single-reviewer development evidence; independent review and more recordings
+  and Lion 20 visible/7 uncertain: 38 boxes, 6 negatives, 9 uncertain. Later
+  development increments are separate from the frozen 15-box smoke dataset.
+  Labels remain single-reviewer development evidence; independent review and more recordings
   are still missing.
 - evaluation.training_dataset verifies exports and rejects train/val group,
   source-byte, PNG and exact-decoded-pixel overlaps plus duplicate source indices.
@@ -189,3 +189,21 @@ validation or a useful model. 139 tests remain last verified; runtime code uncha
 Next remains reviewed data, independent label review and new recording diversity
 before freezing a meaningful quality-training experiment. Do not implement contacts
 or rallies to bypass absent ball measurements.
+
+## Lion label expansion (2026-10-29)
+
+Added 13 manually reviewed source-image visible-extent boxes: 30,33,36,39,42,45,48
+and 63,66,69,72,78,81. Frames 60,75,84,87 remain uncertain; no Lion negatives were
+inferred from unclear visibility. Sources were exact prepared PNGs, full-image
+inspection, enlarged nearest-neighbor crops and extent overlays; no model boxes
+were consulted. Existing pilots/point labels remain unchanged. Single reviewer,
+not independent review or fresh validation. The frame 78 box crosses the old ROI right edge, and frame 81 lies fully beyond
+it; both are visible in the full prepared image, so label scopes differ.
+Numeric labels: evaluation/lion-box-expansion-a.json and lion-box-expansion-b.json.
+Artifact bundles are lion-box-expansion-a/b-20261029; exports are
+lion-box-expansion-a/b-export-20261029. Exports verified 7+6 visible labels; 4 uncertain excluded. The six reviewed
+exports together validate as 44 usable images: 38 visible boxes and 6 negatives,
+with no duplicate source indices. No training or inference was rerun. The earlier
+31-image evaluation and frozen 15-box smoke dataset remain unchanged. No runtime
+code changed; last application suite remains 139 passing tests. Next: independent
+label review and additional recording diversity before quality-training design.

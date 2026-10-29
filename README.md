@@ -105,6 +105,12 @@ not establish model quality. Training and evaluation are offline, explicit CLI
 operations; neither silently changes normal worker tracking. See
 [fixed protocol and actual results](docs/model-development.md).
 
+A separate [full-frame box evaluator](docs/box-detector-evaluation.md) scores reviewed
+boxes and explicit negatives at a fixed IoU/confidence operating point. It reports
+TP/FP/FN and per-recording precision/recall, separately from center/temporal scoring.
+Its real inference path requires the optional ML environment; test fixtures do not
+establish detector quality.
+
 ## Four-stage completion plan
 
 These are the owner's four delivery stages. Stage 1 establishes and evaluates the
@@ -206,7 +212,7 @@ rally implementation is justified by the present dataset.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-131 automated tests pass without torch, a GPU or model downloads. The annotation
+139 automated tests pass without torch, a GPU or model downloads. The annotation
 browser→JSON→YOLO export and the real local training/evaluation path were also
 exercised. These checks do not establish general tracking accuracy.
 

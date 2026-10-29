@@ -51,7 +51,10 @@ validation. Independent review and more recordings remain necessary. 127 tests p
 the current status/priority guide; docs/CONTINUE.md is the concise resume checkpoint.
 Offline sequence scoring also measures source-time loss sample spans and bounded
 reacquisitions; see docs/tracking-evaluation.md for semantics and source exposure.
-131 tests passed at this later checkpoint. Source-timed gap review now groups
+The later full-frame YOLO box evaluator validates reviewed exports and scores
+TP/FP/FN separately from temporal center scoring. See docs/box-detector-evaluation.md;
+its synthetic framework tests are not model-quality evidence. 139 tests passed
+at the latest checkpoint. Source-timed gap review now groups
 missing observations and supports browser seek navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent

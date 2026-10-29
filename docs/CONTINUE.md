@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
-Checkpoint: 2026-10-28. Data assembly and a real local YOLO smoke-training/evaluation
-flow are verified. 131 Python tests pass. Normal app tracking remains OpenCV.
+Checkpoint: 2026-10-29. Data assembly and a real local YOLO smoke-training/evaluation
+flow are verified. 139 Python tests pass. Normal app tracking remains OpenCV.
 Use README.md as the single current status/priority guide; this file is the handoff.
 
 ## Repository and working rules
@@ -156,3 +156,17 @@ span. Four added tests and the full 131-test suite pass. No model was trained.
 An independent-video-path question was asked in chat; check for the owner's answer.
 If none is supplied, there is no new independent source. Continue useful development
 work without describing reused recordings or repeated review as independent evidence.
+
+## Box evaluator checkpoint (2026-10-29)
+
+Added evaluation.evaluate_box_detector for full prepared-image YOLO box metrics,
+separate from source-center/ROI temporal scoring. It validates reviewed exports,
+rejects duplicate source frames, verifies local model SHA, blocks sockets, scores
+confidence .25 / IoU .5 and reports TP/FP/FN plus per-recording totals and saturation.
+See box-detector-evaluation.md for semantics, limits and command. The normal app,
+training recipe and annotations are unchanged; the smoke checkpoint stays rejected.
+139 tests pass; 31 real reviewed frames (25 boxes/6 negatives) revalidated. Synthetic
+framework composition was tested; no real inference or training was rerun because
+the old temporary optional ML environment is gone. Preserve the local weights;
+recreate the pinned isolated environment before real box evaluation. New footage
+and independent label review remain missing. Do not claim stage 1/2 completion.

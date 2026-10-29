@@ -76,3 +76,50 @@ from the earlier smoke run is no longer present; no real model inference or new
 training was performed during this checkpoint. Recreate the pinned isolated env
 before using this evaluator with the preserved local checkpoint. No detector or
 tracking improvement, fresh validation or stage completion is claimed.
+
+## Real checkpoint evaluation (2026-10-29, after environment restoration)
+
+A separate Python 3.12.14 environment was recreated from requirements-yolo.txt:
+Ultralytics 8.4.190, torch 2.14.1, torchvision 0.29.1, NumPy 2.5.4 and
+opencv-python 4.13.0.92. pip check found no broken requirements. The application
+environment still has neither torch nor Ultralytics. All resolved package versions
+were recorded locally; transitive dependencies are not fully pinned by the five
+versions in requirements-yolo.txt.
+
+The existing smoke best.pt was verified against SHA256
+3d0809efe1419a41de8b035e5098371e1066966f9ed7759a8c64d600a186e6cd.
+Before inference, the four export-provenance hashes and fixed settings above were
+saved in a local protocol receipt. The model then processed all 31 full prepared
+images on CPU with sockets blocked and sync disabled. No new model was downloaded,
+no labels changed, no training occurred and no threshold sweep followed the result.
+
+| Recording | Visible boxes | Negative images | TP | FP | FN | Negative images with predictions | Detection-limit images |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Getty | 18 | 6 | 0 | 45 | 18 | 6 | 0 |
+| Lion | 7 | 0 | 0 | 36 | 7 | 0 | 0 |
+| Total | 25 | 6 | 0 | 81 | 25 | 6 | 0 |
+
+Precision and recall are both zero at confidence 0.25 / matching IoU 0.5 for this
+small development set. This means none of the returned boxes met the matching
+criterion; it does not establish why the detector failed or validate every manual
+extent. Earlier center/ROI results measure a different task and are unchanged.
+
+Some images were used in smoke training/validation; the later 16 Getty images
+were not trained on but come from an already-inspected recording. None of these
+numbers establishes independent generalization. **Keep this checkpoint rejected.**
+The result supports expanding reviewed data and recording diversity before a
+meaningful new training protocol, rather than integrating or tuning this model.
+
+Local receipts/results remain outside Git in the conversation artifact folder:
+
+- Protocol: ball-box-evaluation-protocol-20261029.json; SHA256
+  b8209920f2e3a15c83e4bbb73cbf367bde6bbabec46beb7f1c2b31d52aa31a83.
+- Report: ball-box-evaluation-result-20261029.json; SHA256
+  92266b2c206622613f20c55e449340bcfe1217c9389bfc52a68b01bd0d74a019.
+- Package snapshot: ball-box-evaluation-packages-20261029.json; SHA256
+  73642c52c3f10edb524973cc8f4c0f3a41206fd5a054b4a023378c40ddd9c404.
+
+The report's protocol hash and per-frame/per-recording totals were rechecked.
+This checkpoint changes measured documentation only; the previously verified
+139-test application/evaluation suite is unchanged. No contact/rally implementation
+or runtime model promotion occurred.

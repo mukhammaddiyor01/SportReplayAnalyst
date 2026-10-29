@@ -170,3 +170,22 @@ framework composition was tested; no real inference or training was rerun becaus
 the old temporary optional ML environment is gone. Preserve the local weights;
 recreate the pinned isolated environment before real box evaluation. New footage
 and independent label review remain missing. Do not claim stage 1/2 completion.
+
+## Real box inference checkpoint (2026-10-29)
+
+The optional ML environment was restored in the temporary sra-yolo-20261029 folder,
+with the five pinned requirement versions and pip check passing. App env still
+has no torch/Ultralytics. Existing smoke best.pt SHA was verified; fixed export
+hashes and settings were saved before running actual full-frame CPU inference.
+All 31 reviewed images were processed with socket connections blocked: Getty
+0 TP /45 FP /18 FN, Lion 0 TP /36 FP /7 FN. Total 0 matching boxes from 25 visible
+references, 81 FP, all 6 negatives with predictions, no detection-cap frames.
+Confidence .25, match IoU .5; no sweep, relabeling, training or model promotion.
+See box-detector-evaluation.md for exact result/protocol/package-snapshot hashes.
+All three local receipts are in the artifact folder, prefixed ball-box-evaluation.
+The optional env can expire again; preserve receipts and existing weights.
+This is development diagnosis, partly reusing training/validation images, not fresh
+validation or a useful model. 139 tests remain last verified; runtime code unchanged.
+Next remains reviewed data, independent label review and new recording diversity
+before freezing a meaningful quality-training experiment. Do not implement contacts
+or rallies to bypass absent ball measurements.

@@ -108,8 +108,10 @@ operations; neither silently changes normal worker tracking. See
 A separate [full-frame box evaluator](docs/box-detector-evaluation.md) scores reviewed
 boxes and explicit negatives at a fixed IoU/confidence operating point. It reports
 TP/FP/FN and per-recording precision/recall, separately from center/temporal scoring.
-Its real inference path requires the optional ML environment; test fixtures do not
-establish detector quality.
+A real CPU run with the preserved smoke checkpoint found 0 matching boxes out
+of 25 references, 81 false-positive boxes and predictions on all 6 negative images
+at confidence .25 / IoU .5. These are reused development data, not independent
+validation; the checkpoint stays rejected. Exact receipts are in the linked guide.
 
 ## Four-stage completion plan
 

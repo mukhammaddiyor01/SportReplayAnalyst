@@ -53,7 +53,10 @@ Offline sequence scoring also measures source-time loss sample spans and bounded
 reacquisitions; see docs/tracking-evaluation.md for semantics and source exposure.
 The later full-frame YOLO box evaluator validates reviewed exports and scores
 TP/FP/FN separately from temporal center scoring. See docs/box-detector-evaluation.md;
-its synthetic framework tests are not model-quality evidence. 139 tests passed
+its synthetic framework tests are not model-quality evidence. A subsequent real
+CPU run on 31 reused reviewed frames found 0/25 matching boxes and 81 false boxes
+at confidence .25 / IoU .5, with predictions on all 6 negatives. This confirms the
+smoke checkpoint remains rejected; it is not independent validation. 139 tests passed
 at the latest checkpoint. Source-timed gap review now groups
 missing observations and supports browser seek navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.

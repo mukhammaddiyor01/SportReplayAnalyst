@@ -102,7 +102,7 @@ python -m evaluation.train_ball_model /path/to/dataset --model /path/to/yolo11n.
 python -m evaluation.evaluate_yolo /path/to/clip.mov --annotations evaluation/lion-validation.json --model /path/to/best.pt --model-sha256 CHECKPOINT_SHA256 --ball-class 0
 ```
 
-The trainer runs 2 CPU epochs with fixed arguments to test the plumbing. It does
+The default trainer runs 2 CPU epochs with fixed arguments to test the plumbing. It does
 not establish model quality. Training and evaluation are offline, explicit CLI
 operations; neither silently changes normal worker tracking. See
 [fixed protocol and actual results](docs/model-development.md).
@@ -114,6 +114,11 @@ A real CPU run with the preserved smoke checkpoint found 0 matching boxes out
 of 25 references, 81 false-positive boxes and predictions on all 6 negative images
 at confidence .25 / IoU .5. These are reused development data, not independent
 validation; the checkpoint stays rejected. Exact receipts are in the linked guide.
+
+A separate [data-limited fine-tuning profile](docs/development-finetune-v1.md)
+requires --purpose development_finetune_v1 at assembly and --profile development_v1
+at training. It uses Getty/Lion for training and reserves OpenTTGames for validation;
+the original smoke defaults and checkpoints are preserved.
 
 ## Four-stage completion plan
 
@@ -225,7 +230,7 @@ rally implementation is justified by the present dataset.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-144 automated tests pass without torch, a GPU or model downloads. The annotation
+146 automated tests pass without torch, a GPU or model downloads. The annotation
 browser→JSON→YOLO export and the real local training/evaluation path were also
 exercised. These checks do not establish general tracking accuracy.
 

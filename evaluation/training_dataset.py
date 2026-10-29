@@ -12,6 +12,7 @@ from evaluation.ball_dataset import (MAX_BUNDLE_BYTES, MAX_IMAGE_BYTES, digest,
                                      new_output, review_intended_use, validate_review, yolo_line)
 
 MAX_EXAMPLES = 2000
+DATASET_PURPOSES = ('development_smoke_test', 'development_finetune_v1')
 
 
 def load_export(directory):
@@ -49,7 +50,9 @@ def load_export(directory):
     return examples
 
 
-def assemble(train, val, output):
+def assemble(train, val, output, *, purpose='development_smoke_test'):
+    if purpose not in DATASET_PURPOSES:
+        raise ValueError('Choose an explicit supported dataset purpose.')
     if not train or not val:
         raise ValueError('Provide reviewed exports for both train and validation.')
     splits = {name:[e for directory in directories for e in load_export(directory)]
@@ -72,7 +75,7 @@ def assemble(train, val, output):
             raise ValueError(f'{name} needs at least one reviewed visible ball.')
     output = new_output(output)
     try:
-        report = dict(schema_version=1, purpose='development_smoke_test', classes={'0':'ball'}, splits={},
+        report = dict(schema_version=1, purpose=purpose, classes={'0':'ball'}, splits={},
                       warning='Small single-reviewer development labels. Recording separation does not make reused footage fresh validation. No model quality or production readiness is established.')
         for name, rows in splits.items():
             (output/'images'/name).mkdir(parents=True)
@@ -100,9 +103,10 @@ def main():
     p.add_argument('--train',type=Path,nargs='+',required=True)
     p.add_argument('--val',type=Path,nargs='+',required=True)
     p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--purpose', choices=DATASET_PURPOSES, default='development_smoke_test')
     a = p.parse_args()
     try:
-        r = assemble(a.train,a.val,a.output)
+        r = assemble(a.train,a.val,a.output,purpose=a.purpose)
         print(json.dumps({name:{'counts':s['counts'],'recording_ids':s['recording_ids']} for name,s in r['splits'].items()},indent=2))
     except (ValueError,OSError,KeyError,TypeError) as error:
         p.exit(1,f'Dataset assembly failed: {error}\n')

@@ -125,3 +125,27 @@ class TrainingDatasetTests(unittest.TestCase):
             (dataset/'dataset.json').write_text(json.dumps(report))
             with self.assertRaisesRegex(ValueError,'Evaluation-only'):
                 check_dataset(dataset)
+
+    def test_training_profiles_require_explicit_matching_dataset_and_leave_smoke_unchanged(self):
+        from evaluation.train_ball_model import training_arguments, TRAINING_ARGS
+        self.assertEqual(training_arguments('smoke','development_smoke_test')['epochs'],2)
+        with self.assertRaisesRegex(ValueError,'must match'):
+            training_arguments('development_v1','development_smoke_test')
+        with self.assertRaisesRegex(ValueError,'must match'):
+            training_arguments('smoke','development_finetune_v1')
+        args=training_arguments('development_v1','development_finetune_v1')
+        self.assertEqual(args['freeze'],10)
+        args['epochs']=999
+        self.assertEqual(training_arguments('development_v1','development_finetune_v1')['epochs'],60)
+        self.assertEqual(TRAINING_ARGS['epochs'],2)
+
+    def test_finetune_dataset_preserves_reserved_validation_and_train_separation(self):
+        from evaluation.train_ball_model import check_dataset
+        with TemporaryDirectory() as directory:
+            root=Path(directory)
+            a=self.export(root,'train-one',10);b=self.export(root,'val-one',20,reserved_manifest=True)
+            dataset=root/'dataset'
+            assemble([a],[b],dataset,purpose='development_finetune_v1')
+            report=check_dataset(dataset)
+            self.assertEqual(report['purpose'],'development_finetune_v1')
+            self.assertEqual(report['splits']['val']['examples'][0]['intended_use'],'evaluation_only')

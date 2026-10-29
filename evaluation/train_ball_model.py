@@ -9,6 +9,7 @@ import cv2
 
 from evaluation.ball_dataset import DIGEST, SLUG, digest, new_output, yolo_line
 from evaluation.evaluate_yolo import verify_model
+from evaluation.training_dataset import DATASET_PURPOSES
 
 # A small pipeline smoke test, not an accuracy-tuned training recipe.
 TRAINING_ARGS = dict(epochs=2, imgsz=640, batch=4, device='cpu', workers=0,
@@ -18,11 +19,23 @@ TRAINING_ARGS = dict(epochs=2, imgsz=640, batch=4, device='cpu', workers=0,
     degrees=0, translate=0, scale=0, hsv_h=0, hsv_s=0, hsv_v=0, close_mosaic=0)
 
 
+# A separately requested, data-limited development experiment; never the smoke default.
+FINETUNE_ARGS = dict(TRAINING_ARGS, epochs=60, imgsz=960, optimizer='AdamW',
+                     warmup_epochs=2, freeze=10, hsv_v=.15)
+
+
+def training_arguments(profile, purpose):
+    expected = {'smoke': 'development_smoke_test', 'development_v1': 'development_finetune_v1'}
+    if profile not in expected or purpose != expected[profile]:
+        raise ValueError('Training profile must match the explicitly assembled dataset purpose.')
+    return dict(TRAINING_ARGS if profile == 'smoke' else FINETUNE_ARGS)
+
+
 def check_dataset(dataset):
     dataset = dataset.resolve()
     report = json.loads((dataset/'dataset.json').read_text())
     expected = f'path: {json.dumps(str(dataset))}\ntrain: images/train\nval: images/val\nnames:\n  0: ball\n'
-    if (dataset/'data.yaml').read_text() != expected or report.get('purpose') != 'development_smoke_test':
+    if (dataset/'data.yaml').read_text() != expected or report.get('purpose') not in DATASET_PURPOSES:
         raise ValueError('Use an unchanged dataset produced by evaluation.training_dataset.')
     splits = report['splits']
     for key in ('recording_id','source_sha256','image_sha256','pixel_sha256'):
@@ -60,8 +73,9 @@ def check_dataset(dataset):
     return report
 
 
-def train(dataset, model_path, expected_sha256, output):
+def train(dataset, model_path, expected_sha256, output, *, profile='smoke'):
     report = check_dataset(dataset)
+    arguments = training_arguments(profile, report['purpose'])
     verify_model(model_path, expected_sha256)
     os.environ['YOLO_OFFLINE'] = 'true'
     # No data or telemetry can leave this isolated CLI process.
@@ -69,17 +83,20 @@ def train(dataset, model_path, expected_sha256, output):
         from ultralytics import YOLO
         from ultralytics.utils import SETTINGS
         SETTINGS.update({'sync':False})
+        if profile == 'development_v1':
+            import torch
+            torch.set_num_threads(4)
         model = YOLO(str(model_path.resolve()),task='detect')
         output = new_output(output)
         receipt = dict(status='running', base_model_sha256=expected_sha256,
-            dataset_sha256=digest(dataset/'dataset.json'), args=TRAINING_ARGS,
+            dataset_sha256=digest(dataset/'dataset.json'), profile=profile, args=arguments,
             split_counts={name:split['counts'] for name,split in report['splits'].items()},
-            limitation='Development smoke run on tiny reused single-reviewer labels; not independent validation or app-ready tracking.')
+            limitation='Data-limited development experiment on reused single-reviewer labels. Validation can select a checkpoint; it is not untouched final-test evidence or app-ready tracking.')
         (output/'run.json').write_text(json.dumps(receipt,indent=2)+'\n')
         try:
             # Output was exclusively created above; exist_ok only uses that owned directory.
             model.train(data=str((dataset/'data.yaml').resolve()), project=str(output.parent),
-                        name=output.name, exist_ok=True, verbose=False, **TRAINING_ARGS)
+                        name=output.name, exist_ok=True, verbose=False, **arguments)
             receipt['status'] = 'completed'
             receipt['weights'] = {p.name:digest(p) for p in (output/'weights').glob('*.pt')}
             if 'best.pt' not in receipt['weights']:
@@ -98,9 +115,10 @@ def main():
     p.add_argument('--model',type=Path,required=True)
     p.add_argument('--model-sha256',required=True)
     p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--profile', choices=('smoke','development_v1'), default='smoke')
     a = p.parse_args()
     try:
-        print(json.dumps(train(a.dataset,a.model,a.model_sha256,a.output),indent=2))
+        print(json.dumps(train(a.dataset,a.model,a.model_sha256,a.output,profile=a.profile),indent=2))
     except (ValueError,OSError,KeyError,TypeError,ImportError) as error:
         p.exit(1,f'Local training failed: {error}\n')
 

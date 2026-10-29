@@ -15,7 +15,7 @@ FastAPI/Jinja2 and plain HTML/CSS/JavaScript. Video processing stays on this com
 | Training data | 38 manual boxes, 6 full-frame negatives, 9 uncertain extents, 2 recordings; still insufficient |
 | Contacts and rallies | Not implemented; require stronger ball and independent interaction evidence |
 
-The current bottleneck is ball detection on the edited portrait recording. The
+The current bottleneck is ball detection beyond the initial Getty footage. The
 small YOLO smoke-training run completed, but produced many false candidates and
 no confirmed observations on evaluated intervals. It is not used by the app.
 
@@ -193,6 +193,12 @@ timing evaluation meeting predeclared criteria, followed by browser verification
 
 ### Immediate next action
 
+[A third recording admission](docs/external-data-admission.md) now supplies a
+verified 256-frame OpenTTGames prefix and external point references. Fixed OpenCV
+diagnosis missed all 72 scored references (2 out-of-ROI exclusions); no model was
+promoted. The external coordinates are not reviewed YOLO extent boxes, and this
+prefix is now consumed diagnostic material rather than untouched validation.
+
 [Recording inventory and timing diagnostics](docs/tracking-evaluation.md) now
 record prior exposure and source-time loss/reacquisition measurements. Regressions
 preserve the existing Getty/Lion observation counts; Lion still has no confirmed
@@ -205,9 +211,9 @@ The later development increments are in evaluation/getty-box-expansion.json,
 getty-negative-pilot.json and lion-box-expansion-a.json / lion-box-expansion-b.json.
 They have not been trained on; the Lion increment adds 13 boxes and 4 uncertain
 extents after full-image/crop/overlay review. See [label review notes](docs/ball-annotation.md).
-The frozen 15-box smoke experiment remains unchanged. Independent label review and new recording diversity
-are still missing. A search-region negative requires full-image review before it
-can become a full-frame training negative. No model promotion, contact rules or
+The frozen 15-box smoke experiment remains unchanged. Independent box review and
+additional training-recording diversity are still missing. A search-region negative
+requires full-image review before it can become a full-frame training negative. No model promotion, contact rules or
 rally implementation is justified by the present dataset.
 
 ## Verification and limits
@@ -216,7 +222,7 @@ rally implementation is justified by the present dataset.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-139 automated tests pass without torch, a GPU or model downloads. The annotation
+140 automated tests pass without torch, a GPU or model downloads. The annotation
 browser→JSON→YOLO export and the real local training/evaluation path were also
 exercised. These checks do not establish general tracking accuracy.
 

@@ -1,6 +1,8 @@
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
-from evaluation.evaluate_ball_sequences import score_sequence
+from evaluation.evaluate_ball_sequences import evaluate, score_sequence
 
 
 def label(index, visibility='visible'):
@@ -117,3 +119,17 @@ class SequenceEvaluationTests(unittest.TestCase):
             rows[1]['timestamp_seconds'] = timestamp
             with self.subTest(timestamp=timestamp), self.assertRaises(ValueError):
                 score_sequence([label(0), label(1)], rows, 8)
+
+    def test_external_reference_provenance_is_retained_without_manual_accuracy_claim(self):
+        annotations = dict(sha256='a'*64, source_dimensions=[80, 40],
+            search_region=[0, 0, 80, 40], matching_tolerance_px=8,
+            annotation_method='External model-aided coordinates, not manually reviewed ground truth.',
+            protocol='Source-only admission diagnosis; no threshold tuning.',
+            sequences=[dict(name='external', samples=[label(0)])])
+        with patch('evaluation.evaluate_ball_sequences.collect_records', return_value={0: record(0)}):
+            result = evaluate(Path('unused-test-source'), annotations)
+        self.assertEqual(result['source_sha256'], annotations['sha256'])
+        self.assertEqual(result['annotation_method'], annotations['annotation_method'])
+        self.assertEqual(result['sequences']['external']['counts']['missed'], 1)
+        self.assertNotIn('single-reviewer', result['limitation'])
+        self.assertIn('reference labels', result['limitation'])

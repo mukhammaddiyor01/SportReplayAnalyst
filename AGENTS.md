@@ -61,7 +61,12 @@ at the latest checkpoint. A later Lion-only annotation increment adds 13 visible
 boxes and 4 uncertain extents from previously inspected frames. Current totals are
 38 boxes, 6 full-frame negatives and 9 uncertain extents across the same 2 recordings.
 These remain single-reviewer development labels; frozen experiments are unchanged.
-See docs/ball-annotation.md. Source-timed gap review now groups
+See docs/ball-annotation.md. A third source, official OpenTTGames test_2, now has
+an accepted 256-frame local CFR prefix and a fixed external-point diagnosis:
+0/72 matched observations, 2 outside-ROI exclusions. Its model-aided points are not
+YOLO boxes or independent expert truth. Keep this recording out of training while
+evaluating on it; the prefix is now inspected. No data was redistributed. See
+docs/external-data-admission.md. Latest suite: 140 tests. Source-timed gap review now groups
 missing observations and supports browser seek navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent

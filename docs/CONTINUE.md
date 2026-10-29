@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
 Checkpoint: 2026-10-29. Data assembly and a real local YOLO smoke-training/evaluation
-flow are verified. 139 Python tests pass. Normal app tracking remains OpenCV.
+flow are verified. 140 Python tests pass. Normal app tracking remains OpenCV.
 Use README.md as the single current status/priority guide; this file is the handoff.
 
 ## Repository and working rules
@@ -207,3 +207,27 @@ with no duplicate source indices. No training or inference was rerun. The earlie
 31-image evaluation and frozen 15-box smoke dataset remain unchanged. No runtime
 code changed; last application suite remains 139 passing tests. Next: independent
 label review and additional recording diversity before quality-training design.
+
+## Third recording admission (2026-10-29)
+
+Official OSAI OpenTTGames test_2 was downloaded locally with a bounded receipt.
+See external-data-admission.md for primary sources, declared CC BY-NC-SA terms,
+source/markup/prefix hashes, preparation failures and exact results. No data or
+third-party annotations were committed. Original 225 MB exceeds the app byte cap.
+Accepted openttgames-test2-prefix-cfr.avi is 43,880,226 bytes, 256 decoded frames,
+1920×1080 at 120 FPS, first/last times 0/2.125, zero fallback. One-to-one MJPEG
+reencoding preserves geometry/index/CFR time but is lossy. Both MOV attempts are
+invalid for the app; only the CFR AVI passed existing checks. Browser playback of
+AVI is unverified. Current review PNGs: openttgames-test2-cfr-review (15 images).
+Source-only anchors checked; external model-aided references are not expert/manual
+extent truth. Frozen baseline ROI [300,400,1550,750], 8px point agreement and three
+intervals scored 0/72 correct/near-reference candidates; 188/189 excluded outside
+ROI as uncertain, no negative frames scored. No tuning or model promotion.
+This recording was not used in local training; its prefix/reference intervals are
+now consumed diagnostic data, not untouched validation. Keep openttgames-test2
+out of training while evaluating on it. No automatic point-to-box conversion.
+Sequence reports now retain actual annotation/source provenance instead of a
+hardcoded manual-label claim. 140 tests pass. Getty/Lion manual data remain
+38 boxes/6 negatives/9 uncertain; third-party point references add no YOLO boxes.
+Next: actual extent review with source/license provenance and more training
+recording diversity, while reserving separate untouched evaluation evidence.

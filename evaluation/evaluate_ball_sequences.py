@@ -128,11 +128,17 @@ def evaluate(video: Path, annotations: dict, *, small_candidate_continuation: bo
         appearance_filter=appearance_filter, sparse_motion=sparse_motion)
     return {'sparse_motion': sparse_motion, 'appearance_filter': appearance_filter,
             'small_candidate_continuation': small_candidate_continuation,
-            'protocol': annotations['protocol'], 'sequences': {
+            'protocol': annotations['protocol'],
+            'source_sha256': annotations['sha256'],
+            'source_dimensions': annotations['source_dimensions'],
+            'search_region': annotations['search_region'],
+            'matching_tolerance_px': annotations['matching_tolerance_px'],
+            'annotation_method': annotations.get('annotation_method', 'Not supplied; inspect reference provenance.'),
+            'sequences': {
         seq['name']: score_sequence(seq['samples'], records, annotations['matching_tolerance_px'])
         for seq in sequences},
-        'limitation': ('Approximate single-reviewer same-video labels. Loss intervals bound labeled frames, '
-                       'not physical occlusion durations. Loss sample spans exclude unknown frame exposure '
+        'limitation': ('Agreement with declared reference labels, not whole-video or identity accuracy. '
+                       'Follow the declared annotation provenance. Loss sample spans exclude unknown frame exposure '
                        'durations; reacquisition elapsed time is between scored correct samples, not physical '
                        'occlusion. ID changes are diagnostic, not a standard MOT identity score.')}
 

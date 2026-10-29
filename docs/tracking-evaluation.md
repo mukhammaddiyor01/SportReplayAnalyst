@@ -9,7 +9,7 @@ It is not a completed independent benchmark or a model-promotion decision.
 | --- | --- | --- |
 | getty-recording | Original SHA256 de1be132d44deb1be6e932585b2b029a8092a3fc4aa65c6774368ec5cad28fc1; 768×432, 360 declared frames | All existing point and box intervals inspected; detector tuning and smoke training used this recording. Development/regression only. Sampled camera movement prevents assuming fixed calibration. |
 | lion-recording | Original SHA256 2194ffcd9f572fde42861c1ffd56d3844bb69dd5d9349880d3f33aa02d36f18e; analysis SHA256 36b9bea5db38130117c8e57900b87ef771ef4610a1c59632e5427ec81e61ffb2 | First 180 decoded frames cropped to 720×860, original y=analysis y+140, original index unchanged. Prefix inspected; 20–49 and 60–89 evaluated, 20–29 used for smoke validation. Development/regression only; camera stability uncertain. |
-| Independent evaluation | No fresh recording admitted yet | Source identity, recording relationship, camera suitability and untouched evaluation intervals still need to be recorded. |
+| openttgames-test2 | Official OSAI test_2; accepted native-size 256-frame/120 FPS MJPEG prefix; [admission receipt and source hashes](external-data-admission.md) | 72 external point references scored, 2 excluded, no correct observations. New recording for diagnosis; these intervals are now consumed and are not untouched validation. No YOLO boxes added. |
 
 Related crops, excerpts and transcodes retain the original recording group.
 Unscored frames from an inspected recording are not an independent recording.

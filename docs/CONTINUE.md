@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
 Checkpoint: 2026-10-29. Data assembly and a real local YOLO smoke-training/evaluation
-flow are verified. 144 Python tests pass. Normal app tracking remains OpenCV.
+flow are verified. 146 Python tests pass. Normal app tracking remains OpenCV.
 Use README.md as the single current status/priority guide; this file is the handoff.
 
 ## Repository and working rules
@@ -253,3 +253,33 @@ evidence. This metadata check is not a global or tamper-proof source registry.
 Next: new training-recording diversity and independent extent review. Keep the
 entire OpenTTGames test_2 group reserved; do not repurpose it as training to improve
 its own result. Source/license metadata and owner-managed artifacts remain local.
+
+## Development fine-tuning v1 (2026-10-29)
+
+Owner requested faster completion; moved from repeated smoke scoring to an explicit
+data-limited development profile. Commit c1d59de adds --purpose development_finetune_v1
+and --profile development_v1; smoke defaults remain unchanged and profile/purpose
+must match. 146 tests passed. Actual 60-epoch/960/CPU/AdamW/freeze10 run completed,
+train Getty/Lion 38 visible+6 negative, val reserved OpenTTGames test_2 10 boxes.
+Protocol and actual results: development-finetune-v1.md. best.pt SHA starts b17b03fe.
+Lion development improved to 26/30 correct, but Lion review stayed 0/12; external
+box gate 0/10 (no predicted boxes), points 6/72 nearby candidates /0 correct.
+Several Getty intervals regressed vs OpenCV. Gate failed, no runtime promotion.
+Val selected this checkpoint; no untouched test claim. Actual artifacts include
+ball-development-dataset-v1, ball-development-run-v1, ball-development-evaluation-v1.json.
+Official YOLO11n base restored and pinned in artifact yolo11n-base-v8.4.0.pt.
+
+A separate official OpenTTGames game_1 TRAINING source is now locally admitted:
+openttgames-game1-prefix-cfr.avi (45,642,102 bytes), SHA256
+aff7ef9d916b287f29e8e169bb8090d52f724c15ffa142de1e75265b1d212b90.
+256 sequential frames, 1920×1080/120 FPS, 0..2.125 seconds, zero fallback. Its full
+5,572,649,632-byte source was NOT downloaded or fully hashed. Only first 32 MiB plus
+480,316-byte MP4 metadata tail were fetched with verified HTTP ranges/version.
+The incomplete sparse source is explicitly named incomplete-sparse-source; never
+submit it to app or claim full-file integrity. Source range hashes/ETag/transform
+are in openttgames-game1-admission.json; markup SHA is
+a4109881b1e848340bced411a2da5b21de3794ebcb52454e50443fe3ce2d345c.
+Source/license attribution remains OSAI OpenTTGames / CC BY-NC-SA 4.0. No data
+redistribution. Prepared 17 review PNGs, indices14:256:15, are in
+openttgames-game1-cfr-review. Only four full frames inspected so far; no manual
+boxes saved or added to training. Keep this group distinct from reserved test_2.

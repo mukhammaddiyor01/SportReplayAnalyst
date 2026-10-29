@@ -71,7 +71,13 @@ docs/external-data-admission.md. A later single-reviewer local extent review add
 scoring yielded 0 TP /82 FP /10 FN. No external labels were committed. Dataset tools
 now preserve evaluation_only declarations and refuse reserved train examples;
 the trainer rechecks roles. This metadata guard does not prove independence.
-Latest suite: 144 tests. Source-timed gap review now groups
+A distinct 60-epoch data-limited fine-tune now has 146 passing tool tests and
+completed locally: Lion development 26/30 correct, but external gates failed and
+other intervals regressed. It is not promoted. See docs/development-finetune-v1.md.
+An additional official OpenTTGames game_1 prefix is admitted for future manual
+training-box review using bounded byte ranges; no new boxes yet. Original sparse
+source is incomplete and must never be submitted to app. See docs/CONTINUE.md.
+Latest suite: 146 tests. Source-timed gap review now groups
 missing observations and supports browser seek navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent

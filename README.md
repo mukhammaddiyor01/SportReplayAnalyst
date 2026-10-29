@@ -118,7 +118,9 @@ validation; the checkpoint stays rejected. Exact receipts are in the linked guid
 A separate [data-limited fine-tuning profile](docs/development-finetune-v1.md)
 requires --purpose development_finetune_v1 at assembly and --profile development_v1
 at training. It uses Getty/Lion for training and reserves OpenTTGames for validation;
-the original smoke defaults and checkpoints are preserved.
+the original smoke defaults and checkpoints are preserved. The real run improved
+Lion development to 26/30 correct observations but failed the external gate and
+regressed on other intervals. It remains offline; see the actual-result table.
 
 ## Four-stage completion plan
 
@@ -217,8 +219,8 @@ Continue stages 1–2 with data review. Current labels total 38 visible boxes, 6
 full-frame negatives and 9 uncertain extents across 2 already-inspected recordings.
 The later development increments are in evaluation/getty-box-expansion.json,
 getty-negative-pilot.json and lion-box-expansion-a.json / lion-box-expansion-b.json.
-They have not been trained on; the Lion increment adds 13 boxes and 4 uncertain
-extents after full-image/crop/overlay review. See [label review notes](docs/ball-annotation.md).
+These increments entered the separate development v1 training set; the Lion
+increment adds 13 boxes and 4 uncertain extents after full-image/crop/overlay review. See [label review notes](docs/ball-annotation.md).
 The frozen 15-box smoke experiment remains unchanged. Independent box review and
 additional training-recording diversity are still missing. A search-region negative
 requires full-image review before it can become a full-frame training negative. No model promotion, contact rules or

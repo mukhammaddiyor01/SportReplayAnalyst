@@ -56,4 +56,33 @@ Smoke remains the default with its original 2-epoch arguments. Profile and datas
 purpose must match before model loading. Existing dataset role and leakage checks
 still apply. 146 automated tests pass without optional ML dependencies.
 
-Status at protocol commit: training not yet run; no quality gate passed.
+## Actual result
+
+The fixed 60-epoch CPU run completed in about 609 training seconds. best.pt SHA256:
+b17b03fedc380cb2115cdbea71135cbf15955dad42f08a5e4e836e8c1d28a255.
+last.pt SHA256:4367aacdf0e629fac95ee9b9d39e166f890ff92d26c2d68e63ad8c61a049cd54.
+The frozen 640/full-image box evaluation returned 0 TP, 0 FP and 10 FN on external
+validation: precision null (no predictions), recall zero. The earlier smoke model's
+82 false boxes fell to zero, but absence of predictions is not useful detection.
+
+| Existing source-point interval | Correct / visible | Wrong |
+| --- | ---: | ---: |
+| Lion 20–49 | 26/30 | 0 |
+| Lion 60–89 | 0/12 | 0 |
+| Getty 140–169 | 16/26 | 0 |
+| Getty 230–259 | 26/29 | 0 |
+| Getty 195–224 | 0/28 | 0 |
+| OpenTTGames test_2 combined | 0/72 | 0 |
+
+The fixed ROI-cropped 640 point evaluator found nearby candidates on 6/72 external
+references, without confirmed associations. Getty's 30 search-region negatives
+had no observed associations. These intervals overlap training/development data;
+they do not establish generalization. Candidate gates failed; do not integrate.
+Normal OpenCV tracking and the original smoke run remain unchanged.
+
+Local evaluation report SHA256:
+d0bfc9796e37b00672875fa26c7d970cccd7d8fe3fd444522c6f950a3a694130.
+Run receipt SHA256:ae1ccbec3b48513524d57f1d97daa46ddbd474f5286a17b639392bd7771f36ec.
+All raw reports/logs/weights remain outside Git in ball-development-run-v1 and
+ball-development-evaluation-v1.json. No post-result parameter sweep occurred.
+

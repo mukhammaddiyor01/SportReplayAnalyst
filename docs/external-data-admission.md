@@ -101,3 +101,45 @@ provenance and recording separation. More independent label review, training
 recording diversity and a frozen quality-training protocol remain necessary.
 The 38 existing manual boxes and 6 negatives from Getty/Lion remain the only
 reviewed YOLO data; this admission adds no fabricated training boxes.
+
+## Reserved manual box review and first YOLO box diagnosis
+
+The 15 prepared full images were manually inspected, followed by nearest-neighbor
+crops and visible-extent box overlays. Ten approximate boxes were retained at
+88,99,110,132,154,165,176,187,198,209. Frames 121,143,220,231,242 remain uncertain
+because visibility or extent could not be identified sufficiently; none became
+an invented negative or a point-centered square. The frame 99 lower box edge
+was refined to avoid including the table line before export/inference. Single
+reviewer only: these boxes still need independent review and are not expert truth.
+No YOLO predictions were used to construct or refine them. The source already
+had an OpenCV point diagnosis, so this is consumed evaluation/diagnostic material.
+
+Both source manifest and review declare intended_use=evaluation_only. The real
+export contained exactly 10 class-0 labels; 5 uncertain images were excluded.
+An attempted train assembly using that export was rejected before output creation.
+Training data remain Getty/Lion 38 boxes, 6 negatives and 9 uncertain extents;
+this source contributes a separate 10-box/5-uncertain evaluation-only review.
+
+Before its first YOLO box inference on this recording, a local protocol froze the
+review/export hashes, existing smoke best.pt SHA, confidence .25, match IoU .5,
+NMS IoU .7, image size 640, CPU/class 0 and max_det 100. All 10 full prepared images
+were processed offline. Result: TP 0, FP 82, FN 10; precision/recall zero, no cap
+reached. There are no explicit negative images in this export, so no negative-frame
+false-positive rate is established. No tuning, training or model promotion followed.
+This checkpoint remains unsuitable. No contact/rally inference is justified.
+
+Local files in the artifact folder (not redistributed in Git):
+
+- openttgames-test2-manual-box-review.json; SHA256
+  1d3dcb8bf1f03ba17b994b4627973d113cb54ae28a03041cd79af0476f5ad5bc.
+- openttgames-test2-manual-box-export/ with manifest/review provenance.
+- openttgames-test2-box-protocol.json; SHA256
+  9b7357dcb8f5bcfd72edd8a060146a4c565ad301fb4e84b0c89ae4591150da6f.
+- openttgames-test2-box-result.json; SHA256
+  47b9597b83ad02c5d313296f9355727aaf95f11ffb04b7beaebb48f02b4e8472.
+
+The application still uses OpenCV. Dataset tools now preserve/validate declared
+roles through exports and prevent reserved train membership; the trainer rechecks
+roles, and box reports retain them. All 144 tests pass; actual reserved export and
+train rejection were exercised separately from fixtures. Future work needs diverse
+training recordings and independent extent review, with this recording reserved.

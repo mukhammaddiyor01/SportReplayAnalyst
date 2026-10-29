@@ -9,7 +9,7 @@ import shutil
 import cv2
 
 from evaluation.ball_dataset import (MAX_BUNDLE_BYTES, MAX_IMAGE_BYTES, digest,
-                                     new_output, validate_review, yolo_line)
+                                     new_output, review_intended_use, validate_review, yolo_line)
 
 MAX_EXAMPLES = 2000
 
@@ -40,6 +40,7 @@ def load_export(directory):
             raise ValueError('Exported image dimensions do not match source provenance.')
         examples.append(dict(recording_id=manifest['recording_id'], source_sha256=manifest['source_sha256'],
             frame_index=index, image_sha256=frames[index]['image_sha256'],
+            intended_use=review_intended_use(manifest, review),
             pixel_sha256=hashlib.sha256(pixels.tobytes()).hexdigest(),
             timestamp_seconds=frames[index]['timestamp_seconds'], timestamp_source=frames[index]['timestamp_source'],
             visibility=label['visibility'], bbox=label['bbox'], image=image, text=expected))
@@ -53,6 +54,8 @@ def assemble(train, val, output):
         raise ValueError('Provide reviewed exports for both train and validation.')
     splits = {name:[e for directory in directories for e in load_export(directory)]
               for name, directories in [('train',train),('val',val)]}
+    if any(e['intended_use'] == 'evaluation_only' for e in splits['train']):
+        raise ValueError('Evaluation-only reviewed exports cannot enter the training split.')
     if sum(map(len, splits.values())) > MAX_EXAMPLES:
         raise ValueError('This local assembly is bounded to 2000 examples.')
     if sum(e['image'].stat().st_size for rows in splits.values() for e in rows) > MAX_BUNDLE_BYTES*4:

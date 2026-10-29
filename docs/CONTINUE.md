@@ -1,7 +1,7 @@
 # Continue Sports Replay Analyst
 
 Checkpoint: 2026-10-29. Data assembly and a real local YOLO smoke-training/evaluation
-flow are verified. 140 Python tests pass. Normal app tracking remains OpenCV.
+flow are verified. 144 Python tests pass. Normal app tracking remains OpenCV.
 Use README.md as the single current status/priority guide; this file is the handoff.
 
 ## Repository and working rules
@@ -231,3 +231,25 @@ hardcoded manual-label claim. 140 tests pass. Getty/Lion manual data remain
 38 boxes/6 negatives/9 uncertain; third-party point references add no YOLO boxes.
 Next: actual extent review with source/license provenance and more training
 recording diversity, while reserving separate untouched evaluation evidence.
+
+## Reserved external boxes and dataset roles (2026-10-29)
+
+Reviewed all 15 OpenTTGames admission PNGs: 10 approximate visible-extent boxes,
+5 uncertain (121,143,220,231,242), no negatives. Review JSON, crop/overlay checks,
+YOLO export and result/protocol files stay local with openttgames-test2 prefixes;
+see external-data-admission.md for exact hashes and source attribution. No external
+derivative numeric labels were committed. These are evaluation-only, not added
+to the Getty/Lion development totals (38 boxes/6 negatives/9 uncertain).
+First fixed real YOLO box run on these 10 frames: 0 TP /82 FP /10 FN, no cap reached.
+Confidence .25 /IoU .5; no retraining, sweep, box edits after inference or promotion.
+The old smoke checkpoint is still rejected; normal worker unchanged.
+Prepare now accepts --intended-use evaluation_only. Manifest/review flags combine
+conservatively; browser downloads omitting a role cannot downgrade the original
+manifest. Exports preserve effective roles, assembly rejects reserved train examples,
+and the trainer rechecks before loading weights. Unknown roles rejected; old
+unmarked files default to development. Val use allowed but consumes model-selection
+evidence. This metadata check is not a global or tamper-proof source registry.
+144 tests pass; actual 10-label export and attempted train rejection verified.
+Next: new training-recording diversity and independent extent review. Keep the
+entire OpenTTGames test_2 group reserved; do not repurpose it as training to improve
+its own result. Source/license metadata and owner-managed artifacts remain local.

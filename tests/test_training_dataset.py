@@ -11,14 +11,16 @@ from evaluation.training_dataset import assemble
 
 
 class TrainingDatasetTests(unittest.TestCase):
-    def export(self,root,name,value,*,group=None,source=None):
+    def export(self,root,name,value,*,group=None,source=None,intended_use=None,reserved_manifest=False):
         bundle=root/(name+'-bundle');bundle.mkdir()
         image=bundle/'frame-000001.png'
         cv2.imwrite(str(image),np.full((40,80,3),value,np.uint8))
         m=dict(schema_version=1,recording_id=group or name,source_sha256=source or (hex(value)[2:]*64)[:64],
                source_dimensions=[80,40],coordinate_space='source_image_xyxy',frames=[dict(frame_index=1,
                filename=image.name,image_sha256=digest(image),timestamp_seconds=.1,timestamp_source='presentation')])
-        review={k:v for k,v in m.items() if k!='frames'}
+        if reserved_manifest:m['intended_use']='evaluation_only'
+        review={k:v for k,v in m.items() if k not in ('frames','intended_use')}
+        if intended_use is not None:review['intended_use']=intended_use
         review['labels']=[dict(frame_index=1,image_sha256=digest(image),visibility='visible',bbox=[10,5,30,15])]
         (bundle/'manifest.json').write_text(json.dumps(m));label=root/(name+'.json');label.write_text(json.dumps(review))
         output=root/(name+'-export');export_review(bundle,label,output)
@@ -88,3 +90,38 @@ class TrainingDatasetTests(unittest.TestCase):
             report['splits']['train']['examples'][0]['recording_id']='../outside'
             (dataset/'dataset.json').write_text(json.dumps(report))
             with self.assertRaisesRegex(ValueError,'source-frame identity'):check_dataset(dataset)
+
+    def test_evaluation_only_export_is_allowed_for_val_but_not_train(self):
+        with TemporaryDirectory() as directory:
+            root=Path(directory)
+            development=self.export(root,'development',10)
+            evaluation=self.export(root,'evaluation',20,intended_use='evaluation_only')
+            with self.assertRaisesRegex(ValueError,'Evaluation-only'):
+                assemble([evaluation],[development],root/'rejected')
+            self.assertFalse((root/'rejected').exists())
+            result=assemble([development],[evaluation],root/'accepted')
+            self.assertEqual(result['splits']['val']['examples'][0]['intended_use'],'evaluation_only')
+
+    def test_source_manifest_reservation_survives_review_without_marker(self):
+        with TemporaryDirectory() as directory:
+            root=Path(directory)
+            reserved=self.export(root,'reserved',10,reserved_manifest=True)
+            ordinary=self.export(root,'ordinary',20)
+            with self.assertRaisesRegex(ValueError,'Evaluation-only'):
+                assemble([reserved],[ordinary],root/'rejected')
+
+    def test_unknown_use_cannot_silently_become_training_data(self):
+        with TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError,'intended use'):
+                self.export(Path(directory),'bad',10,intended_use='evaluation-onyl')
+
+    def test_training_rechecks_reserved_role_in_assembled_manifest(self):
+        from evaluation.train_ball_model import check_dataset
+        with TemporaryDirectory() as directory:
+            root=Path(directory);a=self.export(root,'one',10);b=self.export(root,'two',20)
+            dataset=root/'dataset';assemble([a],[b],dataset)
+            report=json.loads((dataset/'dataset.json').read_text())
+            report['splits']['train']['examples'][0]['intended_use']='evaluation_only'
+            (dataset/'dataset.json').write_text(json.dumps(report))
+            with self.assertRaisesRegex(ValueError,'Evaluation-only'):
+                check_dataset(dataset)

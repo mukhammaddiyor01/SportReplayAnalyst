@@ -66,7 +66,12 @@ an accepted 256-frame local CFR prefix and a fixed external-point diagnosis:
 0/72 matched observations, 2 outside-ROI exclusions. Its model-aided points are not
 YOLO boxes or independent expert truth. Keep this recording out of training while
 evaluating on it; the prefix is now inspected. No data was redistributed. See
-docs/external-data-admission.md. Latest suite: 140 tests. Source-timed gap review now groups
+docs/external-data-admission.md. A later single-reviewer local extent review adds
+10 reserved evaluation boxes and 5 uncertain frames on that source; fixed YOLO box
+scoring yielded 0 TP /82 FP /10 FN. No external labels were committed. Dataset tools
+now preserve evaluation_only declarations and refuse reserved train examples;
+the trainer rechecks roles. This metadata guard does not prove independence.
+Latest suite: 144 tests. Source-timed gap review now groups
 missing observations and supports browser seek navigation. These intervals are evidence-review aids, not detected sports events.
 See docs/tracking-review.md. Contact/rally inference still requires independent evidence. No table-contact or rally analysis is implemented.
 Do not describe experimental tracking as generally reliable or claim that event detection works. Implement subsequent

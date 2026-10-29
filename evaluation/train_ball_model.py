@@ -30,6 +30,12 @@ def check_dataset(dataset):
             raise ValueError('Train/validation recording, source or image overlap.')
     for name in ('train','val'):
         rows = splits[name]['examples']
+        for example in rows:
+            intended_use = example.get('intended_use', 'development')
+            if intended_use not in ('development', 'evaluation_only'):
+                raise ValueError('Invalid declared intended use in assembled dataset.')
+            if name == 'train' and intended_use == 'evaluation_only':
+                raise ValueError('Evaluation-only examples cannot enter model training.')
         if not rows or not any(e['visibility']=='visible' for e in rows):
             raise ValueError('Both splits need reviewed visible balls.')
         actual = sorted((dataset/'images'/name).glob('*.png'))

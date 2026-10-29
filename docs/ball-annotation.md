@@ -112,3 +112,29 @@ membership and the measured 31-image detector report remain frozen. Independent
 label review, additional recordings and a separately frozen quality-training
 protocol are still needed. The last application suite passed 139 tests; this
 annotation-only increment was verified through real exports, not new rule tests.
+
+## Reserving an evaluation recording
+
+The prepare command accepts --intended-use evaluation_only (default development).
+The marker is stored in the source manifest. A review JSON may also declare
+intended_use; either file declaring evaluation_only keeps the effective role
+reserved. A downloaded browser re-review omitting the field cannot downgrade the
+unchanged source manifest. Unknown role strings are rejected, not silently defaulted.
+Existing files without a marker remain development inputs for compatibility.
+
+```bash
+.venv/bin/python -m evaluation.ball_dataset prepare /path/to/clip.avi --recording-id reserved-recording --intended-use evaluation_only --start 88 --stop 243 --stride 11 --output /path/to/new-review
+```
+
+Export provenance retains both source/review metadata; the dataset assembler records
+the effective intended_use per example and rejects reserved examples in train
+before creating output. The trainer checks this role again before loading weights.
+Reserved examples may be used in val, but using them for checkpoint selection
+consumes them as validation; they are not untouched final-test evidence afterward.
+Keep related clips under the same recording group. This is an accidental-mixing
+check on declared metadata, not proof of independence or a tamper-proof registry.
+
+A real reserved OpenTTGames export was checked: 10 visible labels exported, 5
+uncertain excluded; attempted train assembly was rejected with no output created.
+Manual review data/license attribution stay outside Git; see external-data-admission.md.
+144 tests cover the new role checks and prior functionality. No app UI changed.

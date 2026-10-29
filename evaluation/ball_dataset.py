@@ -34,9 +34,10 @@ def new_output(path):
     return path
 
 
-def prepare(video, output, recording_id, start, stop, stride=1):
+def prepare(video, output, recording_id, start, stop, stride=1, *, intended_use='development'):
     if not SLUG.fullmatch(recording_id) or not (0 <= start < stop <= 7200 and stride >= 1):
         raise ValueError('Use a recording slug and a bounded nonempty source-frame range.')
+    review_intended_use({'intended_use': intended_use}, {})
     selected = set(range(start, stop, stride))
     if len(selected) > MAX_FRAMES:
         raise ValueError('Prepare at most 120 frames per review bundle.')
@@ -45,7 +46,7 @@ def prepare(video, output, recording_id, start, stop, stride=1):
     source_sha = digest(video)
     output = new_output(output)
     manifest = dict(schema_version=1, recording_id=recording_id, source_sha256=source_sha,
-                    coordinate_space='source_image_xyxy', frames=[])
+                    coordinate_space='source_image_xyxy', intended_use=intended_use, frames=[])
     reader = read_frames(video)
     total_bytes = 0
     try:
@@ -80,11 +81,20 @@ def prepare(video, output, recording_id, start, stop, stride=1):
         reader.close()
 
 
+def review_intended_use(manifest, review):
+    uses = [value.get('intended_use', 'development') for value in (manifest, review)]
+    if any(value not in ('development', 'evaluation_only') for value in uses):
+        raise ValueError('Use development or evaluation_only as the declared intended use.')
+    # A browser re-review cannot remove a reservation carried by its source manifest.
+    return 'evaluation_only' if 'evaluation_only' in uses else 'development'
+
+
 def validate_review(manifest, review):
     if (manifest.get('schema_version') != 1 or review.get('schema_version') != 1 or
             manifest.get('coordinate_space') != 'source_image_xyxy' or
             review.get('coordinate_space') != 'source_image_xyxy'):
         raise ValueError('Use source-image bounding-box review format version 1.')
+    review_intended_use(manifest, review)
     for key in ('recording_id', 'source_sha256', 'source_dimensions'):
         if review.get(key) != manifest.get(key):
             raise ValueError('Labels belong to another source or recording.')
@@ -191,6 +201,7 @@ def main():
     prep.add_argument('video', type=Path)
     prep.add_argument('--output', type=Path, required=True)
     prep.add_argument('--recording-id', required=True)
+    prep.add_argument('--intended-use', choices=('development', 'evaluation_only'), default='development')
     prep.add_argument('--start', type=int, required=True)
     prep.add_argument('--stop', type=int, required=True, help='Exclusive decoded frame index.')
     prep.add_argument('--stride', type=int, default=1)
@@ -201,7 +212,8 @@ def main():
     args = parser.parse_args()
     try:
         if args.command == 'prepare':
-            result = prepare(args.video, args.output, args.recording_id, args.start, args.stop, args.stride)
+            result = prepare(args.video, args.output, args.recording_id, args.start, args.stop, args.stride,
+                             intended_use=args.intended_use)
             print(f"Prepared {len(result['frames'])} exact decoded frames.")
         else:
             result = export_review(args.bundle, args.labels, args.output)

@@ -13,6 +13,7 @@ FastAPI/Jinja2 and plain HTML/CSS/JavaScript. Video processing stays on this com
 | Ball tracking | Experimental OpenCV candidates, temporal association and observed-only 2D trail |
 | Neural detector | Optional local YOLO baseline/training/evaluation; no model promoted |
 | Training data | 38 manual boxes, 6 full-frame negatives, 9 uncertain extents, 2 recordings; still insufficient |
+| Reserved box evaluation | 10 local manual boxes, 5 uncertain extents from OpenTTGames test_2; evaluation_only, excluded from training |
 | Contacts and rallies | Not implemented; require stronger ball and independent interaction evidence |
 
 The current bottleneck is ball detection beyond the initial Getty footage. The
@@ -88,7 +89,8 @@ Assemble reviewed exports by recording, without a random neighboring-frame split
 ```
 
 Shared recording IDs, source hashes, image hashes, identical decoded pixels and
-modified labels are rejected. Related excerpts/transcodes must keep the same
+modified labels are rejected. Exports marked evaluation_only are refused in train;
+the role is checked again before model loading. Related excerpts/transcodes must keep the same
 recording ID. The generated data.yaml and dataset.json stay outside Git.
 
 Install requirements-yolo.txt in a **separate** Python 3.12 environment; do not mix
@@ -196,8 +198,9 @@ timing evaluation meeting predeclared criteria, followed by browser verification
 [A third recording admission](docs/external-data-admission.md) now supplies a
 verified 256-frame OpenTTGames prefix and external point references. Fixed OpenCV
 diagnosis missed all 72 scored references (2 out-of-ROI exclusions); no model was
-promoted. The external coordinates are not reviewed YOLO extent boxes, and this
-prefix is now consumed diagnostic material rather than untouched validation.
+promoted. A separate 10-box manual evaluation export is now reserved from training; its
+first fixed YOLO diagnosis found 0 matches and 82 false boxes. External points were
+not converted into boxes. This is consumed diagnostic material, not untouched validation.
 
 [Recording inventory and timing diagnostics](docs/tracking-evaluation.md) now
 record prior exposure and source-time loss/reacquisition measurements. Regressions
@@ -222,7 +225,7 @@ rally implementation is justified by the present dataset.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-140 automated tests pass without torch, a GPU or model downloads. The annotation
+144 automated tests pass without torch, a GPU or model downloads. The annotation
 browser→JSON→YOLO export and the real local training/evaluation path were also
 exercised. These checks do not establish general tracking accuracy.
 

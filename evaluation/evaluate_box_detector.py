@@ -123,7 +123,8 @@ def evaluate(exports, model_path, model_sha256, *, ball_class=0):
             score = score_box_frame(example['bbox'], predictions, dimensions, ball_class=ball_class)
             frames.append(dict(recording_id=example['recording_id'],
                                source_sha256=example['source_sha256'], frame_index=example['frame_index'],
-                               image_sha256=example['image_sha256'], source_dimensions=dimensions,
+                               image_sha256=example['image_sha256'], intended_use=example['intended_use'],
+                               source_dimensions=dimensions,
                                timestamp_seconds=example['timestamp_seconds'],
                                timestamp_source=example['timestamp_source'], visibility=example['visibility'],
                                detection_limit_reached=len(predictions) >= MAX_DETECTIONS, **score))

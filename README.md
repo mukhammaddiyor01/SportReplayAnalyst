@@ -13,7 +13,7 @@ FastAPI/Jinja2 and plain HTML/CSS/JavaScript. Video processing stays on this com
 | Ball tracking | Experimental OpenCV candidates, temporal association and observed-only 2D trail |
 | Neural detector | Optional local YOLO baseline/training/evaluation; no model promoted |
 | Assembled training data | 45 manual boxes, 6 full-frame negatives, 3 recording groups; still insufficient |
-| Additional training source | 7 local OpenTTGames game_1 boxes, 10 uncertain; assembled into dataset v2, not yet trained |
+| Additional training source | 7 local OpenTTGames game_1 boxes, 10 uncertain; dataset v2 trained and evaluated, quality gate failed |
 | Reserved box evaluation | 10 local manual boxes, 5 uncertain extents from OpenTTGames test_2; evaluation_only, excluded from training |
 | Contacts and rallies | Not implemented; require stronger ball and independent interaction evidence |
 
@@ -221,7 +221,9 @@ fresh independent benchmark.
 A second assembled dataset now includes 7 manually reviewed game_1 boxes: 51
 training images (45 visible, 6 negative) across three recording groups, with the
 same 10 reserved test_2 validation images. Trainer preflight verified image/label
-integrity and split roles. It has not been trained; no improvement is claimed.
+integrity and split roles. The fixed 60-epoch run completed: external correct
+observations rose from 1/72 to 24/72 and box matches reached 5/10, but the gate
+failed and some Getty/Lion intervals regressed. The model remains offline.
 See [dataset v2 review](docs/development-dataset-v2.md).
 
 Continue stages 1–2 with data review. The Getty/Lion portion contains 38 visible
@@ -241,7 +243,7 @@ rally implementation is justified by the present dataset.
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-149 automated tests pass without torch, a GPU or model downloads. The annotation
+149 automated tests passed again on 2026-11-04 without torch, a GPU or model downloads. The annotation
 browser→JSON→YOLO export and the real local training/evaluation path were also
 exercised. These checks do not establish general tracking accuracy.
 

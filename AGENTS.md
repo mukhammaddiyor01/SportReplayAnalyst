@@ -227,3 +227,9 @@ Local dataset v2 assembled and trainer preflight verified: 45 visible + 6 negati
 train examples across Getty/Lion/game_1; 10 reserved test_2 validation boxes.
 No new training or detector promotion. Prior experiments remain frozen. See
 docs/development-dataset-v2.md and the last CONTINUE entry before proceeding.
+
+
+Dataset v2 subsequently completed its frozen 60-epoch run and full-frame evaluation:
+external24/72 correct (was1), boxes5/10, but several Getty/Lion regressions and one
+wrong Lion review observation. Gate failed, no promotion. 149 tests passed again.
+See the actual-result section in docs/development-dataset-v2.md and latest handoff.

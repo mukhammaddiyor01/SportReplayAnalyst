@@ -331,3 +331,26 @@ Latest automated suite remains the earlier 149 passed; data-only change verified
 through real export/assembly/trainer preflight instead of rerunning unrelated tests.
 Next: freeze v2 full-frame training/evaluation protocol before training, preserve
 old results and evaluation-only split. Contacts/rallies still not implemented.
+
+
+## Dataset v2 training and evaluation completed (2026-11-04)
+
+Protocol frozen in commit 845aa57 before training. Recreated separate optional
+temporary environment (sra-yolo-20261104); pip check passed, top-level package
+pins unchanged; transitive versions captured locally. Offline 60-epoch run v2
+completed in about 674 training seconds. Dataset SHA remains 2bebeab6...c33e5;
+best.pt SHA75de45504b426af2aab22d8f7357105bfa66cf432ce7a4d148b51a18e3ee900f.
+Full hashes/results and frozen gate: development-dataset-v2.md. Actual local
+ball-development-evaluation-v2.json SHA256:
+f479847dbf44d4805a981fac55d6d9a6b478074e0d5315e5b2a99c5d66bc4c88.
+Fixed source_frame/960: external boxes5TP/0FP/5FN; points30/72near,24/72correct,
+0wrong (prior same-input v1 1/72correct). Gate FAILED: missed box/coverage/association
+requirements and Getty/Lion regressions. Getty correct19/26,23/29,1/28; negatives
+0observed/30. Lion development27/30 (was30), review2/12 with1wrong (was0wrong).
+Do not cherry-pick external improvement as ready/general reliability. No promotion;
+normal worker unchanged. Model not used for contacts/rallies. No sweep/relabeling.
+149 tests passed again, normal .venv still no torch/Ultralytics. All raw artifacts
+outside Git; original experiments preserved. Training/evaluation sessions finished.
+Next: additional diverse visible extents and hard negatives for missed appearances,
+preserving Getty/Lion coverage; reserve new independent final evidence, keep test_2
+out of gradients. Any next run needs new frozen protocol. Contacts/rallies still open.

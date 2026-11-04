@@ -53,3 +53,35 @@ Local artifact basenames:
 Next: freeze a v2 run/evaluation protocol using the full-frame input contract before
 training. Keep the previous dataset/checkpoints/reports unchanged. This small data
 increment cannot establish general tracking reliability or justify event inference.
+
+
+## Frozen v2 training/evaluation protocol (before training)
+
+One run of the unchanged development_v1 profile: 60 epochs, full-frame 960 input,
+CPU, batch 4, 4 Torch threads, seed 0, frozen first 10 layers, AdamW lr .001,
+no geometric augmentation; all other parameters match development-finetune-v1.md.
+Start from the same official YOLO11n base, SHA256
+0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1.
+Use the assembled v2 dataset above. Preserve the old run and start a new output.
+
+Evaluation uses source_frame/960, confidence .25, NMS IoU .7, box matching IoU .5
+and existing 8px center references. Compare directly to the saved v1 full-frame
+report on the same Getty/Lion/external intervals. This is a reused diagnostic,
+not independent validation. No threshold sweeps or post-inference label edits.
+
+The diagnostic gate requires all of:
+
+- At least 8/10 external box matches and precision at least .8.
+- External candidate coverage at least .8 and correct associations at least .7
+  of 72 visible references, with at most 2 wrong observations.
+- No observations on the existing Getty negative interval.
+- No Getty/Lion sequence loses correct observations or increases wrong observations
+  relative to the prior source_frame/960 report.
+
+Passing this gate alone does not establish general reliability or qualify contact/
+rally inference; independent final evaluation and bounded worker checks still apply.
+Training and scoring run offline with socket connections blocked. The optional ML
+environment is separate from the app. No input footage is sent to model services.
+
+Local frozen ball-development-protocol-v2.json SHA256:
+2818897060068c7886237a3a891176fa48a82cf962b0c2015fd4db0ac5800760.

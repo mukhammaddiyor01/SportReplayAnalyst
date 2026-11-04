@@ -12,8 +12,8 @@ FastAPI/Jinja2 and plain HTML/CSS/JavaScript. Video processing stays on this com
 | Background processing | Working: bounded workers, progress, cancel, expiry and cleanup |
 | Ball tracking | Experimental OpenCV candidates, temporal association and observed-only 2D trail |
 | Neural detector | Optional local YOLO baseline/training/evaluation; no model promoted |
-| Training data | 38 manual boxes, 6 full-frame negatives, 9 uncertain extents, 2 recordings; still insufficient |
-| Additional training-source pilot | 3 local OpenTTGames game_1 boxes, 3 uncertain; not yet trained, separate from frozen runs |
+| Assembled training data | 45 manual boxes, 6 full-frame negatives, 3 recording groups; still insufficient |
+| Additional training source | 7 local OpenTTGames game_1 boxes, 10 uncertain; assembled into dataset v2, not yet trained |
 | Reserved box evaluation | 10 local manual boxes, 5 uncertain extents from OpenTTGames test_2; evaluation_only, excluded from training |
 | Contacts and rallies | Not implemented; require stronger ball and independent interaction evidence |
 
@@ -162,8 +162,8 @@ OpenCV baseline and failures. Current results do not meet this gate.
 - Freeze dataset versions, local model checksum, training settings, resource bounds,
   detection/association metrics and promotion criteria before training.
 - Train locally in the separate PyTorch/Ultralytics environment. The existing fixed
-  2-epoch smoke command tests the pipeline; a quality-training protocol still needs
-  to be defined and implemented explicitly. Do not silently enlarge that smoke run.
+  2-epoch smoke command tests the pipeline; the explicit 60-epoch development
+  profile has completed once and failed its quality gate. Preserve that run when training a new dataset version.
 - Measure box detection and false candidates separately from temporal association.
   Compare against OpenCV on the same fixed data, then evaluate untouched recordings.
 - Integrate only a qualifying local checkpoint through an adapter and bounded worker;
@@ -218,8 +218,14 @@ preserve the existing Getty/Lion observation counts; Lion still has no confirmed
 observations on its 30 development frames. These are development checks, not a
 fresh independent benchmark.
 
-Continue stages 1–2 with data review. Current labels total 38 visible boxes, 6
-full-frame negatives and 9 uncertain extents across 2 already-inspected recordings.
+A second assembled dataset now includes 7 manually reviewed game_1 boxes: 51
+training images (45 visible, 6 negative) across three recording groups, with the
+same 10 reserved test_2 validation images. Trainer preflight verified image/label
+integrity and split roles. It has not been trained; no improvement is claimed.
+See [dataset v2 review](docs/development-dataset-v2.md).
+
+Continue stages 1–2 with data review. The Getty/Lion portion contains 38 visible
+boxes, 6 full-frame negatives and 9 uncertain extents across 2 inspected recordings.
 The later development increments are in evaluation/getty-box-expansion.json,
 getty-negative-pilot.json and lion-box-expansion-a.json / lion-box-expansion-b.json.
 These increments entered the separate development v1 training set; the Lion

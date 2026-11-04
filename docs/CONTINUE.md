@@ -311,3 +311,23 @@ beyond the prior Getty/Lion38, preserving the frozen development-v1 dataset/run.
 No external data or derivative numeric labels entered Git. Source license attribution
 remains in local provenance. More representative training data and independent
 extent review are still needed; no contacts/rallies were implemented.
+
+## Training dataset v2 assembled (2026-11-04)
+
+Read AGENTS and existing handoff before continuing stages 1–2. Completed all 17
+prepared game_1 reviews: 7 visible boxes, 10 uncertain; four new visible extents at
+74/89/119/209 checked in full-image/crop/rectangle overlays, other seven newly
+reviewed frames remain uncertain, no new negatives. Source/model/license rules
+unchanged; no external derivative labels entered Git. Original three-box review
+and frozen v1 experiments preserved. See development-dataset-v2.md for artifacts,
+source/review/dataset hashes and limitations. Local export-v2 has 7 examples.
+Assembled ball-development-dataset-v2: 51 train images (45 visible, 6 negative)
+across Getty/Lion/game_1, same 10 reserved test_2 val boxes. Actual assembler and
+trainer check_dataset preflight passed all integrity/role checks. Dataset SHA256
+2bebeab6563d5a8bee14a0def51d3e87321286f658af76cefe7f20aef12c33e5.
+No new training/inference occurred; optional temporary YOLO environment from
+October 29 no longer exists. Recreate separately if training; normal app unaffected.
+Latest automated suite remains the earlier 149 passed; data-only change verified
+through real export/assembly/trainer preflight instead of rerunning unrelated tests.
+Next: freeze v2 full-frame training/evaluation protocol before training, preserve
+old results and evaluation-only split. Contacts/rallies still not implemented.

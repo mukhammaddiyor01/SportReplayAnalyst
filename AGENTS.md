@@ -219,3 +219,11 @@ and `develop`. Keep `master` at the completed initial setup; subsequent
 implementation commits and pushes belong only on `develop`. Do not advance
 `master` afterward without a separate explicit instruction. Never force push.
 Deployment is outside the authorized scope.
+
+## Latest data checkpoint (2026-11-04)
+
+Game_1 review now covers all 17 prepared frames: 7 visible extents, 10 uncertain.
+Local dataset v2 assembled and trainer preflight verified: 45 visible + 6 negative
+train examples across Getty/Lion/game_1; 10 reserved test_2 validation boxes.
+No new training or detector promotion. Prior experiments remain frozen. See
+docs/development-dataset-v2.md and the last CONTINUE entry before proceeding.
